@@ -86,6 +86,16 @@ class OpeningHours
         return $this->isOpenOn($day);
     }
 
+    public function isOpen(): bool
+    {
+        return $this->isOpenAt(new DateTime());
+    }
+
+    public function isClosed(): bool
+    {
+        return $this->isClosedAt(new DateTime());
+    }
+
     protected function parseOpeningHoursAndExceptions(array $data): array
     {
         $openingHours = Day::mapDays(function ($day) use ($data) {
