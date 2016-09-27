@@ -2,6 +2,8 @@
 
 namespace Spatie\OpeningHours;
 
+use Spatie\OpeningHours\Exceptions\InvalidTimeString;
+
 class Time
 {
     /** @var int */
@@ -13,10 +15,10 @@ class Time
         $this->minutes = $minutes;
     }
 
-    public static function fromString(string $string)
+    public static function fromString(string $string): self
     {
         if (! preg_match('/^([0-1][0-9])|(2[0-4]):[0-5][0-9]$/', $string)) {
-            throw new \InvalidArgumentException();
+            throw InvalidTimeString::forString($string);
         }
 
         list($hours, $minutes) = explode(':', $string);
@@ -24,19 +26,14 @@ class Time
         return new self($hours, $minutes);
     }
 
-    /**
-     * @param \DateTime $dateTime
-     *
-     * @return \Spatie\OpeningHours\Time
-     */
-    public static function fromDateTime(\DateTime $dateTime)
+    public static function fromDateTime(\DateTime $dateTime): self
     {
-        return static::fromString($dateTime->format('H:i'));
+        return self::fromString($dateTime->format('H:i'));
     }
 
     public function isSame(Time $time): bool
     {
-        return $this->hours === $time->hours && $this->minutes === $time->minutes;
+        return (string) $this === (string) $time;
     }
 
     public function isAfter(Time $time): bool
@@ -48,11 +45,6 @@ class Time
         return $this->hours >= $time->hours && $this->minutes >= $time->minutes;
     }
 
-    public function isSameOrAfter(Time $time): bool
-    {
-        return $this->isSame($time) || $this->isAfter($time);
-    }
-
     public function isBefore(Time $time): bool
     {
         if ($this->isSame($time)) {
@@ -60,6 +52,11 @@ class Time
         }
 
         return ! $this->isAfter($time);
+    }
+
+    public function isSameOrAfter(Time $time): bool
+    {
+        return $this->isSame($time) || $this->isAfter($time);
     }
 
     public function __toString()

@@ -2,6 +2,8 @@
 
 namespace Spatie\OpeningHours;
 
+use Spatie\OpeningHours\Exceptions\InvalidTimeRangeString;
+
 class TimeRange
 {
     /** @var \Spatie\OpeningHours\Time */
@@ -13,30 +15,32 @@ class TimeRange
         $this->end = $end;
     }
 
-    public static function fromString(string $string)
+    public static function fromString(string $string): self
     {
-        $string = str_replace(' ', '', $string);
         $times = explode('-', $string);
 
         if (count($times) !== 2) {
-            throw new \InvalidArgumentException();
+            throw InvalidTimeRangeString::forString($string);
         }
 
-        return new static(Time::fromString($times[0]), Time::fromString($times[1]));
-    }
-
-    public function containsTime(Time $time): bool
-    {
-        if ($this->spillsOverToNextDay()) {
-            return $time->isSameOrAfter($this->start) && $time->isAfter($this->end);
-        }
-
-        return $time->isSameOrAfter($this->start) && $time->isBefore($this->end);
+        return new self(Time::fromString($times[0]), Time::fromString($times[1]));
     }
 
     public function spillsOverToNextDay(): bool
     {
         return $this->end->isBefore($this->start);
+    }
+
+    public function containsTime(Time $time): bool
+    {
+        if ($this->spillsOverToNextDay()) {
+            if ($time->isAfter($this->start)) {
+                return $time->isAfter($this->end);
+            }
+            return $time->isBefore($this->end);
+        }
+
+        return $time->isSameOrAfter($this->start) && $time->isBefore($this->end);
     }
 
     public function __toString()
