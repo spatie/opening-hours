@@ -1,0 +1,41 @@
+{
+    "name": "spatie/opening-hours",
+    "description": "A helper to query and format a set of opening hours",
+    "keywords": [
+        "spatie",
+        "opening-hours"
+    ],
+    "homepage": "https://github.com/spatie/opening-hours",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Sebastian De Deyne",
+            "email": "sebastian@spatie.be",
+            "homepage": "https://spatie.be",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^7.0",
+        "nesbot/carbon": "^1.21"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "5.*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Spatie\\OpeningHours\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Spatie\\OpeningHours\\Test\\": "tests"
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit"
+    },
+    "config": {
+        "sort-packages": true
+  }
+}
