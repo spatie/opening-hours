@@ -42,4 +42,19 @@ class TimeRangeTest extends PHPUnit_Framework_TestCase
         $this->assertFalse(TimeRange::fromString('18:00-01:00')->containsTime(Time::fromString('17:00')));
         $this->assertFalse(TimeRange::fromString('18:00-01:00')->containsTime(Time::fromString('02:00')));
     }
+
+    /** @test */
+    public function it_can_determine_that_it_overlaps_another_time_range()
+    {
+        $this->assertTrue(TimeRange::fromString('16:00-18:00')->overlaps(TimeRange::fromString('15:00-17:00')));
+        $this->assertTrue(TimeRange::fromString('16:00-18:00')->overlaps(TimeRange::fromString('17:00-19:00')));
+        $this->assertTrue(TimeRange::fromString('16:00-18:00')->overlaps(TimeRange::fromString('17:00-17:30')));
+
+        $this->assertTrue(TimeRange::fromString('22:00-02:00')->overlaps(TimeRange::fromString('21:00-23:00')));
+        $this->assertTrue(TimeRange::fromString('22:00-02:00')->overlaps(TimeRange::fromString('01:00-02:00')));
+        $this->assertTrue(TimeRange::fromString('22:00-02:00')->overlaps(TimeRange::fromString('23:00-23:30')));
+
+        $this->assertFalse(TimeRange::fromString('16:00-18:00')->overlaps(TimeRange::fromString('14:00-15:00')));
+        $this->assertFalse(TimeRange::fromString('16:00-18:00')->overlaps(TimeRange::fromString('19:00-20:00')));
+    }
 }

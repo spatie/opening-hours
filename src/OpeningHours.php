@@ -51,7 +51,7 @@ class OpeningHours
 
     public function forDate(DateTime $date): OpeningHoursForDay
     {
-        return $this->exceptions[$date->format('Y-m-d')] ?? $this->forDay(Day::forDateTime($date));
+        return $this->exceptions[$date->format('Y-m-d')] ?? $this->forDay(Day::onDateTime($date));
     }
 
     public function isOpenAt(DateTime $dateTime): bool

@@ -37,13 +37,7 @@ class Day
         return in_array($day, static::days());
     }
 
-    /**
-     *
-     * @param \DateTime $dateTime
-     *
-     * @return static
-     */
-    public static function forDateTime(DateTime $dateTime)
+    public static function onDateTime(DateTime $dateTime): string
     {
         return static::days()[$dateTime->format('N') - 1];
     }

@@ -4,6 +4,7 @@ namespace Spatie\OpeningHours;
 
 use ArrayAccess;
 use Countable;
+use Spatie\OpeningHours\Exceptions\OverlappingTimeRanges;
 
 class OpeningHoursForDay implements ArrayAccess, Countable
 {
@@ -63,5 +64,15 @@ class OpeningHoursForDay implements ArrayAccess, Countable
 
     protected function guardAgainstTimeRangeOverlaps(array $openingHours)
     {
+        foreach ($openingHours as $i => $currentTimeRange) {
+            foreach ($openingHours as $j => $timeRange) {
+                if ($i === $j) {
+                    continue;
+                }
+                if ($currentTimeRange->overlaps($timeRange)) {
+                    throw OverlappingTimeRanges::forRanges($currentTimeRange, $timeRange);
+                }
+            }
+        }
     }
 }
