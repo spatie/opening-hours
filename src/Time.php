@@ -2,6 +2,7 @@
 
 namespace Spatie\OpeningHours;
 
+use DateTime;
 use Spatie\OpeningHours\Exceptions\InvalidTimeString;
 
 class Time
@@ -26,7 +27,7 @@ class Time
         return new self($hours, $minutes);
     }
 
-    public static function fromDateTime(\DateTime $dateTime): self
+    public static function fromDateTime(DateTime $dateTime): self
     {
         return self::fromString($dateTime->format('H:i'));
     }
@@ -57,6 +58,11 @@ class Time
     public function isSameOrAfter(Time $time): bool
     {
         return $this->isSame($time) || $this->isAfter($time);
+    }
+
+    public function toDateTime(): DateTime
+    {
+        return new DateTime("1970-01-01 {$this}:00");
     }
 
     public function __toString()

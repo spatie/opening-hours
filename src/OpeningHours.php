@@ -61,6 +61,21 @@ class OpeningHours
         return $openingHoursForDay->isOpenAt(Time::fromDateTime($dateTime));
     }
 
+    public function isClosedAt(DateTime $dateTime): bool
+    {
+        return ! $this->isOpenAt($dateTime);
+    }
+
+    public function isOpenOn(string $day): bool
+    {
+        return count($this->forDay($day)) > 0;
+    }
+
+    public function isClosedOn(string $day): bool
+    {
+        return $this->isOpenOn($day);
+    }
+
     protected function setOpeningHoursFromStrings(string $day, array $openingHours)
     {
         $this->guardAgainstInvalidDay($day);

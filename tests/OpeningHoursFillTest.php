@@ -2,6 +2,7 @@
 
 namespace Spatie\OpeningHours\Test;
 
+use DateTime;
 use Spatie\OpeningHours\OpeningHours;
 use Spatie\OpeningHours\TimeRange;
 
@@ -16,6 +17,9 @@ class OpeningHoursFillTest extends \PHPUnit_Framework_TestCase
             'wednesday' => ['09:00-12:00', '14:00-18:00'],
             'thursday' => [],
             'friday' => ['09:00-20:00'],
+            'exceptions' => [
+                '2016-09-26' => [],
+            ],
         ]);
 
         $this->assertInstanceOf(TimeRange::class, $openingHours->forDay('monday')[0]);
@@ -30,14 +34,11 @@ class OpeningHoursFillTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf(TimeRange::class, $openingHours->forDay('wednesday')[1]);
         $this->assertEquals((string) $openingHours->forDay('wednesday')[1], '14:00-18:00');
 
-        $this->assertEmpty($openingHours->forDay('thursday'));
+        $this->assertCount(0, $openingHours->forDay('thursday'));
 
         $this->assertInstanceOf(TimeRange::class, $openingHours->forDay('friday')[0]);
         $this->assertEquals((string) $openingHours->forDay('friday')[0], '09:00-20:00');
-    }
 
-    public function it_fills_exceptions()
-    {
-
+        $this->assertCount(0, $openingHours->forDate(new DateTime('2016-09-26 11:00:00')));
     }
 }

@@ -26,6 +26,16 @@ class TimeRange
         return new self(Time::fromString($times[0]), Time::fromString($times[1]));
     }
 
+    public function start(): Time
+    {
+        return $this->start;
+    }
+
+    public function end(): Time
+    {
+        return $this->end;
+    }
+
     public function spillsOverToNextDay(): bool
     {
         return $this->end->isBefore($this->start);
