@@ -50,10 +50,17 @@ $openingHours->isOpenAt(new DateTime('2016-12-25')); // false
 It can also return arrays of opening hours for a week or a day:
 
 ```php
-$openingHours->forDay('monday'); // TimeRange[] for the regular schedule
-$openingHours->forWeek(); // TimeRange[][] for the regular schedule, keyed by day name
-$openingHours->forDate(new DateTime('2016-12-25')); // TimeRange[] for a specific day
-$openingHours->exceptions(); // TimeRange[][] of all exceptions, keyed by date
+// TimeRange[] for the regular schedule
+$openingHours->forDay('monday');
+
+// TimeRange[][] for the regular schedule, keyed by day name
+$openingHours->forWeek();
+
+// TimeRange[] for a specific day
+$openingHours->forDate(new DateTime('2016-12-25'));
+
+// TimeRange[][] of all exceptions, keyed by date
+$openingHours->exceptions();
 ```
 
 Read the usage section for the full api.
