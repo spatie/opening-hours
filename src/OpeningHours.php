@@ -31,7 +31,7 @@ class OpeningHours
 
     public function fill(array $data)
     {
-        list($openingHours, $exceptions) = $this->parseOpeningHourseAndExceptions($data);
+        list($openingHours, $exceptions) = $this->parseOpeningHoursAndExceptions($data);
 
         foreach ($openingHours as $day => $openingHours) {
             $this->setOpeningHoursFromStrings($day, $openingHours);
@@ -40,6 +40,16 @@ class OpeningHours
         $this->setExceptionsFromStrings($exceptions);
 
         return $this;
+    }
+
+    public function forWeek(): array
+    {
+        return $this->openingHours;
+    }
+
+    public function exceptions(): array
+    {
+        return $this->exceptions;
     }
 
     public function forDay(string $day): OpeningHoursForDay
@@ -76,6 +86,17 @@ class OpeningHours
         return $this->isOpenOn($day);
     }
 
+    protected function parseOpeningHoursAndExceptions(array $data): array
+    {
+        $openingHours = Day::mapDays(function ($day) use ($data) {
+            return $data[$day] ?? [];
+        });
+
+        $exceptions = $data['exceptions'] ?? [];
+
+        return [$openingHours, $exceptions];
+    }
+
     protected function setOpeningHoursFromStrings(string $day, array $openingHours)
     {
         $this->guardAgainstInvalidDay($day);
@@ -88,17 +109,6 @@ class OpeningHours
         $this->exceptions = array_map(function (array $openingHours) {
             return OpeningHoursForDay::fromStrings($openingHours);
         }, $exceptions);
-    }
-
-    protected function parseOpeningHourseAndExceptions(array $data): array
-    {
-        $openingHours = Day::mapDays(function ($day) use ($data) {
-            return $data[$day] ?? [];
-        });
-
-        $exceptions = $data['exceptions'] ?? [];
-
-        return [$openingHours, $exceptions];
     }
 
     protected function guardAgainstInvalidDay(string $day)

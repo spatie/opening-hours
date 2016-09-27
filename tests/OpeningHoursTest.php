@@ -5,8 +5,43 @@ namespace Spatie\OpeningHours\Test;
 use DateTime;
 use Spatie\OpeningHours\OpeningHours;
 
-class OpeningHoursQueryTest extends \PHPUnit_Framework_TestCase
+class OpeningHoursTest extends \PHPUnit_Framework_TestCase
 {
+    /** @test */
+    public function it_can_return_the_opening_hours_for_a_regular_week()
+    {
+        $openingHours = OpeningHours::create([
+            'monday' => ['09:00-18:00'],
+        ]);
+
+        $openingHoursForWeek = $openingHours->forWeek();
+
+        $this->assertCount(7, $openingHoursForWeek);
+        $this->assertEquals('09:00-18:00', (string) $openingHoursForWeek['monday'][0]);
+        $this->assertCount(0, $openingHoursForWeek['tuesday']);
+        $this->assertCount(0, $openingHoursForWeek['wednesday']);
+        $this->assertCount(0, $openingHoursForWeek['thursday']);
+        $this->assertCount(0, $openingHoursForWeek['friday']);
+        $this->assertCount(0, $openingHoursForWeek['saturday']);
+        $this->assertCount(0, $openingHoursForWeek['sunday']);
+    }
+
+    /** @test */
+    public function it_can_return_the_exceptions()
+    {
+        $openingHours = OpeningHours::create([
+            'monday' => ['09:00-18:00'],
+            'exceptions' => [
+                '2016-09-26' => [],
+            ],
+        ]);
+
+        $exceptions = $openingHours->exceptions();
+
+        $this->assertCount(1, $exceptions);
+        $this->assertCount(0, $exceptions['2016-09-26']);
+    }
+
     /** @test */
     public function it_can_return_the_opening_hours_for_a_regular_week_day()
     {
