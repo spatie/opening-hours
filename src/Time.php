@@ -8,7 +8,8 @@ use Spatie\OpeningHours\Exceptions\InvalidTimeString;
 class Time
 {
     /** @var int */
-    protected $hours, $minutes;
+    protected $hours;
+    protected $minutes;
 
     protected function __construct(int $hours, int $minutes)
     {
@@ -67,6 +68,6 @@ class Time
 
     public function __toString()
     {
-        return str_pad($this->hours, 2, '0', STR_PAD_LEFT) . ':' . str_pad($this->minutes, 2, '0', STR_PAD_LEFT);
+        return str_pad($this->hours, 2, '0', STR_PAD_LEFT).':'.str_pad($this->minutes, 2, '0', STR_PAD_LEFT);
     }
 }

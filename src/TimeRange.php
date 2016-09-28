@@ -7,7 +7,8 @@ use Spatie\OpeningHours\Exceptions\InvalidTimeRangeString;
 class TimeRange
 {
     /** @var \Spatie\OpeningHours\Time */
-    protected $start, $end;
+    protected $start;
+    protected $end;
 
     protected function __construct(Time $start, Time $end)
     {
@@ -47,6 +48,7 @@ class TimeRange
             if ($time->isAfter($this->start)) {
                 return $time->isAfter($this->end);
             }
+
             return $time->isBefore($this->end);
         }
 
