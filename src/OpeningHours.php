@@ -47,11 +47,6 @@ class OpeningHours
         return $this->openingHours;
     }
 
-    public function exceptions(): array
-    {
-        return $this->exceptions;
-    }
-
     public function forDay(string $day): OpeningHoursForDay
     {
         $this->guardAgainstInvalidDay($day);
@@ -64,16 +59,9 @@ class OpeningHours
         return $this->exceptions[$date->format('Y-m-d')] ?? $this->forDay(Day::onDateTime($date));
     }
 
-    public function isOpenAt(DateTime $dateTime): bool
+    public function exceptions(): array
     {
-        $openingHoursForDay = $this->forDate($dateTime);
-
-        return $openingHoursForDay->isOpenAt(Time::fromDateTime($dateTime));
-    }
-
-    public function isClosedAt(DateTime $dateTime): bool
-    {
-        return ! $this->isOpenAt($dateTime);
+        return $this->exceptions;
     }
 
     public function isOpenOn(string $day): bool
@@ -84,6 +72,18 @@ class OpeningHours
     public function isClosedOn(string $day): bool
     {
         return $this->isOpenOn($day);
+    }
+
+    public function isOpenAt(DateTime $dateTime): bool
+    {
+        $openingHoursForDay = $this->forDate($dateTime);
+
+        return $openingHoursForDay->isOpenAt(Time::fromDateTime($dateTime));
+    }
+
+    public function isClosedAt(DateTime $dateTime): bool
+    {
+        return ! $this->isOpenAt($dateTime);
     }
 
     public function isOpen(): bool

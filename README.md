@@ -50,16 +50,16 @@ $openingHours->isOpenAt(new DateTime('2016-12-25')); // false
 It can also return arrays of opening hours for a week or a day:
 
 ```php
-// TimeRange[] for the regular schedule
+// OpeningHoursForDay object for the regular schedule
 $openingHours->forDay('monday');
 
-// TimeRange[][] for the regular schedule, keyed by day name
+// OpeningHoursForDay[] for the regular schedule, keyed by day name
 $openingHours->forWeek();
 
-// TimeRange[] for a specific day
+// OpeningHoursForDay object for a specific day
 $openingHours->forDate(new DateTime('2016-12-25'));
 
-// TimeRange[][] of all exceptions, keyed by date
+// OpeningHoursForDay[] of all exceptions, keyed by date
 $openingHours->exceptions();
 ```
 
@@ -92,10 +92,125 @@ composer require spatie/opening-hours
 
 ## Usage
 
+The package should only be used through the `OpeningHours` class. There are also three value object classes used throughout, `Time`, which represents a single time, `TimeRange`, which represents a period with a start and an end, and `openingHoursForDay`, which represents a set of `TimeRange`s which can't overlap.
+
+### `Spatie\OpeningHours\OpeningHours`
+
+#### `OpeningHours::create(array $data): Spatie\OpeningHours\OpeningHours`
+
+Static factory method to fill the set of opening hours.
+
 ``` php
-$skeleton = new Spatie\Skeleton();
-echo $skeleton->echoPhrase('Hello, Spatie!');
+$openingHours = OpeningHours::create([
+    'monday' => ['09:00-12:00', '13:00-18:00'],
+    // ...
+]);
 ```
+
+Not all days are mandatory, if a day is missing, it will be set as closed.
+
+#### `OpeningHours::fill(array $data): Spatie\OpeningHours\OpeningHours`
+
+The same as `create`, but non-static.
+
+``` php
+$openingHours = (new OpeningHours)->fill([
+    'monday' => ['09:00-12:00', '13:00-18:00'],
+    // ...
+]);
+```
+
+#### `OpeningHours::forWeek(): Spatie\OpeningHours\OpeningHoursForDay[]`
+
+Returns an array of `OpeningHoursForDay` objects for a regular week.
+
+```php
+$openingHours->forWeek();
+```
+
+#### `OpeningHours::forDay(string $day): Spatie\OpeningHours\OpeningHoursForDay`
+
+Returns an `OpeningHoursForDay` object for a regular day. A day is lowercase string of the english day name.
+
+```php
+$openingHours->forDay('monday');
+```
+
+#### `OpeningHours::forDate(DateTime $dateTime): Spatie\OpeningHours\OpeningHoursForDay`
+
+Returns an `OpeningHoursForDay` object for a specific date. It looks for an exception on that day, and otherwise it returns the opening hours based on the regular schedule.
+
+```php
+$openingHours->forDate(new DateTime('2016-12-25'));
+```
+
+#### `OpeningHours::exceptions(): Spatie\OpeningHours\OpeningHoursForDay[]`
+
+Returns an array of all `OpeningHoursForDay` objects for exceptions, keyed by a `Y-m-d` date string.
+
+```php
+$openingHours->exceptions();
+```
+
+#### `OpeningHours::isOpenOn(string $day): bool`
+
+Checks if the business is op on a day in the regular schedule.
+
+```php
+$openingHours->isOpenOn('saturday');
+```
+
+#### `OpeningHours::isClosedOn(string $day): bool`
+
+Checks if the business is closed on a day in the regular schedule.
+
+```php
+$openingHours->isClosedOn('sunday');
+```
+
+#### `OpeningHours::isOpenAt(DateTime $dateTime): bool`
+
+Checks if the business is open on a specific day, at a specific time.
+
+```php
+$openingHours->isOpenAt(new DateTime('2016-26-09 20:00'));
+```
+
+#### `OpeningHours::isClosedAt(DateTime $dateTime): bool`
+
+Checks if the business is closed on a specific day, at a specific time.
+
+```php
+$openingHours->isClosedAt(new DateTime('2016-26-09 20:00'));
+```
+
+#### `OpeningHours::isOpen(): bool`
+
+Checks if the business is open right now.
+
+```php
+$openingHours->isOpen();
+```
+
+#### `OpeningHours::isClosed(): bool`
+
+Checks if the business is closed right now.
+
+```php
+$openingHours->isOpen();
+```
+
+### `Spatie\OpeningHours\OpeningHoursForDay`
+
+This class is meant as read-only. It implements `ArrayAccess`, `Countable` and `IteratorAggregate` so you can process the list of `TimeRange`s in an array-like way.
+
+### `Spatie\OpeningHours\TimeRange`
+
+Value object describing a period with a start and an end time. Can be casted to a string in a `H:i-H:i` format.
+
+### `Spatie\OpeningHours\Time`
+
+Value object describing a single time. Can be casted to a string in a `H:i` format.
 
 ## Changelog
 
