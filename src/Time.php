@@ -65,7 +65,7 @@ class Time
         return new DateTime("1970-01-01 {$this}:00");
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return str_pad($this->hours, 2, '0', STR_PAD_LEFT) . ':' . str_pad($this->minutes, 2, '0', STR_PAD_LEFT);
     }
