@@ -5,6 +5,7 @@
 [![Build Status](https://img.shields.io/travis/spatie/opening-hours/master.svg?style=flat-square)](https://travis-ci.org/spatie/opening-hours)
 [![SensioLabsInsight](https://img.shields.io/sensiolabs/i/082347b4-a3f6-4b77-b8a1-6a64d50232f7.svg?style=flat-square)](https://insight.sensiolabs.com/projects/082347b4-a3f6-4b77-b8a1-6a64d50232f7)
 [![Quality Score](https://img.shields.io/scrutinizer/g/spatie/opening-hours.svg?style=flat-square)](https://scrutinizer-ci.com/g/spatie/opening-hours)
+[![StyleCI](https://styleci.io/repos/69368104/shield?branch=master)](https://styleci.io/repos/69368104)
 [![Total Downloads](https://img.shields.io/packagist/dt/spatie/opening-hours.svg?style=flat-square)](https://packagist.org/packages/spatie/opening-hours)
 
 With `spatie/opening-hours` you create an object that describes a business' opening hours, which you can query for `open` or `closed` on days or specific dates, or use to present the times per day.
