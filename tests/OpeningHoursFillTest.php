@@ -49,7 +49,7 @@ class OpeningHoursFillTest extends \PHPUnit_Framework_TestCase
     {
         $openingHours = OpeningHours::create([]);
 
-        foreach(Day::days() as $dayName) {
+        foreach (Day::days() as $dayName) {
             $this->assertCount(0, $openingHours->forDay($dayName));
         }
     }
