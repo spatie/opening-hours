@@ -3,7 +3,10 @@
     "description": "A helper to query and format a set of opening hours",
     "keywords": [
         "spatie",
-        "opening-hours"
+        "opening-hours",
+        "schedule",
+        "opening",
+        "hours"
     ],
     "homepage": "https://github.com/spatie/opening-hours",
     "license": "MIT",

@@ -40,7 +40,7 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
         return false;
     }
 
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return isset($this->openingHours[$offset]);
     }
@@ -60,7 +60,7 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
         unset($this->openingHours[$offset]);
     }
 
-    public function count()
+    public function count(): int
     {
         return count($this->openingHours);
     }
