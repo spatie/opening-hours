@@ -44,7 +44,11 @@ class Time
             return false;
         }
 
-        return $this->hours >= $time->hours && $this->minutes >= $time->minutes;
+        if ($this->hours > $time->hours) {
+            return true;
+        }
+
+        return $this->hours === $time->hours && $this->minutes >= $time->minutes;
     }
 
     public function isBefore(Time $time): bool

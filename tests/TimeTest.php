@@ -46,6 +46,7 @@ class TimeTest extends PHPUnit_Framework_TestCase
         $this->assertTrue(Time::fromString('09:00')->isBefore(Time::fromString('09:30')));
         $this->assertFalse(Time::fromString('09:00')->isBefore(Time::fromString('09:00')));
         $this->assertFalse(Time::fromString('09:00')->isBefore(Time::fromString('08:00')));
+        $this->assertFalse(Time::fromString('09:00')->isBefore(Time::fromString('08:30')));
         $this->assertFalse(Time::fromString('08:30')->isBefore(Time::fromString('08:00')));
     }
 
@@ -54,6 +55,7 @@ class TimeTest extends PHPUnit_Framework_TestCase
     {
         $this->assertTrue(Time::fromString('09:00')->isAfter(Time::fromString('08:00')));
         $this->assertTrue(Time::fromString('09:30')->isAfter(Time::fromString('09:00')));
+        $this->assertTrue(Time::fromString('09:00')->isAfter(Time::fromString('08:30')));
         $this->assertFalse(Time::fromString('09:00')->isAfter(Time::fromString('09:00')));
         $this->assertFalse(Time::fromString('09:00')->isAfter(Time::fromString('09:30')));
         $this->assertFalse(Time::fromString('09:00')->isAfter(Time::fromString('10:00')));
