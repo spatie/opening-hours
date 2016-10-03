@@ -3,6 +3,8 @@
 namespace Spatie\OpeningHours;
 
 use DateTime;
+use Spatie\OpeningHours\Exceptions\InvalidDayName;
+use Spatie\OpeningHours\Helpers\Arr;
 
 class OpeningHours
 {
@@ -49,7 +51,7 @@ class OpeningHours
 
     public function forDay(string $day): OpeningHoursForDay
     {
-        $this->guardAgainstInvalidDay($day);
+        $day = $this->normalizeDayName($day);
 
         return $this->openingHours[$day];
     }
@@ -98,18 +100,19 @@ class OpeningHours
 
     protected function parseOpeningHoursAndExceptions(array $data): array
     {
-        $openingHours = Day::mapDays(function ($day) use ($data) {
-            return $data[$day] ?? [];
-        });
+        $exceptions = Arr::pull($data, 'exceptions', []);
+        $openingHours = [];
 
-        $exceptions = $data['exceptions'] ?? [];
+        foreach ($data as $day => $openingHoursData) {
+            $openingHours[$this->normalizeDayName($day)] = $openingHoursData;
+        }
 
         return [$openingHours, $exceptions];
     }
 
     protected function setOpeningHoursFromStrings(string $day, array $openingHours)
     {
-        $this->guardAgainstInvalidDay($day);
+        $day = $this->normalizeDayName($day);
 
         $this->openingHours[$day] = OpeningHoursForDay::fromStrings($openingHours);
     }
@@ -121,10 +124,14 @@ class OpeningHours
         }, $exceptions);
     }
 
-    protected function guardAgainstInvalidDay(string $day)
+    protected function normalizeDayName(string $day)
     {
+        $day = strtolower($day);
+
         if (! Day::isValid($day)) {
-            throw new \InvalidArgumentException();
+            throw new InvalidDayName();
         }
+
+        return $day;
     }
 }

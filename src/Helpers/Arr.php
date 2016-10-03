@@ -16,4 +16,13 @@ class Arr
 
         return $pairs;
     }
+
+    public static function pull(&$array, $key, $default = null)
+    {
+        $value = $array[$key] ?? $default;
+
+        unset($array[$key]);
+
+        return $value;
+    }
 }

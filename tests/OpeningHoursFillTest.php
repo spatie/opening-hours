@@ -3,8 +3,8 @@
 namespace Spatie\OpeningHours\Test;
 
 use DateTime;
-use Doctrine\Instantiator\Exception\InvalidArgumentException;
 use Spatie\OpeningHours\Day;
+use Spatie\OpeningHours\Exceptions\InvalidDayName;
 use Spatie\OpeningHours\OpeningHours;
 use Spatie\OpeningHours\TimeRange;
 
@@ -73,7 +73,7 @@ class OpeningHoursFillTest extends \PHPUnit_Framework_TestCase
     /** @test */
     public function it_will_throw_an_exception_when_using_an_invalid_day_name()
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(InvalidDayName::class);
 
         OpeningHours::create(['mmmmonday' => ['09:00-18:00']]);
     }
