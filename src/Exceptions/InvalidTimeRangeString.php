@@ -2,8 +2,6 @@
 
 namespace Spatie\OpeningHours\Exceptions;
 
-use Exception;
-
 class InvalidTimeRangeString extends Exception
 {
     public static function forString(string $string): self

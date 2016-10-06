@@ -2,9 +2,7 @@
 
 namespace Spatie\OpeningHours\Exceptions;
 
-use InvalidArgumentException;
-
-class InvalidDate extends InvalidArgumentException
+class InvalidDate extends Exception
 {
     public static function invalidDate(string $date): self
     {
