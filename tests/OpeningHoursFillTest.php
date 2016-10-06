@@ -86,8 +86,8 @@ class OpeningHoursFillTest extends \PHPUnit_Framework_TestCase
 
         OpeningHours::create([
             'exceptions' => [
-                '25/12/2016' => []
-            ]
+                '25/12/2016' => [],
+            ],
         ]);
     }
 }
