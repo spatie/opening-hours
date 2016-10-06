@@ -3,6 +3,7 @@
 namespace Spatie\OpeningHours;
 
 use DateTime;
+use Spatie\OpeningHours\Exceptions\Exception;
 use Spatie\OpeningHours\Exceptions\InvalidDate;
 use Spatie\OpeningHours\Exceptions\InvalidDayName;
 use Spatie\OpeningHours\Helpers\Arr;
@@ -30,6 +31,21 @@ class OpeningHours
     public static function create(array $data)
     {
         return (new static())->fill($data);
+    }
+
+    /**
+     * @param array $data
+     *
+     * @return bool
+     */
+    public static function isValid(array $data): bool
+    {
+        try {
+            static::create($data);
+            return true;
+        } catch (Exception $exception) {
+            return false;
+        }
     }
 
     public function fill(array $data)
