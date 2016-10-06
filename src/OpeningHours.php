@@ -42,6 +42,7 @@ class OpeningHours
     {
         try {
             static::create($data);
+
             return true;
         } catch (Exception $exception) {
             return false;
