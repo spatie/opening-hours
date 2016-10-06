@@ -3,6 +3,7 @@
 namespace Spatie\OpeningHours;
 
 use DateTime;
+use Spatie\OpeningHours\Exceptions\InvalidDate;
 use Spatie\OpeningHours\Exceptions\InvalidDayName;
 use Spatie\OpeningHours\Helpers\Arr;
 
@@ -119,6 +120,14 @@ class OpeningHours
 
     protected function setExceptionsFromStrings(array $exceptions)
     {
+        foreach ($exceptions as $date => $_) {
+            $dateTime = DateTime::createFromFormat('Y-m-d', $date);
+
+            if ($dateTime === false || $dateTime->format('Y-m-d') !== $date) {
+                throw InvalidDate::invalidDate($date);
+            }
+        }
+
         $this->exceptions = array_map(function (array $openingHours) {
             return OpeningHoursForDay::fromStrings($openingHours);
         }, $exceptions);
