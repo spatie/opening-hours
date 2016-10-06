@@ -120,17 +120,14 @@ class OpeningHours
 
     protected function setExceptionsFromStrings(array $exceptions)
     {
-        foreach ($exceptions as $date => $_) {
+        $this->exceptions = Arr::map($exceptions, function (array $openingHours, string $date) {
             $dateTime = DateTime::createFromFormat('Y-m-d', $date);
 
             if ($dateTime === false || $dateTime->format('Y-m-d') !== $date) {
                 throw InvalidDate::invalidDate($date);
             }
-        }
-
-        $this->exceptions = array_map(function (array $openingHours) {
             return OpeningHoursForDay::fromStrings($openingHours);
-        }, $exceptions);
+        });
     }
 
     protected function normalizeDayName(string $day)

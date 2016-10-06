@@ -18,9 +18,9 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
     {
         $openingHoursForDay = new static();
 
-        $timeRanges = array_map(function ($string) {
+        $timeRanges = Arr::map($strings, function ($string) {
             return TimeRange::fromString($string);
-        }, $strings);
+        });
 
         $openingHoursForDay->guardAgainstTimeRangeOverlaps($timeRanges);
 

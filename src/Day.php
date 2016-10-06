@@ -3,6 +3,7 @@
 namespace Spatie\OpeningHours;
 
 use DateTime;
+use Spatie\OpeningHours\Helpers\Arr;
 
 class Day
 {
@@ -29,7 +30,7 @@ class Day
 
     public static function mapDays(callable $callback): array
     {
-        return array_map($callback, array_combine(static::days(), static::days()));
+        return Arr::map(Arr::mirror(static::days()), $callback);
     }
 
     public static function isValid(string $day): bool
