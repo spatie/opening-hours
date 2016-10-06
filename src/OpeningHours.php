@@ -126,6 +126,7 @@ class OpeningHours
             if ($dateTime === false || $dateTime->format('Y-m-d') !== $date) {
                 throw InvalidDate::invalidDate($date);
             }
+
             return OpeningHoursForDay::fromStrings($openingHours);
         });
     }
