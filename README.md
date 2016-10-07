@@ -191,7 +191,7 @@ $openingHours->isOpen();
 Checks if the business is closed right now.
 
 ```php
-$openingHours->isOpen();
+$openingHours->isClosed();
 ```
 
 ### `Spatie\OpeningHours\OpeningHoursForDay`
