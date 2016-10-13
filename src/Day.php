@@ -2,7 +2,7 @@
 
 namespace Spatie\OpeningHours;
 
-use DateTime;
+use DateTimeInterface;
 use Spatie\OpeningHours\Helpers\Arr;
 
 class Day
@@ -38,7 +38,7 @@ class Day
         return in_array($day, static::days());
     }
 
-    public static function onDateTime(DateTime $dateTime): string
+    public static function onDateTime(DateTimeInterface $dateTime): string
     {
         return static::days()[$dateTime->format('N') - 1];
     }
