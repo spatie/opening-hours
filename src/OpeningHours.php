@@ -54,8 +54,8 @@ class OpeningHours
     {
         list($openingHours, $exceptions) = $this->parseOpeningHoursAndExceptions($data);
 
-        foreach ($openingHours as $day => $openingHours) {
-            $this->setOpeningHoursFromStrings($day, $openingHours);
+        foreach ($openingHours as $day => $openingHoursForThisDay) {
+            $this->setOpeningHoursFromStrings($day, $openingHoursForThisDay);
         }
 
         $this->setExceptionsFromStrings($exceptions);
