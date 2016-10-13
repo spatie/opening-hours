@@ -2,7 +2,7 @@
 
 namespace Spatie\OpeningHours;
 
-use DateTime;
+use DateTimeInterface;
 use Spatie\OpeningHours\Exceptions\InvalidTimeString;
 
 class Time
@@ -28,7 +28,7 @@ class Time
         return new self($hours, $minutes);
     }
 
-    public static function fromDateTime(DateTime $dateTime): self
+    public static function fromDateTime(DateTimeInterface $dateTime): self
     {
         return self::fromString($dateTime->format('H:i'));
     }

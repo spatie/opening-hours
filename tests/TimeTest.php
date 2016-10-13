@@ -70,4 +70,12 @@ class TimeTest extends PHPUnit_Framework_TestCase
         $this->assertTrue(Time::fromString('09:30')->isSameOrAfter(Time::fromString('09:00')));
         $this->assertFalse(Time::fromString('09:00')->isSameOrAfter(Time::fromString('10:00')));
     }
+
+    /** @test */
+    public function it_can_accept_any_date_format_with_the_date_time_interface()
+    {
+        $dateTime = date_create_immutable('2012-11-06 13:25:59.123456');
+
+        $this->assertEquals('13:25', (string) Time::fromDateTime($dateTime));
+    }
 }
