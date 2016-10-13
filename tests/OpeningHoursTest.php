@@ -98,9 +98,9 @@ class OpeningHoursTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($openingHours->isOpenAt($shouldBeOpen));
         $this->assertFalse($openingHours->isClosedAt($shouldBeOpen));
 
-        $shouldBeOpenAlternaiveDate = date_create_immutable('2016-09-26 11:12:13.123456');
-        $this->assertTrue($openingHours->isOpenAt($shouldBeOpenAlternaiveDate));
-        $this->assertFalse($openingHours->isClosedAt($shouldBeOpenAlternaiveDate));
+        $shouldBeOpenAlternativeDate = date_create_immutable('2016-09-26 11:12:13.123456');
+        $this->assertTrue($openingHours->isOpenAt($shouldBeOpenAlternativeDate));
+        $this->assertFalse($openingHours->isClosedAt($shouldBeOpenAlternativeDate));
 
         $shouldBeClosedBecauseOfTime = new DateTime('2016-09-26 20:00:00');
         $this->assertFalse($openingHours->isOpenAt($shouldBeClosedBecauseOfTime));
