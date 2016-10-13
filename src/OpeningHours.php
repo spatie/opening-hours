@@ -3,6 +3,7 @@
 namespace Spatie\OpeningHours;
 
 use DateTime;
+use DateTimeInterface;
 use Spatie\OpeningHours\Exceptions\Exception;
 use Spatie\OpeningHours\Exceptions\InvalidDate;
 use Spatie\OpeningHours\Exceptions\InvalidDayName;
@@ -74,7 +75,7 @@ class OpeningHours
         return $this->openingHours[$day];
     }
 
-    public function forDate(DateTime $date): OpeningHoursForDay
+    public function forDate(DateTimeInterface $date): OpeningHoursForDay
     {
         return $this->exceptions[$date->format('Y-m-d')] ?? $this->forDay(Day::onDateTime($date));
     }
@@ -94,14 +95,14 @@ class OpeningHours
         return $this->isOpenOn($day);
     }
 
-    public function isOpenAt(DateTime $dateTime): bool
+    public function isOpenAt(DateTimeInterface $dateTime): bool
     {
         $openingHoursForDay = $this->forDate($dateTime);
 
         return $openingHoursForDay->isOpenAt(Time::fromDateTime($dateTime));
     }
 
-    public function isClosedAt(DateTime $dateTime): bool
+    public function isClosedAt(DateTimeInterface $dateTime): bool
     {
         return ! $this->isOpenAt($dateTime);
     }
