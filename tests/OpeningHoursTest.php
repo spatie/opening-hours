@@ -3,6 +3,7 @@
 namespace Spatie\OpeningHours\Test;
 
 use DateTime;
+use DateTimeZone;
 use Spatie\OpeningHours\OpeningHours;
 
 class OpeningHoursTest extends \PHPUnit_Framework_TestCase
@@ -124,5 +125,23 @@ class OpeningHoursTest extends \PHPUnit_Framework_TestCase
         $shouldBeClosed = new DateTime('2016-09-26 11:00:00');
         $this->assertFalse($openingHours->isOpenAt($shouldBeClosed));
         $this->assertTrue($openingHours->isClosedAt($shouldBeClosed));
+    }
+
+    /** @test */
+    public function it_can_set_the_timezone_on_the_openings_hours_object()
+    {
+        $openingHours = new OpeningHours('Europe/Amsterdam');
+        $openingHours->fill([
+            'monday' => ['09:00-18:00'],
+        ]);
+
+        $this->assertTrue($openingHours->isOpenAt(new DateTime('2016-10-10 10:00')));
+        $this->assertTrue($openingHours->isOpenAt(new DateTime('2016-10-10 15:59'))); // 2 Hours difference
+        $this->assertTrue($openingHours->isOpenAt(new DateTime('2016-10-10 08:00'))); // 2 Hours difference
+        $this->assertFalse($openingHours->isOpenAt(new DateTime('2016-10-10 06:00'))); // 2 Hours difference
+
+        $this->assertFalse($openingHours->isOpenAt(new DateTime('2016-10-10 06:00', new DateTimeZone('Europe/Amsterdam'))));
+        $this->assertTrue($openingHours->isOpenAt(new DateTime('2016-10-10 09:00', new DateTimeZone('Europe/Amsterdam'))));
+        $this->assertTrue($openingHours->isOpenAt(new DateTime('2016-10-10 17:59', new DateTimeZone('Europe/Amsterdam'))));
     }
 }
