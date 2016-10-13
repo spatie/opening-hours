@@ -2,7 +2,11 @@
 
 All Notable changes to `opening-hours` will be documented in this file
 
-## 1.0.1- 2016-1010
+## 1.0.2 -2016-10-13
+
+- Fixed missing import in `Time` class
+
+## 1.0.1- 2016-10-13
 
 - Replaced `DateTime` by `DateTimeInterface`
 
