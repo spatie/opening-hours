@@ -107,8 +107,6 @@ class OpeningHours
     {
         $dateTime = $this->setTimezone($dateTime);
 
-        var_dump($dateTime, $this->timezone);
-
         $openingHoursForDay = $this->forDate($dateTime);
 
         return $openingHoursForDay->isOpenAt(Time::fromDateTime($dateTime));
