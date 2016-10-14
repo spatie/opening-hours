@@ -135,12 +135,12 @@ class OpeningHoursTest extends \PHPUnit_Framework_TestCase
             'monday' => ['09:00-18:00'],
             'exceptions' => [
                  '2016-11-14' => ['09:00-13:00'],
-            ]
+            ],
         ]);
 
         $this->assertTrue($openingHours->isOpenAt(new DateTime('2016-10-10 10:00')));
         $this->assertTrue($openingHours->isOpenAt(new DateTime('2016-10-10 15:59')));
-        $this->assertTrue($openingHours->isOpenAt(new DateTime('2016-10-10 08:00'))); 
+        $this->assertTrue($openingHours->isOpenAt(new DateTime('2016-10-10 08:00')));
         $this->assertFalse($openingHours->isOpenAt(new DateTime('2016-10-10 06:00')));
 
         $this->assertFalse($openingHours->isOpenAt(new DateTime('2016-10-10 06:00', new DateTimeZone('Europe/Amsterdam'))));
@@ -153,8 +153,8 @@ class OpeningHoursTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($openingHours->isOpenAt(new DateTime('2016-11-14 15:59', new DateTimeZone('America/Denver'))));
         $this->assertTrue($openingHours->isOpenAt(new DateTime('2016-10-10 09:59', new DateTimeZone('America/Denver'))));
 
-        date_default_timezone_set ( 'America/Denver' );
+        date_default_timezone_set('America/Denver');
         $this->assertTrue($openingHours->isOpenAt(new DateTime('2016-10-10 09:59')));
-        $this->assertFalse($openingHours->isOpenAt(new DateTime('2016-10-10 10:00')));
+        $this->assertTrue($openingHours->isOpenAt(new DateTime('2016-10-10 10:00')));
     }
 }
