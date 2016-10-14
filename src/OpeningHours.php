@@ -175,7 +175,7 @@ class OpeningHours
     protected function setTimezone(DateTimeInterface $date)
     {
         if ($this->timezone) {
-            $date->setTimezone($this->timezone);
+            $date = $date->setTimezone($this->timezone);
         }
 
         return $date;
