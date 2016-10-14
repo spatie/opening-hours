@@ -155,6 +155,6 @@ class OpeningHoursTest extends \PHPUnit_Framework_TestCase
 
         date_default_timezone_set('America/Denver');
         $this->assertTrue($openingHours->isOpenAt(new DateTime('2016-10-10 09:59')));
-        $this->assertTrue($openingHours->isOpenAt(new DateTime('2016-10-10 10:00')));
+        $this->assertFalse($openingHours->isOpenAt(new DateTime('2016-10-10 10:00')));
     }
 }
