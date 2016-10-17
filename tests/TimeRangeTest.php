@@ -24,6 +24,15 @@ class TimeRangeTest extends PHPUnit_Framework_TestCase
     }
 
     /** @test */
+    public function it_can_get_the_time_objects()
+    {
+        $timeRange = TimeRange::fromString('16:00-18:00');
+
+        $this->assertInstanceOf(Time::class, $timeRange->start());
+        $this->assertInstanceOf(Time::class, $timeRange->end());
+    }
+
+    /** @test */
     public function it_can_determine_that_it_spills_over_to_the_next_day()
     {
         $this->assertTrue(TimeRange::fromString('18:00-01:00')->spillsOverToNextDay());

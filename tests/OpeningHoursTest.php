@@ -28,6 +28,21 @@ class OpeningHoursTest extends \PHPUnit_Framework_TestCase
     }
 
     /** @test */
+    public function it_can_validate_the_opening_hours()
+    {
+        $valid = OpeningHours::isValid([
+            'monday' => ['09:00-18:00'],
+        ]);
+
+        $invalid = OpeningHours::isValid([
+            'notaday' => ['18:00-09:00'],
+        ]);
+
+        $this->assertTrue($valid);
+        $this->assertFalse($invalid);
+    }
+
+    /** @test */
     public function it_can_return_the_exceptions()
     {
         $openingHours = OpeningHours::create([
@@ -145,7 +160,7 @@ class OpeningHoursTest extends \PHPUnit_Framework_TestCase
         $openingHours->fill([
             'monday' => ['09:00-18:00'],
             'exceptions' => [
-                 '2016-11-14' => ['09:00-13:00'],
+                '2016-11-14' => ['09:00-13:00'],
             ],
         ]);
 
@@ -167,5 +182,28 @@ class OpeningHoursTest extends \PHPUnit_Framework_TestCase
         date_default_timezone_set('America/Denver');
         $this->assertTrue($openingHours->isOpenAt(new DateTime('2016-10-10 09:59')));
         $this->assertFalse($openingHours->isOpenAt(new DateTime('2016-10-10 10:00')));
+    }
+
+    public function it_can_determine_that_its_open_now()
+    {
+        $openingHours = OpeningHours::create([
+            'monday' => ['00:00-23:59'],
+            'tuesday' => ['00:00-23:59'],
+            'wednesday' => ['00:00-23:59'],
+            'thursday' => ['00:00-23:59'],
+            'friday' => ['00:00-23:59'],
+            'saturday' => ['00:00-23:59'],
+            'sunday' => ['00:00-23:59'],
+        ]);
+
+        $this->assertTrue($openingHours->isOpen());
+    }
+
+    /** @test */
+    public function it_can_determine_that_its_closed_now()
+    {
+        $openingHours = OpeningHours::create([]);
+
+        $this->assertTrue($openingHours->isClosed());
     }
 }
