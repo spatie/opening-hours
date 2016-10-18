@@ -64,6 +64,15 @@ $openingHours->forDate(new DateTime('2016-12-25'));
 $openingHours->exceptions();
 ```
 
+It can also return next open `DateTime` from the given `DateTime`.
+
+```
+// 2016-12-26 09:00:00
+$nextOpen = $openingHours->nextOpen(new DateTime('2016-12-25 10:00:00'));
+
+// 2016-12-24 13:00:00
+$nextOpen = $openingHours->nextOpen(new DateTime('2016-12-24 11:00:00'));
+```
 Read the usage section for the full api.
 
 Spatie is a webdesign agency based in Antwerp, Belgium. You'll find an overview of all our open source projects [on our website](https://spatie.be/opensource).
@@ -192,6 +201,14 @@ Checks if the business is closed right now.
 
 ```php
 $openingHours->isClosed();
+```
+
+#### `nextOpen(DateTimeInterface $dateTime) : DateTime`
+
+Returns next open DateTime from the given DateTime
+
+```php
+$openingHours->nextOpen(new DateTime('2016-12-24 11:00:00'));
 ```
 
 ### `Spatie\OpeningHours\OpeningHoursForDay`

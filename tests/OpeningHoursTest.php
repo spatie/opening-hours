@@ -3,6 +3,7 @@
 namespace Spatie\OpeningHours\Test;
 
 use DateTime;
+use Spatie\OpeningHours\Time;
 use Spatie\OpeningHours\OpeningHours;
 
 class OpeningHoursTest extends \PHPUnit_Framework_TestCase
@@ -124,5 +125,49 @@ class OpeningHoursTest extends \PHPUnit_Framework_TestCase
         $shouldBeClosed = new DateTime('2016-09-26 11:00:00');
         $this->assertFalse($openingHours->isOpenAt($shouldBeClosed));
         $this->assertTrue($openingHours->isClosedAt($shouldBeClosed));
+    }
+
+    /** @test */
+    public function it_can_determine_next_open_hours_from_non_working_date_time()
+    {
+        $openingHours = OpeningHours::create([
+            'monday' => ['09:00-11:00', '13:00-19:00'],
+        ]);
+
+        $nextTimeOpen = $openingHours->nextOpen(new DateTime('2016-09-26 12:00:00'));
+
+        $this->assertInstanceOf('\DateTime', $nextTimeOpen);
+        $this->assertEquals('2016-09-26 13:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
+    }
+
+    /** @test */
+    public function it_can_determine_next_open_hours_from_working_date_time()
+    {
+        $openingHours = OpeningHours::create([
+            'monday' => ['09:00-11:00', '13:00-19:00'],
+            'tuesday' => ['10:00-11:00', '14:00-19:00'],
+        ]);
+
+        $nextTimeOpen = $openingHours->nextOpen(new DateTime('2016-09-26 16:00:00'));
+
+        $this->assertInstanceOf('\DateTime', $nextTimeOpen);
+        $this->assertEquals('2016-09-27 10:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
+    }
+
+    /** @test */
+    public function it_can_determine_next_open_hours_from_early_morning()
+    {
+        $openingHours = OpeningHours::create([
+            'monday' => ['09:00-11:00', '13:00-19:00'],
+            'tuesday' => ['10:00-11:00', '14:00-19:00'],
+            'exceptions' => [
+                '2016-09-26' => [],
+            ],
+        ]);
+
+        $nextTimeOpen = $openingHours->nextOpen(new DateTime('2016-09-26 04:00:00'));
+
+        $this->assertInstanceOf('\DateTime', $nextTimeOpen);
+        $this->assertEquals('2016-09-27 10:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
     }
 }
