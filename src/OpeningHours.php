@@ -92,7 +92,7 @@ class OpeningHours
 
     public function isClosedOn(string $day): bool
     {
-        return $this->isOpenOn($day);
+        return ! $this->isOpenOn($day);
     }
 
     public function isOpenAt(DateTimeInterface $dateTime): bool

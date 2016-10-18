@@ -69,6 +69,17 @@ class OpeningHoursTest extends \PHPUnit_Framework_TestCase
     }
 
     /** @test */
+    public function it_can_determine_that_its_regularly_closed_on_a_week_day()
+    {
+        $openingHours = OpeningHours::create([
+            'monday' => ['09:00-18:00'],
+        ]);
+
+        $this->assertFalse($openingHours->isClosedOn('monday'));
+        $this->assertTrue($openingHours->isClosedOn('tuesday'));
+    }
+
+    /** @test */
     public function it_can_return_the_opening_hours_for_a_specific_date()
     {
         $openingHours = OpeningHours::create([
