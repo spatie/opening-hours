@@ -83,7 +83,7 @@ class OpeningHours
 
     public function forDate(DateTimeInterface $date): OpeningHoursForDay
     {
-        $date = $this->setTimezone($date);
+        $date = $this->applyTimezone($date);
 
         return $this->exceptions[$date->format('Y-m-d')] ?? $this->forDay(Day::onDateTime($date));
     }
@@ -105,7 +105,7 @@ class OpeningHours
 
     public function isOpenAt(DateTimeInterface $dateTime): bool
     {
-        $dateTime = $this->setTimezone($dateTime);
+        $dateTime = $this->applyTimezone($dateTime);
 
         $openingHoursForDay = $this->forDate($dateTime);
 
@@ -114,8 +114,6 @@ class OpeningHours
 
     public function isClosedAt(DateTimeInterface $dateTime): bool
     {
-        $dateTime = $this->setTimezone($dateTime);
-
         return ! $this->isOpenAt($dateTime);
     }
 
@@ -127,6 +125,11 @@ class OpeningHours
     public function isClosed(): bool
     {
         return $this->isClosedAt(new DateTime());
+    }
+
+    public function setTimezone($timezone)
+    {
+        $this->timezone = new DateTimeZone($timezone);
     }
 
     protected function parseOpeningHoursAndExceptions(array $data): array
@@ -172,7 +175,7 @@ class OpeningHours
         return $day;
     }
 
-    protected function setTimezone(DateTimeInterface $date)
+    protected function applyTimezone(DateTimeInterface $date)
     {
         if ($this->timezone) {
             $date = $date->setTimezone($this->timezone);
