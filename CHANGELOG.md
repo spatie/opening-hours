@@ -2,6 +2,9 @@
 
 All Notable changes to `opening-hours` will be documented in this file
 
+## 1.1.0 - 2016-11-09
+- Added timezone support
+
 ## 1.0.3 - 2016-10-18
 - `isClosedOn` fix
 
