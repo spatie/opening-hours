@@ -3,12 +3,12 @@
 namespace Spatie\OpeningHours;
 
 use DateTime;
-use DateTimeInterface;
 use DateTimeZone;
+use DateTimeInterface;
+use Spatie\OpeningHours\Helpers\Arr;
 use Spatie\OpeningHours\Exceptions\Exception;
 use Spatie\OpeningHours\Exceptions\InvalidDate;
 use Spatie\OpeningHours\Exceptions\InvalidDayName;
-use Spatie\OpeningHours\Helpers\Arr;
 
 class OpeningHours
 {
