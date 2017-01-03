@@ -3,12 +3,12 @@
 namespace Spatie\OpeningHours;
 
 use DateTime;
-use DateTimeInterface;
 use DateTimeZone;
+use DateTimeInterface;
+use Spatie\OpeningHours\Helpers\Arr;
 use Spatie\OpeningHours\Exceptions\Exception;
 use Spatie\OpeningHours\Exceptions\InvalidDate;
 use Spatie\OpeningHours\Exceptions\InvalidDayName;
-use Spatie\OpeningHours\Helpers\Arr;
 
 class OpeningHours
 {
@@ -135,8 +135,7 @@ class OpeningHours
         while ($nextOpen == false) {
             $dateTime
                 ->modify('+1 day')
-                ->setTime(0, 0, 0)
-            ;
+                ->setTime(0, 0, 0);
 
             $openingHoursForDay = $this->forDate($dateTime);
 
@@ -148,7 +147,7 @@ class OpeningHours
 
         return $dateTime;
     }
-  
+
     public function setTimezone($timezone)
     {
         $this->timezone = new DateTimeZone($timezone);
