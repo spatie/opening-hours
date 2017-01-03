@@ -2,11 +2,11 @@
 
 namespace Spatie\OpeningHours\Test;
 
-use PHPUnit_Framework_TestCase;
-use Spatie\OpeningHours\Exceptions\OverlappingTimeRanges;
-use Spatie\OpeningHours\OpeningHoursForDay;
 use Spatie\OpeningHours\Time;
+use PHPUnit_Framework_TestCase;
 use Spatie\OpeningHours\TimeRange;
+use Spatie\OpeningHours\OpeningHoursForDay;
+use Spatie\OpeningHours\Exceptions\OverlappingTimeRanges;
 
 class OpeningHoursForDayTest extends PHPUnit_Framework_TestCase
 {
