@@ -215,9 +215,19 @@ class OpeningHours
         return Arr::flatMap($this->openingHours, $callback);
     }
 
+    public function mapExceptions(callable $callback): array
+    {
+        return Arr::map($this->exceptions, $callback);
+    }
+
+    public function flatMapExceptions(callable $callback): array
+    {
+        return Arr::flatMap($this->exceptions, $callback);
+    }
+
     public function asStructuredData(): array
     {
-        return $this->flatMap(function (OpeningHoursForDay $openingHoursForDay, string $day) {
+        $regularHours = $this->flatMap(function (OpeningHoursForDay $openingHoursForDay, string $day) {
             return $openingHoursForDay->map(function (TimeRange $timeRange) use ($day) {
                 return [
                     '@type' => 'OpeningHoursSpecification',
@@ -227,5 +237,30 @@ class OpeningHours
                 ];
             });
         });
+
+        $exceptions = $this->flatMapExceptions(function (OpeningHoursForDay $openingHoursForDay, string $date) {
+
+            if ($openingHoursForDay->isEmpty()) {
+                return [[
+                    '@type' => 'OpeningHoursSpecification',
+                    'opens' => '00:00',
+                    'closes' => '00:00',
+                    'validFrom' => $date,
+                    'validThrough' => $date,
+                ]];
+            }
+
+            return $openingHoursForDay->map(function (TimeRange $timeRange) use ($date) {
+                return [
+                    '@type' => 'OpeningHoursSpecification',
+                    'opens' => $timeRange->start(),
+                    'closes' => $timeRange->end(),
+                    'validFrom' => $date,
+                    'validThrough' => $date,
+                ];
+            });
+        });
+
+        return array_merge($regularHours, $exceptions);
     }
 }

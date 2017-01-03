@@ -105,6 +105,11 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
         return new ArrayIterator($this->openingHours);
     }
 
+    public function isEmpty(): bool
+    {
+        return empty($this->openingHours);
+    }
+
     public function map(callable $callback): array
     {
         return Arr::map($this->openingHours, $callback);

@@ -3,8 +3,8 @@
 All Notable changes to `opening-hours` will be documented in this file
 
 ## 1.2.0 - 2017-01-03
-- Added `asStructuredData` to retrieve the opening hours as structured data
-- Added `OpeningHours::map`, `OpeningHours::flatMap` and `OpeningHoursForDay::map` utility methods
+- Added `asStructuredData` to retrieve the opening hours as a Schema.org structured data array 
+- Added utility methods: `OpeningHours::map`, `OpeningHours::flatMap`, `OpeningHours::mapExceptions`, `OpeningHours::flatMapExceptions`,`OpeningHoursForDay::map` and `OpeningHoursForDay::empty`
 
 ## 1.1.0 - 2016-11-09
 - Added timezone support

@@ -17,7 +17,8 @@ class OpeningHoursStructuredDataTest extends PHPUnit_Framework_TestCase
             'thursday' => [],
             'friday' => ['09:00-20:00'],
             'exceptions' => [
-                '2016-09-26' => [],
+                '2016-09-26' => ['09:00-12:00'], // Monday
+                '2016-09-27' => [], // Tuesday
             ],
         ]);
 
@@ -47,6 +48,18 @@ class OpeningHoursStructuredDataTest extends PHPUnit_Framework_TestCase
                 'dayOfWeek' => 'Friday',
                 'opens' => '09:00',
                 'closes' => '20:00',
+            ], [
+                '@type' => 'OpeningHoursSpecification',
+                'opens' => '09:00',
+                'closes' => '12:00',
+                'validFrom' => '2016-09-26',
+                'validThrough' => '2016-09-26',
+            ], [
+                '@type' => 'OpeningHoursSpecification',
+                'opens' => '00:00',
+                'closes' => '00:00',
+                'validFrom' => '2016-09-27',
+                'validThrough' => '2016-09-27',
             ],
         ];
 
