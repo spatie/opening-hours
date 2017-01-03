@@ -4,13 +4,30 @@ namespace Spatie\OpeningHours\Helpers;
 
 class Arr
 {
-    public static function map(array $array, callable $callback)
+    public static function map(array $array, callable $callback): array
     {
         $keys = array_keys($array);
 
         $items = array_map($callback, $array, $keys);
 
         return array_combine($keys, $items);
+    }
+
+    public static function flatMap(array $array, callable $callback): array
+    {
+        $mapped = self::map($array, $callback);
+
+        $flattened = [];
+
+        foreach ($mapped as $item) {
+            if (is_array($item)) {
+                $flattened = array_merge($flattened, $item);
+            } else {
+                $flattened[] = $item;
+            }
+        }
+
+        return $flattened;
     }
 
     public static function pull(&$array, $key, $default = null)
@@ -22,7 +39,7 @@ class Arr
         return $value;
     }
 
-    public static function mirror(array $array)
+    public static function mirror(array $array): array
     {
         return array_combine($array, $array);
     }
