@@ -3,12 +3,12 @@
 namespace Spatie\OpeningHours;
 
 use DateTime;
-use DateTimeInterface;
 use DateTimeZone;
+use DateTimeInterface;
+use Spatie\OpeningHours\Helpers\Arr;
 use Spatie\OpeningHours\Exceptions\Exception;
 use Spatie\OpeningHours\Exceptions\InvalidDate;
 use Spatie\OpeningHours\Exceptions\InvalidDayName;
-use Spatie\OpeningHours\Helpers\Arr;
 
 class OpeningHours
 {
@@ -125,6 +125,27 @@ class OpeningHours
     public function isClosed(): bool
     {
         return $this->isClosedAt(new DateTime());
+    }
+
+    public function nextOpen(DateTimeInterface $dateTime) : DateTime
+    {
+        $openingHoursForDay = $this->forDate($dateTime);
+        $nextOpen = $openingHoursForDay->nextOpen(Time::fromDateTime($dateTime));
+
+        while ($nextOpen == false) {
+            $dateTime
+                ->modify('+1 day')
+                ->setTime(0, 0, 0);
+
+            $openingHoursForDay = $this->forDate($dateTime);
+
+            $nextOpen = $openingHoursForDay->nextOpen(Time::fromDateTime($dateTime));
+        }
+
+        $nextDateTime = $nextOpen->toDateTime();
+        $dateTime->setTime($nextDateTime->format('G'), $nextDateTime->format('i'), 0);
+
+        return $dateTime;
     }
 
     public function setTimezone($timezone)

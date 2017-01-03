@@ -2,12 +2,12 @@
 
 namespace Spatie\OpeningHours;
 
+use Countable;
 use ArrayAccess;
 use ArrayIterator;
-use Countable;
 use IteratorAggregate;
-use Spatie\OpeningHours\Exceptions\OverlappingTimeRanges;
 use Spatie\OpeningHours\Helpers\Arr;
+use Spatie\OpeningHours\Exceptions\OverlappingTimeRanges;
 
 class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
 {
@@ -38,6 +38,41 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
         }
 
         return false;
+    }
+
+    public function nextOpen(Time $time)
+    {
+        foreach ($this->openingHours as $timeRange) {
+            if ($nextOpen = $this->findNextOpenInWorkingHours($time, $timeRange)) {
+                return $nextOpen;
+            }
+
+            if ($nextOpen = $this->findNextOpenInFreeTime($time, $timeRange)) {
+                return $nextOpen;
+            }
+        }
+
+        return false;
+    }
+
+    protected function findNextOpenInWorkingHours(Time $time, TimeRange $timeRange)
+    {
+        if ($timeRange->containsTime($time) && next($timeRange) !== $timeRange) {
+            return next($timeRange);
+        }
+    }
+
+    protected function findNextOpenInFreeTime(Time $time, TimeRange $timeRange, TimeRange &$prevTimeRange = null)
+    {
+        $timeOffRange = $prevTimeRange ?
+            TimeRange::fromString($prevTimeRange->end().'-'.$timeRange->start()) :
+            TimeRange::fromString('00:00-'.$timeRange->start());
+
+        if ($timeOffRange->containsTime($time)) {
+            return $timeRange->start();
+        }
+
+        $prevTimeRange = $timeRange;
     }
 
     public function offsetExists($offset): bool

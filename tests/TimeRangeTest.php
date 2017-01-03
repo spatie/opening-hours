@@ -2,10 +2,10 @@
 
 namespace Spatie\OpeningHours\Test;
 
-use PHPUnit_Framework_TestCase;
-use Spatie\OpeningHours\Exceptions\InvalidTimeRangeString;
 use Spatie\OpeningHours\Time;
+use PHPUnit_Framework_TestCase;
 use Spatie\OpeningHours\TimeRange;
+use Spatie\OpeningHours\Exceptions\InvalidTimeRangeString;
 
 class TimeRangeTest extends PHPUnit_Framework_TestCase
 {
@@ -21,6 +21,15 @@ class TimeRangeTest extends PHPUnit_Framework_TestCase
         $this->expectException(InvalidTimeRangeString::class);
 
         TimeRange::fromString('16:00/18:00');
+    }
+
+    /** @test */
+    public function it_can_get_the_time_objects()
+    {
+        $timeRange = TimeRange::fromString('16:00-18:00');
+
+        $this->assertInstanceOf(Time::class, $timeRange->start());
+        $this->assertInstanceOf(Time::class, $timeRange->end());
     }
 
     /** @test */
