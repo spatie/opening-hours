@@ -221,7 +221,7 @@ class OpeningHours
             return $openingHoursForDay->map(function (TimeRange $timeRange) use ($day) {
                 return [
                     '@type' => 'OpeningHoursSpecification',
-                    'dayOfWeek' => [ucfirst($day)],
+                    'dayOfWeek' => ucfirst($day),
                     'opens' => (string) $timeRange->start(),
                     'closes' => (string) $timeRange->end(),
                 ];

@@ -24,27 +24,27 @@ class OpeningHoursStructuredDataTest extends PHPUnit_Framework_TestCase
         $expected = [
             [
                 '@type' => 'OpeningHoursSpecification',
-                'dayOfWeek' => ['Monday'],
+                'dayOfWeek' => 'Monday',
                 'opens' => '09:00',
                 'closes' => '18:00',
             ], [
                 '@type' => 'OpeningHoursSpecification',
-                'dayOfWeek' => ['Tuesday'],
+                'dayOfWeek' => 'Tuesday',
                 'opens' => '09:00',
                 'closes' => '18:00',
             ], [
                 '@type' => 'OpeningHoursSpecification',
-                'dayOfWeek' => ['Wednesday'],
+                'dayOfWeek' => 'Wednesday',
                 'opens' => '09:00',
                 'closes' => '12:00',
             ], [
                 '@type' => 'OpeningHoursSpecification',
-                'dayOfWeek' => ['Wednesday'],
+                'dayOfWeek' => 'Wednesday',
                 'opens' => '14:00',
                 'closes' => '18:00',
             ], [
                 '@type' => 'OpeningHoursSpecification',
-                'dayOfWeek' => ['Friday'],
+                'dayOfWeek' => 'Friday',
                 'opens' => '09:00',
                 'closes' => '20:00',
             ],
