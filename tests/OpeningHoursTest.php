@@ -4,7 +4,6 @@ namespace Spatie\OpeningHours\Test;
 
 use DateTime;
 use DateTimeZone;
-use Spatie\OpeningHours\Time;
 use Spatie\OpeningHours\OpeningHours;
 
 class OpeningHoursTest extends \PHPUnit_Framework_TestCase
@@ -197,7 +196,7 @@ class OpeningHoursTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('\DateTime', $nextTimeOpen);
         $this->assertEquals('2016-09-27 10:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
     }
-  
+
     public function it_can_set_the_timezone_on_the_openings_hours_object()
     {
         $openingHours = new OpeningHours('Europe/Amsterdam');

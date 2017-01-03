@@ -2,12 +2,12 @@
 
 namespace Spatie\OpeningHours;
 
+use Countable;
 use ArrayAccess;
 use ArrayIterator;
-use Countable;
 use IteratorAggregate;
-use Spatie\OpeningHours\Exceptions\OverlappingTimeRanges;
 use Spatie\OpeningHours\Helpers\Arr;
+use Spatie\OpeningHours\Exceptions\OverlappingTimeRanges;
 
 class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
 {
@@ -66,8 +66,7 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
     {
         $timeOffRange = $prevTimeRange ?
             TimeRange::fromString($prevTimeRange->end().'-'.$timeRange->start()) :
-            TimeRange::fromString('00:00-'.$timeRange->start())
-        ;
+            TimeRange::fromString('00:00-'.$timeRange->start());
 
         if ($timeOffRange->containsTime($time)) {
             return $timeRange->start();
