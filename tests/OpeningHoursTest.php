@@ -3,6 +3,7 @@
 namespace Spatie\OpeningHours\Test;
 
 use DateTime;
+use DateTimeZone;
 use Spatie\OpeningHours\Time;
 use Spatie\OpeningHours\OpeningHours;
 
@@ -25,6 +26,21 @@ class OpeningHoursTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(0, $openingHoursForWeek['friday']);
         $this->assertCount(0, $openingHoursForWeek['saturday']);
         $this->assertCount(0, $openingHoursForWeek['sunday']);
+    }
+
+    /** @test */
+    public function it_can_validate_the_opening_hours()
+    {
+        $valid = OpeningHours::isValid([
+            'monday' => ['09:00-18:00'],
+        ]);
+
+        $invalid = OpeningHours::isValid([
+            'notaday' => ['18:00-09:00'],
+        ]);
+
+        $this->assertTrue($valid);
+        $this->assertFalse($invalid);
     }
 
     /** @test */
@@ -67,6 +83,17 @@ class OpeningHoursTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($openingHours->isOpenOn('monday'));
         $this->assertFalse($openingHours->isOpenOn('tuesday'));
+    }
+
+    /** @test */
+    public function it_can_determine_that_its_regularly_closed_on_a_week_day()
+    {
+        $openingHours = OpeningHours::create([
+            'monday' => ['09:00-18:00'],
+        ]);
+
+        $this->assertFalse($openingHours->isClosedOn('monday'));
+        $this->assertTrue($openingHours->isClosedOn('tuesday'));
     }
 
     /** @test */
@@ -169,5 +196,58 @@ class OpeningHoursTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf('\DateTime', $nextTimeOpen);
         $this->assertEquals('2016-09-27 10:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
+    }
+  
+    public function it_can_set_the_timezone_on_the_openings_hours_object()
+    {
+        $openingHours = new OpeningHours('Europe/Amsterdam');
+        $openingHours->fill([
+            'monday' => ['09:00-18:00'],
+            'exceptions' => [
+                '2016-11-14' => ['09:00-13:00'],
+            ],
+        ]);
+
+        $this->assertTrue($openingHours->isOpenAt(new DateTime('2016-10-10 10:00')));
+        $this->assertTrue($openingHours->isOpenAt(new DateTime('2016-10-10 15:59')));
+        $this->assertTrue($openingHours->isOpenAt(new DateTime('2016-10-10 08:00')));
+        $this->assertFalse($openingHours->isOpenAt(new DateTime('2016-10-10 06:00')));
+
+        $this->assertFalse($openingHours->isOpenAt(new DateTime('2016-10-10 06:00', new DateTimeZone('Europe/Amsterdam'))));
+        $this->assertTrue($openingHours->isOpenAt(new DateTime('2016-10-10 09:00', new DateTimeZone('Europe/Amsterdam'))));
+        $this->assertTrue($openingHours->isOpenAt(new DateTime('2016-10-10 17:59', new DateTimeZone('Europe/Amsterdam'))));
+
+        $this->assertFalse($openingHours->isOpenAt(new DateTime('2016-11-14 17:59', new DateTimeZone('Europe/Amsterdam'))));
+        $this->assertTrue($openingHours->isOpenAt(new DateTime('2016-11-14 12:59', new DateTimeZone('Europe/Amsterdam'))));
+
+        $this->assertFalse($openingHours->isOpenAt(new DateTime('2016-11-14 15:59', new DateTimeZone('America/Denver'))));
+        $this->assertTrue($openingHours->isOpenAt(new DateTime('2016-10-10 09:59', new DateTimeZone('America/Denver'))));
+
+        date_default_timezone_set('America/Denver');
+        $this->assertTrue($openingHours->isOpenAt(new DateTime('2016-10-10 09:59')));
+        $this->assertFalse($openingHours->isOpenAt(new DateTime('2016-10-10 10:00')));
+    }
+
+    public function it_can_determine_that_its_open_now()
+    {
+        $openingHours = OpeningHours::create([
+            'monday' => ['00:00-23:59'],
+            'tuesday' => ['00:00-23:59'],
+            'wednesday' => ['00:00-23:59'],
+            'thursday' => ['00:00-23:59'],
+            'friday' => ['00:00-23:59'],
+            'saturday' => ['00:00-23:59'],
+            'sunday' => ['00:00-23:59'],
+        ]);
+
+        $this->assertTrue($openingHours->isOpen());
+    }
+
+    /** @test */
+    public function it_can_determine_that_its_closed_now()
+    {
+        $openingHours = OpeningHours::create([]);
+
+        $this->assertTrue($openingHours->isClosed());
     }
 }

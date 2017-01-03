@@ -4,6 +4,7 @@ namespace Spatie\OpeningHours;
 
 use DateTime;
 use DateTimeInterface;
+use DateTimeZone;
 use Spatie\OpeningHours\Exceptions\Exception;
 use Spatie\OpeningHours\Exceptions\InvalidDate;
 use Spatie\OpeningHours\Exceptions\InvalidDayName;
@@ -17,8 +18,13 @@ class OpeningHours
     /** @var array */
     protected $exceptions = [];
 
-    public function __construct()
+    /** @var DateTimeZone|null */
+    protected $timezone;
+
+    public function __construct($timezone = null)
     {
+        $this->timezone = $timezone ? new DateTimeZone($timezone) : null;
+
         $this->openingHours = Day::mapDays(function () {
             return new OpeningHoursForDay();
         });
@@ -77,6 +83,8 @@ class OpeningHours
 
     public function forDate(DateTimeInterface $date): OpeningHoursForDay
     {
+        $date = $this->applyTimezone($date);
+
         return $this->exceptions[$date->format('Y-m-d')] ?? $this->forDay(Day::onDateTime($date));
     }
 
@@ -92,11 +100,13 @@ class OpeningHours
 
     public function isClosedOn(string $day): bool
     {
-        return $this->isOpenOn($day);
+        return ! $this->isOpenOn($day);
     }
 
     public function isOpenAt(DateTimeInterface $dateTime): bool
     {
+        $dateTime = $this->applyTimezone($dateTime);
+
         $openingHoursForDay = $this->forDate($dateTime);
 
         return $openingHoursForDay->isOpenAt(Time::fromDateTime($dateTime));
@@ -137,6 +147,11 @@ class OpeningHours
         $dateTime->setTime($nextDateTime->format('G'), $nextDateTime->format('i'), 0);
 
         return $dateTime;
+    }
+  
+    public function setTimezone($timezone)
+    {
+        $this->timezone = new DateTimeZone($timezone);
     }
 
     protected function parseOpeningHoursAndExceptions(array $data): array
@@ -180,5 +195,14 @@ class OpeningHours
         }
 
         return $day;
+    }
+
+    protected function applyTimezone(DateTimeInterface $date)
+    {
+        if ($this->timezone) {
+            $date = $date->setTimezone($this->timezone);
+        }
+
+        return $date;
     }
 }
