@@ -239,7 +239,6 @@ class OpeningHours
         });
 
         $exceptions = $this->flatMapExceptions(function (OpeningHoursForDay $openingHoursForDay, string $date) {
-
             if ($openingHoursForDay->isEmpty()) {
                 return [[
                     '@type' => 'OpeningHoursSpecification',
