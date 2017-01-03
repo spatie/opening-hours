@@ -183,4 +183,28 @@ class OpeningHours
 
         return $date;
     }
+
+    public function map(callable $callback): array
+    {
+        return Arr::map($this->openingHours, $callback);
+    }
+
+    public function flatMap(callable $callback): array
+    {
+        return Arr::flatMap($this->openingHours, $callback);
+    }
+
+    public function asStructuredData(): array
+    {
+        return $this->flatMap(function (OpeningHoursForDay $openingHoursForDay, string $day) {
+            return $openingHoursForDay->map(function (TimeRange $timeRange) use ($day) {
+                return [
+                    '@type' => 'OpeningHoursSpecification',
+                    'dayOfWeek' => [ucfirst($day)],
+                    'opens' => (string) $timeRange->start(),
+                    'closes' => (string) $timeRange->end(),
+                ];
+            });
+        });
+    }
 }

@@ -11,7 +11,7 @@ use Spatie\OpeningHours\Helpers\Arr;
 
 class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
 {
-    /** @var array */
+    /** @var \Spatie\OpeningHours\TimeRange[] */
     protected $openingHours = [];
 
     public static function fromStrings(array $strings)
@@ -68,6 +68,11 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
     public function getIterator()
     {
         return new ArrayIterator($this->openingHours);
+    }
+
+    public function map(callable $callback): array
+    {
+        return Arr::map($this->openingHours, $callback);
     }
 
     protected function guardAgainstTimeRangeOverlaps(array $openingHours)
