@@ -55,14 +55,14 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
         return false;
     }
 
-    private function findNextOpenInWorkingHours(Time $time, TimeRange $timeRange)
+    protected function findNextOpenInWorkingHours(Time $time, TimeRange $timeRange)
     {
         if ($timeRange->containsTime($time) && next($timeRange) !== $timeRange) {
             return next($timeRange);
         }
     }
 
-    private function findNextOpenInFreeTime(Time $time, TimeRange $timeRange, TimeRange &$prevTimeRange = null)
+    protected function findNextOpenInFreeTime(Time $time, TimeRange $timeRange, TimeRange &$prevTimeRange = null)
     {
         $timeOffRange = $prevTimeRange ?
             TimeRange::fromString($prevTimeRange->end().'-'.$timeRange->start()) :
