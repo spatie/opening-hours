@@ -78,4 +78,12 @@ class TimeTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals('13:25', (string) Time::fromDateTime($dateTime));
     }
+
+    /** @test */
+    public function it_can_be_formatted()
+    {
+        $this->assertEquals('09:00', Time::fromString('09:00')->format());
+        $this->assertEquals('09:00', Time::fromString('09:00')->format('H:i'));
+        $this->assertEquals('9 AM', Time::fromString('09:00')->format('g A'));
+    }
 }

@@ -10,6 +10,8 @@ class Time
 {
     /** @var int */
     protected $hours;
+
+    /** @var int */
     protected $minutes;
 
     protected function __construct(int $hours, int $minutes)
@@ -68,11 +70,16 @@ class Time
 
     public function toDateTime(): DateTime
     {
-        return new DateTime("1970-01-01 {$this}:00");
+        return (new DateTime('1970-01-01 00:00:00'))->setTime($this->hours, $this->minutes);
+    }
+
+    public function format(string $format = 'H:i'): string
+    {
+        return $this->toDateTime()->format($format);
     }
 
     public function __toString(): string
     {
-        return str_pad($this->hours, 2, '0', STR_PAD_LEFT).':'.str_pad($this->minutes, 2, '0', STR_PAD_LEFT);
+        return $this->format();
     }
 }

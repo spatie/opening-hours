@@ -66,4 +66,12 @@ class TimeRangeTest extends PHPUnit_Framework_TestCase
         $this->assertFalse(TimeRange::fromString('16:00-18:00')->overlaps(TimeRange::fromString('14:00-15:00')));
         $this->assertFalse(TimeRange::fromString('16:00-18:00')->overlaps(TimeRange::fromString('19:00-20:00')));
     }
+
+    /** @test */
+    public function it_can_be_formatted()
+    {
+        $this->assertEquals('16:00-18:00', TimeRange::fromString('16:00-18:00')->format());
+        $this->assertEquals('16:00 - 18:00', TimeRange::fromString('16:00-18:00')->format('H:i', '%s - %s'));
+        $this->assertEquals('from 4 PM to 6 PM', TimeRange::fromString('16:00-18:00')->format('g A', 'from %s to %s'));
+    }
 }

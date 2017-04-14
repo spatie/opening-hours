@@ -8,6 +8,8 @@ class TimeRange
 {
     /** @var \Spatie\OpeningHours\Time */
     protected $start;
+
+    /** @var \Spatie\OpeningHours\Time */
     protected $end;
 
     protected function __construct(Time $start, Time $end)
@@ -60,8 +62,13 @@ class TimeRange
         return $this->containsTime($timeRange->start) || $this->containsTime($timeRange->end);
     }
 
-    public function __toString()
+    public function format(string $timeFormat = 'H:i', string $rangeFormat = '%s-%s'): string
     {
-        return "{$this->start}-{$this->end}";
+        return sprintf($rangeFormat, $this->start->format($timeFormat), $this->end->format($timeFormat));
+    }
+
+    public function __toString(): string
+    {
+        return $this->format();
     }
 }
