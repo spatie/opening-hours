@@ -249,4 +249,53 @@ class OpeningHoursTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($openingHours->isClosed());
     }
+
+    /** @test */
+    public function it_can_retrieve_regular_closing_days_as_strings()
+    {
+        $openingHours = OpeningHours::create([
+            'monday' => ['09:00-18:00'],
+            'tuesday' => ['09:00-18:00'],
+            'wednesday' => ['09:00-18:00'],
+            'thursday' => ['09:00-18:00'],
+            'friday' => ['09:00-18:00'],
+            'saturday' => [],
+            'sunday' => [],
+        ]);
+
+        $this->assertEquals(['saturday', 'sunday'], $openingHours->regularClosingDays());
+    }
+
+    /** @test */
+    public function it_can_retrieve_regular_closing_days_as_iso_numbers()
+    {
+        $openingHours = OpeningHours::create([
+            'monday' => ['09:00-18:00'],
+            'tuesday' => ['09:00-18:00'],
+            'wednesday' => ['09:00-18:00'],
+            'thursday' => ['09:00-18:00'],
+            'friday' => ['09:00-18:00'],
+            'saturday' => [],
+            'sunday' => [],
+        ]);
+
+        $this->assertEquals([6, 7], $openingHours->regularClosingDaysISO());
+    }
+
+    /** @test */
+    public function it_can_retrieve_a_list_of_exceptional_closing_dates()
+    {
+        $openingHours = OpeningHours::create([
+            'exceptions' => [
+                '2017-06-01' => [],
+                '2017-06-02' => [],
+            ],
+        ]);
+        
+        $exceptionalClosingDates = $openingHours->exceptionalClosingDates();
+
+        $this->assertCount(2, $exceptionalClosingDates);
+        $this->assertEquals('2017-06-01', $exceptionalClosingDates[0]->format('Y-m-d'));
+        $this->assertEquals('2017-06-02', $exceptionalClosingDates[1]->format('Y-m-d'));
+    }
 }

@@ -42,4 +42,9 @@ class Day
     {
         return static::days()[$dateTime->format('N') - 1];
     }
+
+    public static function toISO(string $day): int
+    {
+        return array_search($day, static::days()) + 1;
+    }
 }

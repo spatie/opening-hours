@@ -4,6 +4,11 @@ namespace Spatie\OpeningHours\Helpers;
 
 class Arr
 {
+    public static function filter(array $array, callable $callback): array
+    {
+        return array_filter($array, $callback, ARRAY_FILTER_USE_BOTH);
+    }
+
     public static function map(array $array, callable $callback): array
     {
         $keys = array_keys($array);

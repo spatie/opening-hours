@@ -13,13 +13,13 @@ use Spatie\OpeningHours\Exceptions\InvalidDayName;
 class OpeningHours
 {
     /** @var \Spatie\OpeningHours\Day[] */
-    protected $openingHours;
+    protected $openingHours = [];
 
     /** @var array */
     protected $exceptions = [];
 
     /** @var DateTimeZone|null */
-    protected $timezone;
+    protected $timezone = null;
 
     public function __construct($timezone = null)
     {
@@ -127,7 +127,7 @@ class OpeningHours
         return $this->isClosedAt(new DateTime());
     }
 
-    public function nextOpen(DateTimeInterface $dateTime) : DateTime
+    public function nextOpen(DateTimeInterface $dateTime): DateTime
     {
         $openingHoursForDay = $this->forDate($dateTime);
         $nextOpen = $openingHoursForDay->nextOpen(Time::fromDateTime($dateTime));
@@ -146,6 +146,29 @@ class OpeningHours
         $dateTime->setTime($nextDateTime->format('G'), $nextDateTime->format('i'), 0);
 
         return $dateTime;
+    }
+
+    public function regularClosingDays(): array
+    {
+        return array_keys($this->filter(function (OpeningHoursForDay $openingHoursForDay) {
+            return $openingHoursForDay->isEmpty();
+        }));
+    }
+
+    public function regularClosingDaysISO(): array
+    {
+        return Arr::map($this->regularClosingDays(), [Day::class, 'toISO']);
+    }
+
+    public function exceptionalClosingDates(): array
+    {
+        $dates = array_keys($this->filterExceptions(function (OpeningHoursForDay $openingHoursForDay, $date) {
+            return $openingHoursForDay->isEmpty();
+        }));
+
+        return Arr::map($dates, function ($date) {
+            return DateTime::createFromFormat('Y-m-d', $date);
+        });
     }
 
     public function setTimezone($timezone)
@@ -205,6 +228,11 @@ class OpeningHours
         return $date;
     }
 
+    public function filter(callable $callback): array
+    {
+        return Arr::filter($this->openingHours, $callback);
+    }
+
     public function map(callable $callback): array
     {
         return Arr::map($this->openingHours, $callback);
@@ -213,6 +241,11 @@ class OpeningHours
     public function flatMap(callable $callback): array
     {
         return Arr::flatMap($this->openingHours, $callback);
+    }
+
+    public function filterExceptions(callable $callback): array
+    {
+        return Arr::filter($this->exceptions, $callback);
     }
 
     public function mapExceptions(callable $callback): array

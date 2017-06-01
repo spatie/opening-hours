@@ -2,6 +2,9 @@
 
 All Notable changes to `opening-hours` will be documented in this file
 
+## 1.3.0 - 2017-06-01
+- Added `regularClosingDays`, `regularClosingDaysISO` and `exceptionalClosingDates` methods
+
 ## 1.2.0 - 2017-01-03
 - Added `asStructuredData` to retrieve the opening hours as a Schema.org structured data array 
 - Added `nextOpen` method to determine the next time the business will be open
