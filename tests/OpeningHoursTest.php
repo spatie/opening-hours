@@ -291,7 +291,7 @@ class OpeningHoursTest extends \PHPUnit_Framework_TestCase
                 '2017-06-02' => [],
             ],
         ]);
-        
+
         $exceptionalClosingDates = $openingHours->exceptionalClosingDates();
 
         $this->assertCount(2, $exceptionalClosingDates);
