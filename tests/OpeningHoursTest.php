@@ -304,7 +304,6 @@ class OpeningHoursTest extends \PHPUnit_Framework_TestCase
     {
         $openingHours = OpeningHours::create([
             'monday' => ['00:00-16:00'],
-            'thursday' => ['01:00-18:00'],
         ]);
 
         $nextTimeOpen = $openingHours->nextOpen(new DateTime());
