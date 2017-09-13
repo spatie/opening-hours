@@ -162,7 +162,7 @@ class OpeningHoursTest extends \PHPUnit_Framework_TestCase
 
         $nextTimeOpen = $openingHours->nextOpen(new DateTime('2016-09-26 12:00:00'));
 
-        $this->assertInstanceOf('\DateTime', $nextTimeOpen);
+        $this->assertInstanceOf('DateTime', $nextTimeOpen);
         $this->assertEquals('2016-09-26 13:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
     }
 
@@ -176,7 +176,7 @@ class OpeningHoursTest extends \PHPUnit_Framework_TestCase
 
         $nextTimeOpen = $openingHours->nextOpen(new DateTime('2016-09-26 16:00:00'));
 
-        $this->assertInstanceOf('\DateTime', $nextTimeOpen);
+        $this->assertInstanceOf('DateTime', $nextTimeOpen);
         $this->assertEquals('2016-09-27 10:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
     }
 
@@ -193,7 +193,7 @@ class OpeningHoursTest extends \PHPUnit_Framework_TestCase
 
         $nextTimeOpen = $openingHours->nextOpen(new DateTime('2016-09-26 04:00:00'));
 
-        $this->assertInstanceOf('\DateTime', $nextTimeOpen);
+        $this->assertInstanceOf('DateTime', $nextTimeOpen);
         $this->assertEquals('2016-09-27 10:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
     }
 
@@ -307,6 +307,6 @@ class OpeningHoursTest extends \PHPUnit_Framework_TestCase
         ]);
 
         $nextTimeOpen = $openingHours->nextOpen(new DateTime());
-        $this->assertInstanceOf('\DateTime', $nextTimeOpen);
+        $this->assertInstanceOf('DateTime', $nextTimeOpen);
     }
 }
