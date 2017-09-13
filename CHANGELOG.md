@@ -2,6 +2,9 @@
 
 All Notable changes to `opening-hours` will be documented in this file
 
+## 1.3.1 - 2017-09-13
+- Fixed bug where checking on times starting at midnight would cause an infinite loop
+
 ## 1.3.0 - 2017-06-01
 - Added `regularClosingDays`, `regularClosingDaysISO` and `exceptionalClosingDates` methods
 
