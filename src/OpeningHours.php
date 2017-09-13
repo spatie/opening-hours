@@ -89,7 +89,7 @@ class OpeningHours
     {
         $date = $this->applyTimezone($date);
 
-        return $this->recurring_exceptions[$date->format('m-d')] ?? ($this->exceptions[$date->format('Y-m-d')] ?? $this->forDay(Day::onDateTime($date)));
+        return $this->exceptions[$date->format('Y-m-d')] ?? ($this->recurring_exceptions[$date->format('m-d')] ?? $this->forDay(Day::onDateTime($date)));
     }
 
     public function exceptions(): array
