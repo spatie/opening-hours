@@ -68,7 +68,7 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
             TimeRange::fromString($prevTimeRange->end().'-'.$timeRange->start()) :
             TimeRange::fromString('00:00-'.$timeRange->start());
 
-        if ($timeOffRange->containsTime($time) || $timeOffRange->start() == $time) {
+        if ($timeOffRange->containsTime($time) || $timeOffRange->start()->isSame($time)) {
             return $timeRange->start();
         }
 
