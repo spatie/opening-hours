@@ -176,7 +176,6 @@ class OpeningHoursTest extends \PHPUnit_Framework_TestCase
         $openOnChristmasMorning = new DateTime('2025-12-25 10:00:00');
         $this->assertTrue($openingHours->isOpenAt($openOnChristmasMorning));
         $this->assertFalse($openingHours->isClosedAt($openOnChristmasMorning));
-
     }
 
     /** @test */
