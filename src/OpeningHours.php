@@ -18,6 +18,9 @@ class OpeningHours
     /** @var array */
     protected $exceptions = [];
 
+    /** @var array */
+    protected $recurring_exceptions = [];
+
     /** @var DateTimeZone|null */
     protected $timezone = null;
 
@@ -58,13 +61,14 @@ class OpeningHours
 
     public function fill(array $data)
     {
-        list($openingHours, $exceptions) = $this->parseOpeningHoursAndExceptions($data);
+        list($openingHours, $exceptions, $recurring_exceptions) = $this->parseOpeningHoursAndExceptions($data);
 
         foreach ($openingHours as $day => $openingHoursForThisDay) {
             $this->setOpeningHoursFromStrings($day, $openingHoursForThisDay);
         }
 
         $this->setExceptionsFromStrings($exceptions);
+        $this->setRecurringExceptionsForDates($recurring_exceptions);
 
         return $this;
     }
@@ -85,12 +89,17 @@ class OpeningHours
     {
         $date = $this->applyTimezone($date);
 
-        return $this->exceptions[$date->format('Y-m-d')] ?? $this->forDay(Day::onDateTime($date));
+        return $this->recurring_exceptions[$date->format('m-d')] ?? ($this->exceptions[$date->format('Y-m-d')] ?? $this->forDay(Day::onDateTime($date)));
     }
 
     public function exceptions(): array
     {
         return $this->exceptions;
+    }
+
+    public function recurringExceptions(): array
+    {
+        return $this->recurring_exceptions;
     }
 
     public function isOpenOn(string $day): bool
@@ -179,13 +188,14 @@ class OpeningHours
     protected function parseOpeningHoursAndExceptions(array $data): array
     {
         $exceptions = Arr::pull($data, 'exceptions', []);
+        $recurring_exceptions = Arr::pull($data, 'recurring_exceptions', []);
         $openingHours = [];
 
         foreach ($data as $day => $openingHoursData) {
             $openingHours[$this->normalizeDayName($day)] = $openingHoursData;
         }
 
-        return [$openingHours, $exceptions];
+        return [$openingHours, $exceptions, $recurring_exceptions];
     }
 
     protected function setOpeningHoursFromStrings(string $day, array $openingHours)
@@ -205,6 +215,19 @@ class OpeningHours
             }
 
             return OpeningHoursForDay::fromStrings($openingHours);
+        });
+    }
+
+    protected function setRecurringExceptionsForDates(array $recurring_exceptions)
+    {
+        $this->recurring_exceptions = Arr::map($recurring_exceptions, function (array $openingsHours, string $date) {
+            $dateTime = DateTime::createFromFormat('m-d', $date);
+
+            if ($dateTime === false || $dateTime->format('m-d') !== $date) {
+                throw InvalidDate::invalidDate($date);
+            }
+
+            return OpeningHoursForDay::fromStrings($openingsHours);
         });
     }
 
@@ -258,6 +281,21 @@ class OpeningHours
         return Arr::flatMap($this->exceptions, $callback);
     }
 
+    public function filterRecurringExceptions(callable $callback): array
+    {
+        return Arr::filter($this->recurring_exceptions, $callback);
+    }
+
+    public function mapRecurringExceptions(callable $callback): array
+    {
+        return Arr::map($this->recurring_exceptions, $callback);
+    }
+
+    public function flatMapRecurringExceptions(callable $callback): array
+    {
+        return Arr::flatMap($this->recurring_exceptions, $callback);
+    }
+
     public function asStructuredData(): array
     {
         $regularHours = $this->flatMap(function (OpeningHoursForDay $openingHoursForDay, string $day) {
@@ -293,6 +331,18 @@ class OpeningHours
             });
         });
 
-        return array_merge($regularHours, $exceptions);
+        $recurring_exceptions = $this->flatMapRecurringExceptions(function (OpeningHoursForDay $openingHoursForDay, string $date) {
+            if ($openingHoursForDay->isEmpty()) {
+                return [[
+                    '@type' => 'OpeningHoursSpecification',
+                    'opens' => '00:00',
+                    'closes' => '00:00',
+                    'validFrom' => $date,
+                    'validThrough' => $date,
+                ]];
+            }
+        });
+
+        return array_merge($regularHours, $exceptions, $recurring_exceptions);
     }
 }
