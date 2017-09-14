@@ -158,7 +158,7 @@ class OpeningHoursTest extends \PHPUnit_Framework_TestCase
     {
         $openingHours = OpeningHours::create([
             'monday' => ['09:00-18:00'],
-            'recurring_exceptions' => [
+            'exceptions' => [
                 '01-01' => [],
                 '12-25' => ['09:00-12:00'],
                 '12-26' => [],
@@ -184,8 +184,6 @@ class OpeningHoursTest extends \PHPUnit_Framework_TestCase
         $openingHours = OpeningHours::create([
             'exceptions' => [
                 '2018-01-01' => ['09:00-18:00'],
-            ],
-            'recurring_exceptions' => [
                 '01-01' => [],
                 '12-25' => ['09:00-12:00'],
                 '12-26' => [],
