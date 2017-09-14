@@ -200,7 +200,7 @@ class OpeningHours
         $this->exceptions = Arr::map($exceptions, function (array $openingHours, string $date) {
             $recurring = DateTime::createFromFormat('m-d', $date);
 
-            if($recurring === false || $recurring->format('m-d') !== $date) {
+            if ($recurring === false || $recurring->format('m-d') !== $date) {
                 $dateTime = DateTime::createFromFormat('Y-m-d', $date);
 
                 if ($dateTime === false || $dateTime->format('Y-m-d') !== $date) {
