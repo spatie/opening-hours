@@ -154,6 +154,52 @@ class OpeningHoursTest extends \PHPUnit_Framework_TestCase
     }
 
     /** @test */
+    public function it_can_determine_that_its_open_at_a_certain_date_and_time_on_an_recurring_exceptional_day()
+    {
+        $openingHours = OpeningHours::create([
+            'monday' => ['09:00-18:00'],
+            'exceptions' => [
+                '01-01' => [],
+                '12-25' => ['09:00-12:00'],
+                '12-26' => [],
+            ],
+        ]);
+
+        $closedOnNewYearDay = new DateTime('2017-01-01 11:00:00');
+        $this->assertFalse($openingHours->isOpenAt($closedOnNewYearDay));
+        $this->assertTrue($openingHours->isClosedAt($closedOnNewYearDay));
+
+        $closedOnSecondChristmasDay = new DateTime('2025-12-16 12:00:00');
+        $this->assertFalse($openingHours->isOpenAt($closedOnSecondChristmasDay));
+        $this->assertTrue($openingHours->isClosedAt($closedOnSecondChristmasDay));
+
+        $openOnChristmasMorning = new DateTime('2025-12-25 10:00:00');
+        $this->assertTrue($openingHours->isOpenAt($openOnChristmasMorning));
+        $this->assertFalse($openingHours->isClosedAt($openOnChristmasMorning));
+    }
+
+    /** @test */
+    public function it_can_prioritize_exceptions_by_giving_full_dates_priority()
+    {
+        $openingHours = OpeningHours::create([
+            'exceptions' => [
+                '2018-01-01' => ['09:00-18:00'],
+                '01-01' => [],
+                '12-25' => ['09:00-12:00'],
+                '12-26' => [],
+            ],
+        ]);
+
+        $openOnNewYearDay2018 = new DateTime('2018-01-01 11:00:00');
+        $this->assertTrue($openingHours->isOpenAt($openOnNewYearDay2018));
+        $this->assertFalse($openingHours->isClosedAt($openOnNewYearDay2018));
+
+        $closedOnNewYearDay2019 = new DateTime('2019-01-01 11:00:00');
+        $this->assertFalse($openingHours->isOpenAt($closedOnNewYearDay2019));
+        $this->assertTrue($openingHours->isClosedAt($closedOnNewYearDay2019));
+    }
+
+    /** @test */
     public function it_can_determine_next_open_hours_from_non_working_date_time()
     {
         $openingHours = OpeningHours::create([

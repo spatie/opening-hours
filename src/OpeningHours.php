@@ -85,7 +85,7 @@ class OpeningHours
     {
         $date = $this->applyTimezone($date);
 
-        return $this->exceptions[$date->format('Y-m-d')] ?? $this->forDay(Day::onDateTime($date));
+        return $this->exceptions[$date->format('Y-m-d')] ?? ($this->exceptions[$date->format('m-d')] ?? $this->forDay(Day::onDateTime($date)));
     }
 
     public function exceptions(): array
@@ -198,10 +198,14 @@ class OpeningHours
     protected function setExceptionsFromStrings(array $exceptions)
     {
         $this->exceptions = Arr::map($exceptions, function (array $openingHours, string $date) {
-            $dateTime = DateTime::createFromFormat('Y-m-d', $date);
+            $recurring = DateTime::createFromFormat('m-d', $date);
 
-            if ($dateTime === false || $dateTime->format('Y-m-d') !== $date) {
-                throw InvalidDate::invalidDate($date);
+            if ($recurring === false || $recurring->format('m-d') !== $date) {
+                $dateTime = DateTime::createFromFormat('Y-m-d', $date);
+
+                if ($dateTime === false || $dateTime->format('Y-m-d') !== $date) {
+                    throw InvalidDate::invalidDate($date);
+                }
             }
 
             return OpeningHoursForDay::fromStrings($openingHours);

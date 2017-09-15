@@ -24,6 +24,8 @@ $openingHours = OpeningHours::create([
     'exceptions' => [
         '2016-11-11' => ['09:00-12:00'],
         '2016-12-25' => [],
+        '01-01' => [], // recurring on each 1st of january
+        '12-25' => ['09:00-12:00'], // recurring on each 25nd of december
     ],
 ]);
 ```
