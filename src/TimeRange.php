@@ -57,7 +57,7 @@ class TimeRange
         return $time->isSameOrAfter($this->start) && $time->isBefore($this->end);
     }
 
-    public function overlaps(TimeRange $timeRange): bool
+    public function overlaps(self $timeRange): bool
     {
         return $this->containsTime($timeRange->start) || $this->containsTime($timeRange->end);
     }
