@@ -36,12 +36,12 @@ class Time
         return self::fromString($dateTime->format('H:i'));
     }
 
-    public function isSame(Time $time): bool
+    public function isSame(self $time): bool
     {
         return (string) $this === (string) $time;
     }
 
-    public function isAfter(Time $time): bool
+    public function isAfter(self $time): bool
     {
         if ($this->isSame($time)) {
             return false;
@@ -54,7 +54,7 @@ class Time
         return $this->hours === $time->hours && $this->minutes >= $time->minutes;
     }
 
-    public function isBefore(Time $time): bool
+    public function isBefore(self $time): bool
     {
         if ($this->isSame($time)) {
             return false;
@@ -63,7 +63,7 @@ class Time
         return ! $this->isAfter($time);
     }
 
-    public function isSameOrAfter(Time $time): bool
+    public function isSameOrAfter(self $time): bool
     {
         return $this->isSame($time) || $this->isAfter($time);
     }
