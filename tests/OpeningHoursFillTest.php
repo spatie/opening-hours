@@ -4,12 +4,13 @@ namespace Spatie\OpeningHours\Test;
 
 use DateTime;
 use Spatie\OpeningHours\Day;
+use PHPUnit\Framework\TestCase;
 use Spatie\OpeningHours\TimeRange;
 use Spatie\OpeningHours\OpeningHours;
 use Spatie\OpeningHours\Exceptions\InvalidDate;
 use Spatie\OpeningHours\Exceptions\InvalidDayName;
 
-class OpeningHoursFillTest extends \PHPUnit_Framework_TestCase
+class OpeningHoursFillTest extends TestCase
 {
     /** @test */
     public function it_fills_opening_hours()

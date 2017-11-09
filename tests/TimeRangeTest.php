@@ -3,11 +3,11 @@
 namespace Spatie\OpeningHours\Test;
 
 use Spatie\OpeningHours\Time;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use Spatie\OpeningHours\TimeRange;
 use Spatie\OpeningHours\Exceptions\InvalidTimeRangeString;
 
-class TimeRangeTest extends PHPUnit_Framework_TestCase
+class TimeRangeTest extends TestCase
 {
     /** @test */
     public function it_can_be_created_from_a_string()

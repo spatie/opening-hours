@@ -4,10 +4,10 @@ namespace Spatie\OpeningHours\Test;
 
 use DateTime;
 use Spatie\OpeningHours\Time;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use Spatie\OpeningHours\Exceptions\InvalidTimeString;
 
-class TimeTest extends PHPUnit_Framework_TestCase
+class TimeTest extends TestCase
 {
     /** @test */
     public function it_can_be_created_from_a_string()

@@ -4,9 +4,10 @@ namespace Spatie\OpeningHours\Test;
 
 use DateTime;
 use DateTimeZone;
+use PHPUnit\Framework\TestCase;
 use Spatie\OpeningHours\OpeningHours;
 
-class OpeningHoursTest extends \PHPUnit_Framework_TestCase
+class OpeningHoursTest extends TestCase
 {
     /** @test */
     public function it_can_return_the_opening_hours_for_a_regular_week()
