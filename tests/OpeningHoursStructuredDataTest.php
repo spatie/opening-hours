@@ -2,10 +2,10 @@
 
 namespace Spatie\OpeningHours\Test;
 
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use Spatie\OpeningHours\OpeningHours;
 
-class OpeningHoursStructuredDataTest extends PHPUnit_Framework_TestCase
+class OpeningHoursStructuredDataTest extends TestCase
 {
     /** @test */
     public function it_can_render_opening_hours_as_an_array_of_structured_data()

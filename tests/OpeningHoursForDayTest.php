@@ -3,12 +3,12 @@
 namespace Spatie\OpeningHours\Test;
 
 use Spatie\OpeningHours\Time;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use Spatie\OpeningHours\TimeRange;
 use Spatie\OpeningHours\OpeningHoursForDay;
 use Spatie\OpeningHours\Exceptions\OverlappingTimeRanges;
 
-class OpeningHoursForDayTest extends PHPUnit_Framework_TestCase
+class OpeningHoursForDayTest extends TestCase
 {
     /** @test */
     public function it_can_be_created_from_an_array_of_time_range_strings()
