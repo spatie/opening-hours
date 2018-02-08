@@ -74,6 +74,37 @@ class OpeningHours
         return $this->openingHours;
     }
 
+    public function forWeekCombined(): array
+    {
+        $equalDays = [];
+        $allOpeningHours = $this->openingHours;
+        $uniqueOpeningHours = array_unique($allOpeningHours);
+        $nonUniqueOpeningHours = $allOpeningHours;
+
+        // Initialize $equalDays array based on unique days
+        foreach ($uniqueOpeningHours as $day => $value) {
+            $equalDays[$day] = ['days' => [$day], 'opening_hours' => $value];
+            unset($nonUniqueOpeningHours[$day]);
+        }
+
+        /**
+         * @var OpeningHoursForDay $uniqueValue
+         *
+         * Compare each uniqueDay data, with data from nonUnique days.
+         * Populate equalDays array if data matches
+         */
+        foreach ($uniqueOpeningHours as $uniqueDay => $uniqueValue) {
+            /** @var OpeningHoursForDay $nonUniqueValue */
+            foreach ($nonUniqueOpeningHours as $nonUniqueDay => $nonUniqueValue) {
+                if((string) $uniqueValue === (string) $nonUniqueValue){
+                    $equalDays[$uniqueDay]['days'][] = $nonUniqueDay;
+                }
+            }
+        }
+
+        return $equalDays;
+    }
+
     public function forDay(string $day): OpeningHoursForDay
     {
         $day = $this->normalizeDayName($day);

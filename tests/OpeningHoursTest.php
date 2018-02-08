@@ -29,6 +29,25 @@ class OpeningHoursTest extends TestCase
     }
 
     /** @test */
+    public function it_can_return_combined_opening_hours_for_a_regular_week()
+    {
+        $openingHours = OpeningHours::create([
+            'monday' => ['09:00-18:00'],
+            'tuesday' => ['09:00-18:00'],
+            'wednesday' => ['11:00-15:00'],
+            'thursday' => ['11:00-15:00'],
+            'friday' => ['12:00-14:00']
+        ]);
+
+        $openingHoursForWeek = $openingHours->forWeekCombined();
+
+        $this->assertCount(4, $openingHoursForWeek);
+        $this->assertEquals('11:00-15:00', $openingHoursForWeek['wednesday']['opening_hours']);
+        $this->assertEquals('thursday', array_values($openingHoursForWeek['wednesday']['days'])[1]);
+
+    }
+
+    /** @test */
     public function it_can_validate_the_opening_hours()
     {
         $valid = OpeningHours::isValid([
