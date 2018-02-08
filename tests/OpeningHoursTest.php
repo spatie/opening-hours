@@ -36,7 +36,7 @@ class OpeningHoursTest extends TestCase
             'tuesday' => ['09:00-18:00'],
             'wednesday' => ['11:00-15:00'],
             'thursday' => ['11:00-15:00'],
-            'friday' => ['12:00-14:00']
+            'friday' => ['12:00-14:00'],
         ]);
 
         $openingHoursForWeek = $openingHours->forWeekCombined();
@@ -44,7 +44,6 @@ class OpeningHoursTest extends TestCase
         $this->assertCount(4, $openingHoursForWeek);
         $this->assertEquals('11:00-15:00', $openingHoursForWeek['wednesday']['opening_hours']);
         $this->assertEquals('thursday', array_values($openingHoursForWeek['wednesday']['days'])[1]);
-
     }
 
     /** @test */
