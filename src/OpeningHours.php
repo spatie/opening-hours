@@ -81,14 +81,11 @@ class OpeningHours
         $uniqueOpeningHours = array_unique($allOpeningHours);
         $nonUniqueOpeningHours = $allOpeningHours;
 
-        // Initialize $equalDays array based on unique days
         foreach ($uniqueOpeningHours as $day => $value) {
             $equalDays[$day] = ['days' => [$day], 'opening_hours' => $value];
             unset($nonUniqueOpeningHours[$day]);
         }
 
-        // Compare each uniqueDay data, with data from nonUnique days.
-        // Populate equalDays array if data matches
         foreach ($uniqueOpeningHours as $uniqueDay => $uniqueValue) {
             /** @var OpeningHoursForDay $nonUniqueValue */
             foreach ($nonUniqueOpeningHours as $nonUniqueDay => $nonUniqueValue) {
