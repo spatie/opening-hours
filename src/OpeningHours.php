@@ -87,7 +87,6 @@ class OpeningHours
         }
 
         foreach ($uniqueOpeningHours as $uniqueDay => $uniqueValue) {
-            /** @var OpeningHoursForDay $nonUniqueValue */
             foreach ($nonUniqueOpeningHours as $nonUniqueDay => $nonUniqueValue) {
                 if ((string) $uniqueValue === (string) $nonUniqueValue) {
                     $equalDays[$uniqueDay]['days'][] = $nonUniqueDay;
