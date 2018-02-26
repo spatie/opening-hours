@@ -74,6 +74,29 @@ class OpeningHours
         return $this->openingHours;
     }
 
+    public function forWeekCombined(): array
+    {
+        $equalDays = [];
+        $allOpeningHours = $this->openingHours;
+        $uniqueOpeningHours = array_unique($allOpeningHours);
+        $nonUniqueOpeningHours = $allOpeningHours;
+
+        foreach ($uniqueOpeningHours as $day => $value) {
+            $equalDays[$day] = ['days' => [$day], 'opening_hours' => $value];
+            unset($nonUniqueOpeningHours[$day]);
+        }
+
+        foreach ($uniqueOpeningHours as $uniqueDay => $uniqueValue) {
+            foreach ($nonUniqueOpeningHours as $nonUniqueDay => $nonUniqueValue) {
+                if ((string) $uniqueValue === (string) $nonUniqueValue) {
+                    $equalDays[$uniqueDay]['days'][] = $nonUniqueDay;
+                }
+            }
+        }
+
+        return $equalDays;
+    }
+
     public function forDay(string $day): OpeningHoursForDay
     {
         $day = $this->normalizeDayName($day);

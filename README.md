@@ -59,6 +59,9 @@ $openingHours->forDay('monday');
 // OpeningHoursForDay[] for the regular schedule, keyed by day name
 $openingHours->forWeek();
 
+// Array of day with same schedule for the regular schedule, keyed by day name, days combined by working hours
+$openingHours->forWeekCombined();
+
 // OpeningHoursForDay object for a specific day
 $openingHours->forDate(new DateTime('2016-12-25'));
 
@@ -123,6 +126,14 @@ Returns an array of `OpeningHoursForDay` objects for a regular week.
 
 ```php
 $openingHours->forWeek();
+```
+
+#### `OpeningHours::forWeekCombined(): array`
+
+Returns an array of days. Array key is first day with same hours, array values are days that have the same working hours and `OpeningHoursForDay` object. 
+
+```php
+$openingHours->forWeekCombined();
 ```
 
 #### `OpeningHours::forDay(string $day): Spatie\OpeningHours\OpeningHoursForDay`
