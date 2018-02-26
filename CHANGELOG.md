@@ -2,6 +2,9 @@
 
 All Notable changes to `opening-hours` will be documented in this file
 
+## 1.5.0 - 2018-02-26
+- Added `OpeningHours::forWeekCombined()`
+
 ## 1.4.0 - 2017-09-15
 - Added the ability to add recurring exceptions
 
@@ -12,7 +15,7 @@ All Notable changes to `opening-hours` will be documented in this file
 - Added `regularClosingDays`, `regularClosingDaysISO` and `exceptionalClosingDates` methods
 
 ## 1.2.0 - 2017-01-03
-- Added `asStructuredData` to retrieve the opening hours as a Schema.org structured data array 
+- Added `asStructuredData` to retrieve the opening hours as a Schema.org structured data array
 - Added `nextOpen` method to determine the next time the business will be open
 - Added utility methods: `OpeningHours::map`, `OpeningHours::flatMap`, `OpeningHours::mapExceptions`, `OpeningHours::flatMapExceptions`,`OpeningHoursForDay::map` and `OpeningHoursForDay::empty`
 
