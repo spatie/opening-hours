@@ -68,9 +68,9 @@ class Time
         return $this->isSame($time) || $this->isAfter($time);
     }
 
-    public function toDateTime(): DateTime
+    public function toDateTime(DateTime $date = null): DateTime
     {
-        return (new DateTime('1970-01-01 00:00:00'))->setTime($this->hours, $this->minutes);
+        return ($date ?? new DateTime('1970-01-01 00:00:00'))->setTime($this->hours, $this->minutes);
     }
 
     public function format(string $format = 'H:i'): string
