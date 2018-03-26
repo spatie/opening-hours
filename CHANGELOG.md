@@ -2,6 +2,9 @@
 
 All Notable changes to `opening-hours` will be documented in this file
 
+## 1.6.0 - 2018-03-26
+- Added the ability to pass a `DateTime` instance to mutate to `Time::toDateTime`
+
 ## 1.5.0 - 2018-02-26
 - Added `OpeningHours::forWeekCombined()`
 
