@@ -49,4 +49,32 @@ class OpeningHoursForDayTest extends TestCase
 
         $this->assertEquals('09:00-12:00,13:00-18:00', (string) $openingHoursForDay);
     }
+
+    /** @test */
+    public function it_can_offset_is_existed()
+    {
+        $openingHoursForDay = OpeningHoursForDay::fromStrings(['09:00-12:00', '13:00-18:00']);
+
+        $this->assertTrue($openingHoursForDay->offsetExists(0));
+        $this->assertTrue($openingHoursForDay->offsetExists(1));
+        $this->assertFalse($openingHoursForDay->offsetExists(2));
+    }
+
+    /** @test */
+    public function it_can_unset_offset()
+    {
+        $openingHoursForDay = OpeningHoursForDay::fromStrings(['09:00-12:00', '13:00-18:00']);
+
+        $this->assertNull($openingHoursForDay->offsetUnset(0));
+        $this->assertNull($openingHoursForDay->offsetUnset(1));
+        $this->assertNull($openingHoursForDay->offsetUnset(2));
+    }
+
+    /** @test */
+    public function ic_can_get_iterator()
+    {
+        $openingHoursForDay = OpeningHoursForDay::fromStrings(['09:00-12:00', '13:00-18:00']);
+
+        $this->assertCount(2, $openingHoursForDay->getIterator()->getArrayCopy());
+    }
 }
