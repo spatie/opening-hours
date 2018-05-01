@@ -227,7 +227,7 @@ class OpeningHoursTest extends TestCase
 
         $nextTimeOpen = $openingHours->nextOpen(new DateTime('2016-09-26 12:00:00'));
 
-        $this->assertInstanceOf('DateTime', $nextTimeOpen);
+        $this->assertInstanceOf(DateTime::class, $nextTimeOpen);
         $this->assertEquals('2016-09-26 13:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
     }
 
@@ -241,7 +241,7 @@ class OpeningHoursTest extends TestCase
 
         $nextTimeOpen = $openingHours->nextOpen(new DateTime('2016-09-26 16:00:00'));
 
-        $this->assertInstanceOf('DateTime', $nextTimeOpen);
+        $this->assertInstanceOf(DateTime::class, $nextTimeOpen);
         $this->assertEquals('2016-09-27 10:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
     }
 
@@ -258,10 +258,11 @@ class OpeningHoursTest extends TestCase
 
         $nextTimeOpen = $openingHours->nextOpen(new DateTime('2016-09-26 04:00:00'));
 
-        $this->assertInstanceOf('DateTime', $nextTimeOpen);
+        $this->assertInstanceOf(DateTime::class, $nextTimeOpen);
         $this->assertEquals('2016-09-27 10:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
     }
 
+    /** @test */
     public function it_can_set_the_timezone_on_the_openings_hours_object()
     {
         $openingHours = new OpeningHours('Europe/Amsterdam');
@@ -292,6 +293,7 @@ class OpeningHoursTest extends TestCase
         $this->assertFalse($openingHours->isOpenAt(new DateTime('2016-10-10 10:00')));
     }
 
+    /** @test */
     public function it_can_determine_that_its_open_now()
     {
         $openingHours = OpeningHours::create([
@@ -372,6 +374,25 @@ class OpeningHoursTest extends TestCase
         ]);
 
         $nextTimeOpen = $openingHours->nextOpen(new DateTime());
-        $this->assertInstanceOf('DateTime', $nextTimeOpen);
+        $this->assertInstanceOf(DateTime::class, $nextTimeOpen);
+    }
+
+    /** @test */
+    public function it_can_set_the_timezone()
+    {
+        $openingHours = OpeningHours::create([
+            'monday' => ['00:00-16:00'],
+        ]);
+        $openingHours->setTimezone('Asia/Taipei');
+        $openingHoursForWeek = $openingHours->forWeek();
+
+        $this->assertCount(7, $openingHoursForWeek);
+        $this->assertEquals('00:00-16:00', (string) $openingHoursForWeek['monday'][0]);
+        $this->assertCount(0, $openingHoursForWeek['tuesday']);
+        $this->assertCount(0, $openingHoursForWeek['wednesday']);
+        $this->assertCount(0, $openingHoursForWeek['thursday']);
+        $this->assertCount(0, $openingHoursForWeek['friday']);
+        $this->assertCount(0, $openingHoursForWeek['saturday']);
+        $this->assertCount(0, $openingHoursForWeek['sunday']);
     }
 }
