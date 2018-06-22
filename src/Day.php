@@ -9,7 +9,8 @@ use Spatie\OpeningHours\Helpers\Arr;
  * Class Day
  * @package Spatie\OpeningHours
  */
-class Day {
+class Day
+{
     const MONDAY = 'monday';
     const TUESDAY = 'tuesday';
     const WEDNESDAY = 'wednesday';
@@ -19,9 +20,19 @@ class Day {
     const SUNDAY = 'sunday';
 
     /**
+     * @param callable $callback
      * @return array
      */
-    public static function days() {
+    public static function mapDays(callable $callback)
+    {
+        return Arr::map(Arr::mirror(static::days()), $callback);
+    }
+
+    /**
+     * @return array
+     */
+    public static function days()
+    {
         return [
             static::MONDAY,
             static::TUESDAY,
@@ -34,18 +45,11 @@ class Day {
     }
 
     /**
-     * @param callable $callback
-     * @return array
-     */
-    public static function mapDays(callable $callback) {
-        return Arr::map(Arr::mirror(static::days()), $callback);
-    }
-
-    /**
      * @param string $day
      * @return bool
      */
-    public static function isValid($day) {
+    public static function isValid($day)
+    {
         return in_array($day, static::days());
     }
 
@@ -53,7 +57,8 @@ class Day {
      * @param DateTimeInterface $dateTime
      * @return string
      */
-    public static function onDateTime(DateTimeInterface $dateTime) {
+    public static function onDateTime(DateTimeInterface $dateTime)
+    {
         return static::days()[$dateTime->format('N') - 1];
     }
 
@@ -61,7 +66,8 @@ class Day {
      * @param string $day
      * @return int
      */
-    public static function toISO($day) {
+    public static function toISO($day)
+    {
         return array_search($day, static::days()) + 1;
     }
 }

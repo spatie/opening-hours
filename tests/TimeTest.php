@@ -3,16 +3,16 @@
 namespace Spatie\OpeningHours\Test;
 
 use DateTime;
-use Spatie\OpeningHours\Time;
 use PHPUnit\Framework\TestCase;
 use Spatie\OpeningHours\Exceptions\InvalidTimeString;
+use Spatie\OpeningHours\Time;
 
 class TimeTest extends TestCase
 {
     /** @test */
     public function it_can_be_created_from_a_string()
     {
-        $this->assertEquals('16:00', (string) Time::fromString('16:00'));
+        $this->assertEquals('16:00', (string)Time::fromString('16:00'));
     }
 
     /** @test */
@@ -28,7 +28,7 @@ class TimeTest extends TestCase
     {
         $dateTime = new DateTime('2016-09-27 16:00:00');
 
-        $this->assertEquals('16:00', (string) Time::fromDateTime($dateTime));
+        $this->assertEquals('16:00', (string)Time::fromDateTime($dateTime));
     }
 
     /** @test */
@@ -76,7 +76,7 @@ class TimeTest extends TestCase
     {
         $dateTime = date_create_immutable('2012-11-06 13:25:59.123456');
 
-        $this->assertEquals('13:25', (string) Time::fromDateTime($dateTime));
+        $this->assertEquals('13:25', (string)Time::fromDateTime($dateTime));
     }
 
     /** @test */

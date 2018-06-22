@@ -28,33 +28,39 @@ class OpeningHoursStructuredDataTest extends TestCase
                 'dayOfWeek' => 'Monday',
                 'opens' => '09:00',
                 'closes' => '18:00',
-            ], [
+            ],
+            [
                 '@type' => 'OpeningHoursSpecification',
                 'dayOfWeek' => 'Tuesday',
                 'opens' => '09:00',
                 'closes' => '18:00',
-            ], [
+            ],
+            [
                 '@type' => 'OpeningHoursSpecification',
                 'dayOfWeek' => 'Wednesday',
                 'opens' => '09:00',
                 'closes' => '12:00',
-            ], [
+            ],
+            [
                 '@type' => 'OpeningHoursSpecification',
                 'dayOfWeek' => 'Wednesday',
                 'opens' => '14:00',
                 'closes' => '18:00',
-            ], [
+            ],
+            [
                 '@type' => 'OpeningHoursSpecification',
                 'dayOfWeek' => 'Friday',
                 'opens' => '09:00',
                 'closes' => '20:00',
-            ], [
+            ],
+            [
                 '@type' => 'OpeningHoursSpecification',
                 'opens' => '09:00',
                 'closes' => '12:00',
                 'validFrom' => '2016-09-26',
                 'validThrough' => '2016-09-26',
-            ], [
+            ],
+            [
                 '@type' => 'OpeningHoursSpecification',
                 'opens' => '00:00',
                 'closes' => '00:00',

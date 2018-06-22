@@ -7,12 +7,14 @@
 namespace Spatie\OpeningHours\Exceptions;
 
 
-class NotSupportedException extends Exception {
+class NotSupportedException extends Exception
+{
     /**
      * @param string $feature
      * @return NotSupportedException
      */
-    public static function notSupported($feature) {
+    public static function notSupported($feature)
+    {
         return new self("Unsupported `{$feature}`.");
     }
 }

@@ -4,7 +4,8 @@ namespace Spatie\OpeningHours;
 
 use Spatie\OpeningHours\Exceptions\InvalidTimeRangeString;
 
-class TimeRange {
+class TimeRange
+{
     /** @var \Spatie\OpeningHours\Time */
     protected $start;
     /** @var \Spatie\OpeningHours\Time */
@@ -15,9 +16,10 @@ class TimeRange {
      * @param Time $start
      * @param Time $end
      */
-    protected function __construct(Time $start, Time $end) {
+    protected function __construct(Time $start, Time $end)
+    {
         $this->start = $start;
-        $this->end   = $end;
+        $this->end = $end;
     }
 
     /**
@@ -26,7 +28,8 @@ class TimeRange {
      * @throws Exceptions\InvalidTimeString
      * @throws InvalidTimeRangeString
      */
-    public static function fromString($string) {
+    public static function fromString($string)
+    {
         $times = explode('-', $string);
 
         if (count($times) !== 2) {
@@ -39,29 +42,34 @@ class TimeRange {
     /**
      * @return Time
      */
-    public function start() {
+    public function start()
+    {
         return $this->start;
     }
 
     /**
      * @return Time
      */
-    public function end() {
+    public function end()
+    {
         return $this->end;
     }
 
     /**
+     * @param TimeRange $timeRange
      * @return bool
      */
-    public function spillsOverToNextDay() {
-        return $this->end->isBefore($this->start);
+    public function overlaps(TimeRange $timeRange)
+    {
+        return $this->containsTime($timeRange->start) || $this->containsTime($timeRange->end);
     }
 
     /**
      * @param Time $time
      * @return bool
      */
-    public function containsTime(Time $time) {
+    public function containsTime(Time $time)
+    {
         if ($this->spillsOverToNextDay()) {
             if ($time->isAfter($this->start)) {
                 return $time->isAfter($this->end);
@@ -74,11 +82,19 @@ class TimeRange {
     }
 
     /**
-     * @param TimeRange $timeRange
      * @return bool
      */
-    public function overlaps(TimeRange $timeRange) {
-        return $this->containsTime($timeRange->start) || $this->containsTime($timeRange->end);
+    public function spillsOverToNextDay()
+    {
+        return $this->end->isBefore($this->start);
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->format();
     }
 
     /**
@@ -86,14 +102,8 @@ class TimeRange {
      * @param string $rangeFormat
      * @return string
      */
-    public function format($timeFormat = 'H:i', $rangeFormat = '%s-%s') {
+    public function format($timeFormat = 'H:i', $rangeFormat = '%s-%s')
+    {
         return sprintf($rangeFormat, $this->start->format($timeFormat), $this->end->format($timeFormat));
-    }
-
-    /**
-     * @return string
-     */
-    public function __toString() {
-        return $this->format();
     }
 }

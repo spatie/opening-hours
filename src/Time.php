@@ -6,7 +6,8 @@ use DateTime;
 use DateTimeInterface;
 use Spatie\OpeningHours\Exceptions\InvalidTimeString;
 
-class Time {
+class Time
+{
     /** @var int */
     protected $hours;
     /** @var int */
@@ -17,9 +18,20 @@ class Time {
      * @param $hours
      * @param $minutes
      */
-    protected function __construct($hours, $minutes) {
-        $this->hours   = $hours;
+    protected function __construct($hours, $minutes)
+    {
+        $this->hours = $hours;
         $this->minutes = $minutes;
+    }
+
+    /**
+     * @param DateTimeInterface $dateTime
+     * @return static
+     * @throws InvalidTimeString
+     */
+    public static function fromDateTime(DateTimeInterface $dateTime)
+    {
+        return self::fromString($dateTime->format('H:i'));
     }
 
     /**
@@ -27,7 +39,8 @@ class Time {
      * @return static
      * @throws InvalidTimeString
      */
-    public static function fromString($string) {
+    public static function fromString($string)
+    {
         if (!preg_match('/^([0-1][0-9])|(2[0-4]):[0-5][0-9]$/', $string)) {
             throw InvalidTimeString::forString($string);
         }
@@ -38,19 +51,24 @@ class Time {
     }
 
     /**
-     * @param DateTimeInterface $dateTime
-     * @return static
-     * @throws InvalidTimeString
+     * @param Time $time
+     * @return bool
      */
-    public static function fromDateTime(DateTimeInterface $dateTime) {
-        return self::fromString($dateTime->format('H:i'));
+    public function isBefore(Time $time)
+    {
+        if ($this->isSame($time)) {
+            return false;
+        }
+
+        return !$this->isAfter($time);
     }
 
     /**
      * @param Time $time
      * @return bool
      */
-    public function isSame(Time $time) {
+    public function isSame(Time $time)
+    {
         return (string)$this === (string)$time;
     }
 
@@ -58,7 +76,8 @@ class Time {
      * @param Time $time
      * @return bool
      */
-    public function isAfter(Time $time) {
+    public function isAfter(Time $time)
+    {
         if ($this->isSame($time)) {
             return false;
         }
@@ -74,42 +93,34 @@ class Time {
      * @param Time $time
      * @return bool
      */
-    public function isBefore(Time $time) {
-        if ($this->isSame($time)) {
-            return false;
-        }
-
-        return !$this->isAfter($time);
-    }
-
-    /**
-     * @param Time $time
-     * @return bool
-     */
-    public function isSameOrAfter(Time $time) {
+    public function isSameOrAfter(Time $time)
+    {
         return $this->isSame($time) || $this->isAfter($time);
     }
 
     /**
-     * @param DateTime|null $date
-     * @return DateTime|false
+     * @return string
      */
-    public function toDateTime(DateTime $date = null) {
-        return ($date ?: new DateTime('1970-01-01 00:00:00'))->setTime($this->hours, $this->minutes);
+    public function __toString()
+    {
+        return $this->format();
     }
 
     /**
      * @param string $format
      * @return string
      */
-    public function format($format = 'H:i') {
+    public function format($format = 'H:i')
+    {
         return $this->toDateTime()->format($format);
     }
 
     /**
-     * @return string
+     * @param DateTime|null $date
+     * @return DateTime|false
      */
-    public function __toString() {
-        return $this->format();
+    public function toDateTime(DateTime $date = null)
+    {
+        return ($date ?: new DateTime('1970-01-01 00:00:00'))->setTime($this->hours, $this->minutes);
     }
 }
