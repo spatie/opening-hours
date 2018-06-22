@@ -2,17 +2,17 @@
 
 namespace Spatie\OpeningHours\Test;
 
-use Spatie\OpeningHours\Time;
 use PHPUnit\Framework\TestCase;
-use Spatie\OpeningHours\TimeRange;
 use Spatie\OpeningHours\Exceptions\InvalidTimeRangeString;
+use Spatie\OpeningHours\Time;
+use Spatie\OpeningHours\TimeRange;
 
 class TimeRangeTest extends TestCase
 {
     /** @test */
     public function it_can_be_created_from_a_string()
     {
-        $this->assertEquals('16:00-18:00', (string) TimeRange::fromString('16:00-18:00'));
+        $this->assertEquals('16:00-18:00', (string)TimeRange::fromString('16:00-18:00'));
     }
 
     /** @test */
