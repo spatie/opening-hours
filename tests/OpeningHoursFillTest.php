@@ -46,6 +46,32 @@ class OpeningHoursFillTest extends TestCase
         $this->assertCount(0, $openingHours->forDate(new DateTime('2016-09-26 11:00:00')));
     }
 
+    /**
+     * @test
+     */
+    public function it_can_parse_osm_strings() {
+        $openingHours = OpeningHours::fromOsmString('Mo-Fr 08:00-12:00,13:30-17:30; Aug 01 off');
+
+        $this->assertInstanceOf(TimeRange::class, $openingHours->forDay('monday')[0]);
+        $this->assertEquals((string) $openingHours->forDay('monday')[0], '08:00-12:00');
+        $this->assertEquals((string) $openingHours->forDay('monday')[1], '13:30-17:30');
+        $this->assertInstanceOf(TimeRange::class, $openingHours->forDay('tuesday')[0]);
+        $this->assertEquals((string) $openingHours->forDay('tuesday')[0], '08:00-12:00');
+        $this->assertEquals((string) $openingHours->forDay('tuesday')[1], '13:30-17:30');
+        $this->assertInstanceOf(TimeRange::class, $openingHours->forDay('wednesday')[0]);
+        $this->assertEquals((string) $openingHours->forDay('wednesday')[0], '08:00-12:00');
+        $this->assertEquals((string) $openingHours->forDay('wednesday')[1], '13:30-17:30');
+        $this->assertInstanceOf(TimeRange::class, $openingHours->forDay('thursday')[0]);
+        $this->assertEquals((string) $openingHours->forDay('thursday')[0], '08:00-12:00');
+        $this->assertEquals((string) $openingHours->forDay('thursday')[1], '13:30-17:30');
+        $this->assertInstanceOf(TimeRange::class, $openingHours->forDay('friday')[0]);
+        $this->assertEquals((string) $openingHours->forDay('friday')[0], '08:00-12:00');
+        $this->assertEquals((string) $openingHours->forDay('friday')[1], '13:30-17:30');
+
+//        var_dump($openingHours->exceptions(), $openingHours->forDate(new DateTime('2018-08-01 11:00:00')));
+        $this->assertCount(0, $openingHours->forDate(new DateTime('2018-08-01 11:00:00')));
+    }
+
     /** @test */
     public function it_can_handle_empty_input()
     {

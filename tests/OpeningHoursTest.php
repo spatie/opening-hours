@@ -275,7 +275,7 @@ class OpeningHoursTest extends TestCase
 
         $this->assertTrue($openingHours->isOpenAt(new DateTime('2016-10-10 10:00')));
         $this->assertTrue($openingHours->isOpenAt(new DateTime('2016-10-10 15:59')));
-        $this->assertTrue($openingHours->isOpenAt(new DateTime('2016-10-10 08:00')));
+        $this->assertFalse($openingHours->isOpenAt(new DateTime('2016-10-10 08:00')));
         $this->assertFalse($openingHours->isOpenAt(new DateTime('2016-10-10 06:00')));
 
         $this->assertFalse($openingHours->isOpenAt(new DateTime('2016-10-10 06:00', new DateTimeZone('Europe/Amsterdam'))));
