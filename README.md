@@ -162,7 +162,7 @@ $openingHours->exceptions();
 
 #### `OpeningHours::isOpenOn(string $day): bool`
 
-Checks if the business is op on a day in the regular schedule.
+Checks if the business is open on a day in the regular schedule.
 
 ```php
 $openingHours->isOpenOn('saturday');
