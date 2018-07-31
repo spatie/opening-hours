@@ -86,7 +86,7 @@ class TimeTest extends TestCase
         $this->assertEquals('09:00', Time::fromString('09:00')->format('H:i'));
         $this->assertEquals('9 AM', Time::fromString('09:00')->format('g A'));
     }
-    
+
     /** @test */
     public function it_can_get_hours_and_minutes()
     {
@@ -94,7 +94,7 @@ class TimeTest extends TestCase
         $this->assertEquals(16, $time->hours());
         $this->assertEquals(30, $time->minutes());
     }
-    
+
     /** @test */
     public function it_can_calculate_diff_in_minutes()
     {
