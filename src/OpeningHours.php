@@ -312,8 +312,8 @@ class OpeningHours
             return $openingHoursForDay->map(function (TimeRange $timeRange) use ($date) {
                 return [
                     '@type' => 'OpeningHoursSpecification',
-                    'opens' => $timeRange->start(),
-                    'closes' => $timeRange->end(),
+                    'opens' => (string) $timeRange->start(),
+                    'closes' => (string) $timeRange->end(),
                     'validFrom' => $date,
                     'validThrough' => $date,
                 ];
