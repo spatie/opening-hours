@@ -30,7 +30,7 @@ class Time
 
         return new self($hours, $minutes);
     }
-    
+
     public function hours(): int
     {
         return $this->hours;
