@@ -30,6 +30,16 @@ class Time
 
         return new self($hours, $minutes);
     }
+    
+    public function hours(): int
+    {
+        return $this->hours;
+    }
+
+    public function minutes(): int
+    {
+        return $this->minutes;
+    }
 
     public static function fromDateTime(DateTimeInterface $dateTime): self
     {
@@ -66,6 +76,11 @@ class Time
     public function isSameOrAfter(self $time): bool
     {
         return $this->isSame($time) || $this->isAfter($time);
+    }
+
+    public function diffInMinutes(self $time): int
+    {
+        return ($time->hours() * 60 + $time->minutes()) - ($this->hours() * 60 + $this->minutes());
     }
 
     public function toDateTime(DateTime $date = null): DateTime
