@@ -85,7 +85,9 @@ class Time
 
     public function toDateTime(DateTime $date = null): DateTime
     {
-        return ($date ?? new DateTime('1970-01-01 00:00:00'))->setTime($this->hours, $this->minutes);
+        $date = $date ? (clone $date) : new DateTime('1970-01-01 00:00:00');
+
+        return $date->setTime($this->hours, $this->minutes);
     }
 
     public function format(string $format = 'H:i'): string

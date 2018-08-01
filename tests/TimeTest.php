@@ -103,4 +103,13 @@ class TimeTest extends TestCase
         $this->assertEquals(0, $time1->diff($time2)->h);
         $this->assertEquals(25, $time1->diff($time2)->i);
     }
+
+    /** @test */
+    public function it_should_not_mutate_passed_datetime()
+    {
+        $dateTime = new DateTime('2016-09-27 12:00:00');
+        $time = Time::fromString('15:00');
+        $this->assertEquals('2016-09-27 15:00:00', $time->toDateTime($dateTime)->format('Y-m-d H:i:s'));
+        $this->assertEquals('2016-09-27 12:00:00', $dateTime->format('Y-m-d H:i:s'));
+    }
 }
