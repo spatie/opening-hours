@@ -96,10 +96,11 @@ class TimeTest extends TestCase
     }
 
     /** @test */
-    public function it_can_calculate_diff_in_minutes()
+    public function it_can_calculate_diff()
     {
         $time1 = Time::fromString('16:30');
         $time2 = Time::fromString('16:05');
-        $this->assertEquals(25, $time2->diffInMinutes($time1));
+        $this->assertEquals(0, $time1->diff($time2)->h);
+        $this->assertEquals(25, $time1->diff($time2)->i);
     }
 }

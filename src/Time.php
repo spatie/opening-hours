@@ -78,9 +78,9 @@ class Time
         return $this->isSame($time) || $this->isAfter($time);
     }
 
-    public function diffInMinutes(self $time): int
+    public function diff(self $time): \DateInterval
     {
-        return ($time->hours() * 60 + $time->minutes()) - ($this->hours() * 60 + $this->minutes());
+        return $this->toDateTime()->diff($time->toDateTime());
     }
 
     public function toDateTime(DateTime $date = null): DateTime
