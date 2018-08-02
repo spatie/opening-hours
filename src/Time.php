@@ -31,6 +31,16 @@ class Time
         return new self($hours, $minutes);
     }
 
+    public function hours(): int
+    {
+        return $this->hours;
+    }
+
+    public function minutes(): int
+    {
+        return $this->minutes;
+    }
+
     public static function fromDateTime(DateTimeInterface $dateTime): self
     {
         return self::fromString($dateTime->format('H:i'));
@@ -68,9 +78,16 @@ class Time
         return $this->isSame($time) || $this->isAfter($time);
     }
 
+    public function diff(self $time): \DateInterval
+    {
+        return $this->toDateTime()->diff($time->toDateTime());
+    }
+
     public function toDateTime(DateTime $date = null): DateTime
     {
-        return ($date ?? new DateTime('1970-01-01 00:00:00'))->setTime($this->hours, $this->minutes);
+        $date = $date ? (clone $date) : new DateTime('1970-01-01 00:00:00');
+
+        return $date->setTime($this->hours, $this->minutes);
     }
 
     public function format(string $format = 'H:i'): string

@@ -86,4 +86,30 @@ class TimeTest extends TestCase
         $this->assertEquals('09:00', Time::fromString('09:00')->format('H:i'));
         $this->assertEquals('9 AM', Time::fromString('09:00')->format('g A'));
     }
+
+    /** @test */
+    public function it_can_get_hours_and_minutes()
+    {
+        $time = Time::fromString('16:30');
+        $this->assertEquals(16, $time->hours());
+        $this->assertEquals(30, $time->minutes());
+    }
+
+    /** @test */
+    public function it_can_calculate_diff()
+    {
+        $time1 = Time::fromString('16:30');
+        $time2 = Time::fromString('16:05');
+        $this->assertEquals(0, $time1->diff($time2)->h);
+        $this->assertEquals(25, $time1->diff($time2)->i);
+    }
+
+    /** @test */
+    public function it_should_not_mutate_passed_datetime()
+    {
+        $dateTime = new DateTime('2016-09-27 12:00:00');
+        $time = Time::fromString('15:00');
+        $this->assertEquals('2016-09-27 15:00:00', $time->toDateTime($dateTime)->format('Y-m-d H:i:s'));
+        $this->assertEquals('2016-09-27 12:00:00', $dateTime->format('Y-m-d H:i:s'));
+    }
 }
