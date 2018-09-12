@@ -171,6 +171,27 @@ class OpeningHours
         return $dateTime;
     }
 
+    public function nextClose(DateTimeInterface $dateTime): DateTime
+    {
+        $openingHoursForDay = $this->forDate($dateTime);
+        $nextClose = $openingHoursForDay->nextClose(Time::fromDateTime($dateTime));
+
+        while ($nextClose == false) {
+            $dateTime
+                ->modify('+1 day')
+                ->setTime(0, 0, 0);
+
+            $openingHoursForDay = $this->forDate($dateTime);
+
+            $nextClose = $openingHoursForDay->nextClose(Time::fromDateTime($dateTime));
+        }
+
+        $nextDateTime = $nextClose->toDateTime();
+        $dateTime->setTime($nextDateTime->format('G'), $nextDateTime->format('i'), 0);
+
+        return $dateTime;
+    }
+
     public function regularClosingDays(): array
     {
         return array_keys($this->filter(function (OpeningHoursForDay $openingHoursForDay) {
