@@ -1,6 +1,9 @@
 # Changelog
 
-All Notable changes to `opening-hours` will be documented in this file
+All notable changes to `opening-hours` will be documented in this file
+
+## 1.8.0 - 2018-09-17
+- Added `nextClose`
 
 ## 1.7.0 - 2018-08-02
 - Added additional helpers on `Time`
