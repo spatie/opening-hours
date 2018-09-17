@@ -55,6 +55,21 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
         return false;
     }
 
+    public function nextClose(Time $time)
+    {
+        foreach ($this->openingHours as $timeRange) {
+            if ($nextClose = $this->findNextCloseInWorkingHours($time, $timeRange)) {
+                return $nextClose;
+            }
+
+            if ($nextClose = $this->findNextCloseInFreeTime($time, $timeRange)) {
+                return $nextClose;
+            }
+        }
+
+        return false;
+    }
+
     protected function findNextOpenInWorkingHours(Time $time, TimeRange $timeRange)
     {
         if ($timeRange->containsTime($time) && next($timeRange) !== $timeRange) {
@@ -70,6 +85,26 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
 
         if ($timeOffRange->containsTime($time) || $timeOffRange->start()->isSame($time)) {
             return $timeRange->start();
+        }
+
+        $prevTimeRange = $timeRange;
+    }
+
+    protected function findNextCloseInWorkingHours(Time $time, TimeRange $timeRange)
+    {
+        if ($timeRange->containsTime($time)) {
+            return next($timeRange);
+        }
+    }
+
+    protected function findNextCloseInFreeTime(Time $time, TimeRange $timeRange, TimeRange &$prevTimeRange = null)
+    {
+        $timeOffRange = $prevTimeRange ?
+            TimeRange::fromString($prevTimeRange->end().'-'.$timeRange->start()) :
+            TimeRange::fromString('00:00-'.$timeRange->start());
+
+        if ($timeOffRange->containsTime($time) || $timeOffRange->start()->isSame($time)) {
+            return $timeRange->end();
         }
 
         $prevTimeRange = $timeRange;

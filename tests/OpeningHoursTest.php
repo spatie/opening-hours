@@ -232,6 +232,19 @@ class OpeningHoursTest extends TestCase
     }
 
     /** @test */
+    public function it_can_determine_next_close_hours_from_non_working_date_time()
+    {
+        $openingHours = OpeningHours::create([
+            'monday' => ['09:00-11:00', '13:00-19:00'],
+        ]);
+
+        $nextTimeOpen = $openingHours->nextClose(new DateTime('2016-09-26 12:00:00'));
+
+        $this->assertInstanceOf(DateTime::class, $nextTimeOpen);
+        $this->assertEquals('2016-09-26 19:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
+    }
+
+    /** @test */
     public function it_can_determine_next_open_hours_from_working_date_time()
     {
         $openingHours = OpeningHours::create([
@@ -243,6 +256,20 @@ class OpeningHoursTest extends TestCase
 
         $this->assertInstanceOf(DateTime::class, $nextTimeOpen);
         $this->assertEquals('2016-09-27 10:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
+    }
+
+    /** @test */
+    public function it_can_determine_next_close_hours_from_working_date_time()
+    {
+        $openingHours = OpeningHours::create([
+            'monday' => ['09:00-11:00', '13:00-19:00'],
+            'tuesday' => ['10:00-11:00', '14:00-19:00'],
+        ]);
+
+        $nextTimeOpen = $openingHours->nextClose(new DateTime('2016-09-26 16:00:00'));
+
+        $this->assertInstanceOf(DateTime::class, $nextTimeOpen);
+        $this->assertEquals('2016-09-26 19:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
     }
 
     /** @test */
@@ -260,6 +287,23 @@ class OpeningHoursTest extends TestCase
 
         $this->assertInstanceOf(DateTime::class, $nextTimeOpen);
         $this->assertEquals('2016-09-27 10:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
+    }
+
+    /** @test */
+    public function it_can_determine_next_close_hours_from_early_morning()
+    {
+        $openingHours = OpeningHours::create([
+            'monday' => ['09:00-11:00', '13:00-19:00'],
+            'tuesday' => ['10:00-11:00', '14:00-19:00'],
+            'exceptions' => [
+                '2016-09-26' => [],
+            ],
+        ]);
+
+        $nextTimeOpen = $openingHours->nextClose(new DateTime('2016-09-26 04:00:00'));
+
+        $this->assertInstanceOf(DateTime::class, $nextTimeOpen);
+        $this->assertEquals('2016-09-27 11:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
     }
 
     /** @test */
