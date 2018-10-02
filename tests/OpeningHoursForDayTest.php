@@ -39,7 +39,8 @@ class OpeningHoursForDayTest extends TestCase
 
         $this->assertTrue($openingHoursForDay->isOpenAt(Time::fromString('09:00')));
         $this->assertFalse($openingHoursForDay->isOpenAt(Time::fromString('08:00')));
-        $this->assertFalse($openingHoursForDay->isOpenAt(Time::fromString('18:00')));
+        $this->assertTrue($openingHoursForDay->isOpenAt(Time::fromString('18:00')));
+        $this->assertFalse($openingHoursForDay->isOpenAt(Time::fromString('18:01')));
     }
 
     /** @test */

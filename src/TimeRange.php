@@ -47,14 +47,14 @@ class TimeRange
     public function containsTime(Time $time): bool
     {
         if ($this->spillsOverToNextDay()) {
-            if ($time->isAfter($this->start)) {
+            if ($time->isSameOrAfter($this->start)) {
                 return $time->isAfter($this->end);
             }
 
-            return $time->isBefore($this->end);
+            return ! $time->isAfter($this->end);
         }
 
-        return $time->isSameOrAfter($this->start) && $time->isBefore($this->end);
+        return $time->isSameOrAfter($this->start) && ! $time->isAfter($this->end);
     }
 
     public function overlaps(self $timeRange): bool
