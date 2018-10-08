@@ -50,6 +50,10 @@ class TimeRangeTest extends TestCase
         $this->assertTrue(TimeRange::fromString('18:00-01:00')->containsTime(Time::fromString('22:00')));
         $this->assertFalse(TimeRange::fromString('18:00-01:00')->containsTime(Time::fromString('17:00')));
         $this->assertFalse(TimeRange::fromString('18:00-01:00')->containsTime(Time::fromString('02:00')));
+
+        $this->assertTrue(TimeRange::fromString('18:00-01:00')->containsTime(Time::fromString('18:00')));
+        $this->assertTrue(TimeRange::fromString('18:00-01:00')->containsTime(Time::fromString('00:59')));
+        $this->assertFalse(TimeRange::fromString('18:00-01:00')->containsTime(Time::fromString('01:00')));
     }
 
     /** @test */
