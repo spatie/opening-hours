@@ -47,7 +47,7 @@ class TimeRange
     public function containsTime(Time $time): bool
     {
         if ($this->spillsOverToNextDay()) {
-            if ($time->isAfter($this->start)) {
+            if ($time->isSameOrAfter($this->start)) {
                 return $time->isAfter($this->end);
             }
 
