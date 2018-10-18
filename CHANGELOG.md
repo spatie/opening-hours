@@ -2,6 +2,10 @@
 
 All notable changes to `opening-hours` will be documented in this file
 
+## 1.8.1 - 2018-10-18
+
+- overspilling timerange will now contain start time
+
 ## 1.8.0 - 2018-09-17
 - Added `nextClose`
 
