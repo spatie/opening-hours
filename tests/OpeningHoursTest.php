@@ -4,6 +4,7 @@ namespace Spatie\OpeningHours\Test;
 
 use DateTime;
 use DateTimeZone;
+use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 use Spatie\OpeningHours\OpeningHours;
 
@@ -131,6 +132,14 @@ class OpeningHoursTest extends TestCase
         $this->assertEquals('09:00-18:00', $openingHoursForMonday1909[0]);
 
         $this->assertCount(0, $openingHoursForMonday2609);
+
+        $openingHoursForMonday1909 = $openingHours->forDate(new DateTimeImmutable('2016-09-19 00:00:00'));
+        $openingHoursForMonday2609 = $openingHours->forDate(new DateTimeImmutable('2016-09-26 00:00:00'));
+
+        $this->assertCount(1, $openingHoursForMonday1909);
+        $this->assertEquals('09:00-18:00', $openingHoursForMonday1909[0]);
+
+        $this->assertCount(0, $openingHoursForMonday2609);
     }
 
     /** @test */
@@ -144,6 +153,10 @@ class OpeningHoursTest extends TestCase
         $this->assertTrue($openingHours->isOpenAt($shouldBeOpen));
         $this->assertFalse($openingHours->isClosedAt($shouldBeOpen));
 
+        $shouldBeOpen = new DateTimeImmutable('2016-09-26 11:00:00');
+        $this->assertTrue($openingHours->isOpenAt($shouldBeOpen));
+        $this->assertFalse($openingHours->isClosedAt($shouldBeOpen));
+
         $shouldBeOpenAlternativeDate = date_create_immutable('2016-09-26 11:12:13.123456');
         $this->assertTrue($openingHours->isOpenAt($shouldBeOpenAlternativeDate));
         $this->assertFalse($openingHours->isClosedAt($shouldBeOpenAlternativeDate));
@@ -152,7 +165,15 @@ class OpeningHoursTest extends TestCase
         $this->assertFalse($openingHours->isOpenAt($shouldBeClosedBecauseOfTime));
         $this->assertTrue($openingHours->isClosedAt($shouldBeClosedBecauseOfTime));
 
+        $shouldBeClosedBecauseOfTime = new DateTimeImmutable('2016-09-26 20:00:00');
+        $this->assertFalse($openingHours->isOpenAt($shouldBeClosedBecauseOfTime));
+        $this->assertTrue($openingHours->isClosedAt($shouldBeClosedBecauseOfTime));
+
         $shouldBeClosedBecauseOfDay = new DateTime('2016-09-27 11:00:00');
+        $this->assertFalse($openingHours->isOpenAt($shouldBeClosedBecauseOfDay));
+        $this->assertTrue($openingHours->isClosedAt($shouldBeClosedBecauseOfDay));
+
+        $shouldBeClosedBecauseOfDay = new DateTimeImmutable('2016-09-27 11:00:00');
         $this->assertFalse($openingHours->isOpenAt($shouldBeClosedBecauseOfDay));
         $this->assertTrue($openingHours->isClosedAt($shouldBeClosedBecauseOfDay));
     }
@@ -168,6 +189,10 @@ class OpeningHoursTest extends TestCase
         ]);
 
         $shouldBeClosed = new DateTime('2016-09-26 11:00:00');
+        $this->assertFalse($openingHours->isOpenAt($shouldBeClosed));
+        $this->assertTrue($openingHours->isClosedAt($shouldBeClosed));
+
+        $shouldBeClosed = new DateTimeImmutable('2016-09-26 11:00:00');
         $this->assertFalse($openingHours->isOpenAt($shouldBeClosed));
         $this->assertTrue($openingHours->isClosedAt($shouldBeClosed));
     }
@@ -188,11 +213,23 @@ class OpeningHoursTest extends TestCase
         $this->assertFalse($openingHours->isOpenAt($closedOnNewYearDay));
         $this->assertTrue($openingHours->isClosedAt($closedOnNewYearDay));
 
+        $closedOnNewYearDay = new DateTimeImmutable('2017-01-01 11:00:00');
+        $this->assertFalse($openingHours->isOpenAt($closedOnNewYearDay));
+        $this->assertTrue($openingHours->isClosedAt($closedOnNewYearDay));
+
         $closedOnSecondChristmasDay = new DateTime('2025-12-16 12:00:00');
         $this->assertFalse($openingHours->isOpenAt($closedOnSecondChristmasDay));
         $this->assertTrue($openingHours->isClosedAt($closedOnSecondChristmasDay));
 
+        $closedOnSecondChristmasDay = new DateTimeImmutable('2025-12-16 12:00:00');
+        $this->assertFalse($openingHours->isOpenAt($closedOnSecondChristmasDay));
+        $this->assertTrue($openingHours->isClosedAt($closedOnSecondChristmasDay));
+
         $openOnChristmasMorning = new DateTime('2025-12-25 10:00:00');
+        $this->assertTrue($openingHours->isOpenAt($openOnChristmasMorning));
+        $this->assertFalse($openingHours->isClosedAt($openOnChristmasMorning));
+
+        $openOnChristmasMorning = new DateTimeImmutable('2025-12-25 10:00:00');
         $this->assertTrue($openingHours->isOpenAt($openOnChristmasMorning));
         $this->assertFalse($openingHours->isClosedAt($openOnChristmasMorning));
     }
@@ -213,7 +250,15 @@ class OpeningHoursTest extends TestCase
         $this->assertTrue($openingHours->isOpenAt($openOnNewYearDay2018));
         $this->assertFalse($openingHours->isClosedAt($openOnNewYearDay2018));
 
+        $openOnNewYearDay2018 = new DateTimeImmutable('2018-01-01 11:00:00');
+        $this->assertTrue($openingHours->isOpenAt($openOnNewYearDay2018));
+        $this->assertFalse($openingHours->isClosedAt($openOnNewYearDay2018));
+
         $closedOnNewYearDay2019 = new DateTime('2019-01-01 11:00:00');
+        $this->assertFalse($openingHours->isOpenAt($closedOnNewYearDay2019));
+        $this->assertTrue($openingHours->isClosedAt($closedOnNewYearDay2019));
+
+        $closedOnNewYearDay2019 = new DateTimeImmutable('2019-01-01 11:00:00');
         $this->assertFalse($openingHours->isOpenAt($closedOnNewYearDay2019));
         $this->assertTrue($openingHours->isClosedAt($closedOnNewYearDay2019));
     }
@@ -229,6 +274,11 @@ class OpeningHoursTest extends TestCase
 
         $this->assertInstanceOf(DateTime::class, $nextTimeOpen);
         $this->assertEquals('2016-09-26 13:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
+
+        $nextTimeOpen = $openingHours->nextOpen(new DateTimeImmutable('2016-09-26 12:00:00'));
+
+        $this->assertInstanceOf(DateTimeImmutable::class, $nextTimeOpen);
+        $this->assertEquals('2016-09-26 13:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
     }
 
     /** @test */
@@ -241,6 +291,11 @@ class OpeningHoursTest extends TestCase
         $nextTimeOpen = $openingHours->nextClose(new DateTime('2016-09-26 12:00:00'));
 
         $this->assertInstanceOf(DateTime::class, $nextTimeOpen);
+        $this->assertEquals('2016-09-26 19:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
+
+        $nextTimeOpen = $openingHours->nextClose(new DateTimeImmutable('2016-09-26 12:00:00'));
+
+        $this->assertInstanceOf(DateTimeImmutable::class, $nextTimeOpen);
         $this->assertEquals('2016-09-26 19:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
     }
 
@@ -256,6 +311,11 @@ class OpeningHoursTest extends TestCase
 
         $this->assertInstanceOf(DateTime::class, $nextTimeOpen);
         $this->assertEquals('2016-09-27 10:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
+
+        $nextTimeOpen = $openingHours->nextOpen(new DateTimeImmutable('2016-09-26 16:00:00'));
+
+        $this->assertInstanceOf(DateTimeImmutable::class, $nextTimeOpen);
+        $this->assertEquals('2016-09-27 10:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
     }
 
     /** @test */
@@ -266,10 +326,15 @@ class OpeningHoursTest extends TestCase
             'tuesday' => ['10:00-11:00', '14:00-19:00'],
         ]);
 
-        $nextTimeOpen = $openingHours->nextClose(new DateTime('2016-09-26 16:00:00'));
+        $nextTimeClose = $openingHours->nextClose(new DateTime('2016-09-26 16:00:00'));
 
-        $this->assertInstanceOf(DateTime::class, $nextTimeOpen);
-        $this->assertEquals('2016-09-26 19:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
+        $this->assertInstanceOf(DateTime::class, $nextTimeClose);
+        $this->assertEquals('2016-09-26 19:00:00', $nextTimeClose->format('Y-m-d H:i:s'));
+
+        $nextTimeClose = $openingHours->nextClose(new DateTimeImmutable('2016-09-26 16:00:00'));
+
+        $this->assertInstanceOf(DateTimeImmutable::class, $nextTimeClose);
+        $this->assertEquals('2016-09-26 19:00:00', $nextTimeClose->format('Y-m-d H:i:s'));
     }
 
     /** @test */
@@ -287,6 +352,11 @@ class OpeningHoursTest extends TestCase
 
         $this->assertInstanceOf(DateTime::class, $nextTimeOpen);
         $this->assertEquals('2016-09-27 10:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
+
+        $nextTimeOpen = $openingHours->nextOpen(new DateTimeImmutable('2016-09-26 04:00:00'));
+
+        $this->assertInstanceOf(DateTimeImmutable::class, $nextTimeOpen);
+        $this->assertEquals('2016-09-27 10:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
     }
 
     /** @test */
@@ -303,6 +373,11 @@ class OpeningHoursTest extends TestCase
         $nextTimeOpen = $openingHours->nextClose(new DateTime('2016-09-26 04:00:00'));
 
         $this->assertInstanceOf(DateTime::class, $nextTimeOpen);
+        $this->assertEquals('2016-09-27 11:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
+
+        $nextTimeOpen = $openingHours->nextClose(new DateTimeImmutable('2016-09-26 04:00:00'));
+
+        $this->assertInstanceOf(DateTimeImmutable::class, $nextTimeOpen);
         $this->assertEquals('2016-09-27 11:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
     }
 
@@ -332,9 +407,27 @@ class OpeningHoursTest extends TestCase
         $this->assertFalse($openingHours->isOpenAt(new DateTime('2016-11-14 15:59', new DateTimeZone('America/Denver'))));
         $this->assertTrue($openingHours->isOpenAt(new DateTime('2016-10-10 09:59', new DateTimeZone('America/Denver'))));
 
+        $this->assertTrue($openingHours->isOpenAt(new DateTimeImmutable('2016-10-10 10:00')));
+        $this->assertTrue($openingHours->isOpenAt(new DateTimeImmutable('2016-10-10 15:59')));
+        $this->assertTrue($openingHours->isOpenAt(new DateTimeImmutable('2016-10-10 08:00')));
+        $this->assertFalse($openingHours->isOpenAt(new DateTimeImmutable('2016-10-10 06:00')));
+
+        $this->assertFalse($openingHours->isOpenAt(new DateTimeImmutable('2016-10-10 06:00', new DateTimeZone('Europe/Amsterdam'))));
+        $this->assertTrue($openingHours->isOpenAt(new DateTimeImmutable('2016-10-10 09:00', new DateTimeZone('Europe/Amsterdam'))));
+        $this->assertTrue($openingHours->isOpenAt(new DateTimeImmutable('2016-10-10 17:59', new DateTimeZone('Europe/Amsterdam'))));
+
+        $this->assertFalse($openingHours->isOpenAt(new DateTime('2016-11-14 17:59', new DateTimeZone('Europe/Amsterdam'))));
+        $this->assertTrue($openingHours->isOpenAt(new DateTime('2016-11-14 12:59', new DateTimeZone('Europe/Amsterdam'))));
+
+        $this->assertFalse($openingHours->isOpenAt(new DateTime('2016-11-14 15:59', new DateTimeZone('America/Denver'))));
+        $this->assertTrue($openingHours->isOpenAt(new DateTime('2016-10-10 09:59', new DateTimeZone('America/Denver'))));
+
         date_default_timezone_set('America/Denver');
         $this->assertTrue($openingHours->isOpenAt(new DateTime('2016-10-10 09:59')));
         $this->assertFalse($openingHours->isOpenAt(new DateTime('2016-10-10 10:00')));
+
+        $this->assertTrue($openingHours->isOpenAt(new DateTimeImmutable('2016-10-10 09:59')));
+        $this->assertFalse($openingHours->isOpenAt(new DateTimeImmutable('2016-10-10 10:00')));
     }
 
     /** @test */
@@ -419,6 +512,9 @@ class OpeningHoursTest extends TestCase
 
         $nextTimeOpen = $openingHours->nextOpen(new DateTime());
         $this->assertInstanceOf(DateTime::class, $nextTimeOpen);
+
+        $nextTimeOpen = $openingHours->nextOpen(new DateTimeImmutable());
+        $this->assertInstanceOf(DateTimeImmutable::class, $nextTimeOpen);
     }
 
     /** @test */
