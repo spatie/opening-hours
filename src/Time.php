@@ -87,7 +87,7 @@ class Time
     /**
      * @TODO This should returns DateTime on next major release
      */
-    public function toDateTime(DateTimeInterface $date = null): DateTime
+    public function toDateTime(DateTime $date = null): DateTime
     {
         if (! $date) {
             $date = new DateTime('1970-01-01 00:00:00');
