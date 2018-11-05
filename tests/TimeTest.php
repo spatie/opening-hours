@@ -3,6 +3,7 @@
 namespace Spatie\OpeningHours\Test;
 
 use DateTime;
+use DateTimeImmutable;
 use Spatie\OpeningHours\Time;
 use PHPUnit\Framework\TestCase;
 use Spatie\OpeningHours\Exceptions\InvalidTimeString;
@@ -27,6 +28,10 @@ class TimeTest extends TestCase
     public function it_can_be_created_from_a_date_time_instance()
     {
         $dateTime = new DateTime('2016-09-27 16:00:00');
+
+        $this->assertEquals('16:00', (string) Time::fromDateTime($dateTime));
+
+        $dateTime = new DateTimeImmutable('2016-09-27 16:00:00');
 
         $this->assertEquals('16:00', (string) Time::fromDateTime($dateTime));
     }
@@ -108,6 +113,17 @@ class TimeTest extends TestCase
     public function it_should_not_mutate_passed_datetime()
     {
         $dateTime = new DateTime('2016-09-27 12:00:00');
+        $time = Time::fromString('15:00');
+        $this->assertEquals('2016-09-27 15:00:00', $time->toDateTime($dateTime)->format('Y-m-d H:i:s'));
+        $this->assertEquals('2016-09-27 12:00:00', $dateTime->format('Y-m-d H:i:s'));
+    }
+
+    /** @test */
+    public function it_should_not_mutate_passed_datetime_immutable()
+    {
+        $this->markTestIncomplete('Not supported in v1.x');
+
+        $dateTime = new DateTimeImmutable('2016-09-27 12:00:00');
         $time = Time::fromString('15:00');
         $this->assertEquals('2016-09-27 15:00:00', $time->toDateTime($dateTime)->format('Y-m-d H:i:s'));
         $this->assertEquals('2016-09-27 12:00:00', $dateTime->format('Y-m-d H:i:s'));

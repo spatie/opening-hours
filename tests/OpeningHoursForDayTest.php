@@ -71,7 +71,7 @@ class OpeningHoursForDayTest extends TestCase
     }
 
     /** @test */
-    public function ic_can_get_iterator()
+    public function it_can_get_iterator()
     {
         $openingHoursForDay = OpeningHoursForDay::fromStrings(['09:00-12:00', '13:00-18:00']);
 
