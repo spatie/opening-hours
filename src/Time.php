@@ -84,7 +84,10 @@ class Time
         return $this->toDateTime()->diff($time->toDateTime());
     }
 
-    public function toDateTime(DateTimeInterface $date = null): DateTimeInterface
+    /**
+     * @TODO This should returns DateTime on next major release
+     */
+    public function toDateTime(DateTimeInterface $date = null): DateTime
     {
         if (! $date) {
             $date = new DateTime('1970-01-01 00:00:00');

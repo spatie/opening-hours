@@ -274,10 +274,20 @@ class OpeningHoursTest extends TestCase
 
         $this->assertInstanceOf(DateTime::class, $nextTimeOpen);
         $this->assertEquals('2016-09-26 13:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
+    }
 
-        $nextTimeOpen = $openingHours->nextOpen(new DateTimeImmutable('2016-09-26 12:00:00'));
+    /** @test */
+    public function it_can_determine_next_open_hours_from_non_working_date_time_immutable()
+    {
+        $this->markTestIncomplete('Not supported in v1.x');
 
-        $this->assertInstanceOf(DateTimeImmutable::class, $nextTimeOpen);
+        $openingHours = OpeningHours::create([
+            'monday' => ['09:00-11:00', '13:00-19:00'],
+        ]);
+
+        $nextTimeOpen = $openingHours->nextOpen(new DateTime('2016-09-26 12:00:00'));
+
+        $this->assertInstanceOf(DateTime::class, $nextTimeOpen);
         $this->assertEquals('2016-09-26 13:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
     }
 
@@ -292,6 +302,16 @@ class OpeningHoursTest extends TestCase
 
         $this->assertInstanceOf(DateTime::class, $nextTimeOpen);
         $this->assertEquals('2016-09-26 19:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
+    }
+
+    /** @test */
+    public function it_can_determine_next_close_hours_from_non_working_date_time_immutable()
+    {
+        $this->markTestIncomplete('Not supported in v1.x');
+
+        $openingHours = OpeningHours::create([
+            'monday' => ['09:00-11:00', '13:00-19:00'],
+        ]);
 
         $nextTimeOpen = $openingHours->nextClose(new DateTimeImmutable('2016-09-26 12:00:00'));
 
@@ -311,6 +331,17 @@ class OpeningHoursTest extends TestCase
 
         $this->assertInstanceOf(DateTime::class, $nextTimeOpen);
         $this->assertEquals('2016-09-27 10:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
+    }
+
+    /** @test */
+    public function it_can_determine_next_open_hours_from_working_date_time_immutable()
+    {
+        $this->markTestIncomplete('Not supported in v1.x');
+
+        $openingHours = OpeningHours::create([
+            'monday' => ['09:00-11:00', '13:00-19:00'],
+            'tuesday' => ['10:00-11:00', '14:00-19:00'],
+        ]);
 
         $nextTimeOpen = $openingHours->nextOpen(new DateTimeImmutable('2016-09-26 16:00:00'));
 
@@ -330,6 +361,17 @@ class OpeningHoursTest extends TestCase
 
         $this->assertInstanceOf(DateTime::class, $nextTimeClose);
         $this->assertEquals('2016-09-26 19:00:00', $nextTimeClose->format('Y-m-d H:i:s'));
+    }
+
+    /** @test */
+    public function it_can_determine_next_close_hours_from_working_date_time_immutable()
+    {
+        $this->markTestIncomplete('Not supported in v1.x');
+
+        $openingHours = OpeningHours::create([
+            'monday' => ['09:00-11:00', '13:00-19:00'],
+            'tuesday' => ['10:00-11:00', '14:00-19:00'],
+        ]);
 
         $nextTimeClose = $openingHours->nextClose(new DateTimeImmutable('2016-09-26 16:00:00'));
 
@@ -352,6 +394,20 @@ class OpeningHoursTest extends TestCase
 
         $this->assertInstanceOf(DateTime::class, $nextTimeOpen);
         $this->assertEquals('2016-09-27 10:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
+    }
+
+    /** @test */
+    public function it_can_determine_next_open_hours_from_early_morning_immutable()
+    {
+        $this->markTestIncomplete('Not supported in v1.x');
+
+        $openingHours = OpeningHours::create([
+            'monday' => ['09:00-11:00', '13:00-19:00'],
+            'tuesday' => ['10:00-11:00', '14:00-19:00'],
+            'exceptions' => [
+                '2016-09-26' => [],
+            ],
+        ]);
 
         $nextTimeOpen = $openingHours->nextOpen(new DateTimeImmutable('2016-09-26 04:00:00'));
 
@@ -374,6 +430,20 @@ class OpeningHoursTest extends TestCase
 
         $this->assertInstanceOf(DateTime::class, $nextTimeOpen);
         $this->assertEquals('2016-09-27 11:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
+    }
+
+    /** @test */
+    public function it_can_determine_next_close_hours_from_early_morning_immutable()
+    {
+        $this->markTestIncomplete('Not supported in v1.x');
+
+        $openingHours = OpeningHours::create([
+            'monday' => ['09:00-11:00', '13:00-19:00'],
+            'tuesday' => ['10:00-11:00', '14:00-19:00'],
+            'exceptions' => [
+                '2016-09-26' => [],
+            ],
+        ]);
 
         $nextTimeOpen = $openingHours->nextClose(new DateTimeImmutable('2016-09-26 04:00:00'));
 
@@ -512,6 +582,16 @@ class OpeningHoursTest extends TestCase
 
         $nextTimeOpen = $openingHours->nextOpen(new DateTime());
         $this->assertInstanceOf(DateTime::class, $nextTimeOpen);
+    }
+
+    /** @test */
+    public function it_works_when_starting_at_midnight_immutable()
+    {
+        $this->markTestIncomplete('Not supported in v1.x');
+
+        $openingHours = OpeningHours::create([
+            'monday' => ['00:00-16:00'],
+        ]);
 
         $nextTimeOpen = $openingHours->nextOpen(new DateTimeImmutable());
         $this->assertInstanceOf(DateTimeImmutable::class, $nextTimeOpen);
