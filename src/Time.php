@@ -85,7 +85,7 @@ class Time
     }
 
     /**
-     * @TODO This should take and return DateTimeInterface on next major release
+     * @todo This should take and return DateTimeInterface on next major release
      */
     public function toDateTime(DateTime $date = null): DateTime
     {
