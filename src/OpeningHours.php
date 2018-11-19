@@ -152,7 +152,7 @@ class OpeningHours
     }
 
     /**
-     * @TODO This should return DateTimeInterface on next major release
+     * @todo This should return DateTimeInterface on next major release
      */
     public function nextOpen(DateTimeInterface $dateTime): DateTime
     {
@@ -180,7 +180,7 @@ class OpeningHours
     }
 
     /**
-     * @TODO This should return DateTimeInterface on next major release
+     * @todo This should return DateTimeInterface on next major release
      */
     public function nextClose(DateTimeInterface $dateTime): DateTime
     {
