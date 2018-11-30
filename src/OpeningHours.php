@@ -4,6 +4,7 @@ namespace Spatie\OpeningHours;
 
 use DateTime;
 use DateTimeZone;
+use DateTimeImmutable;
 use DateTimeInterface;
 use Spatie\OpeningHours\Helpers\Arr;
 use Spatie\OpeningHours\Exceptions\Exception;
@@ -150,13 +151,20 @@ class OpeningHours
         return $this->isClosedAt(new DateTime());
     }
 
+    /**
+     * @todo This should return DateTimeInterface on next major release
+     */
     public function nextOpen(DateTimeInterface $dateTime): DateTime
     {
+        if (! ($dateTime instanceof DateTimeImmutable)) {
+            $dateTime = clone $dateTime;
+        }
+
         $openingHoursForDay = $this->forDate($dateTime);
         $nextOpen = $openingHoursForDay->nextOpen(Time::fromDateTime($dateTime));
 
-        while ($nextOpen == false) {
-            $dateTime
+        while ($nextOpen === false) {
+            $dateTime = $dateTime
                 ->modify('+1 day')
                 ->setTime(0, 0, 0);
 
@@ -166,18 +174,25 @@ class OpeningHours
         }
 
         $nextDateTime = $nextOpen->toDateTime();
-        $dateTime->setTime($nextDateTime->format('G'), $nextDateTime->format('i'), 0);
+        $dateTime = $dateTime->setTime($nextDateTime->format('G'), $nextDateTime->format('i'), 0);
 
         return $dateTime;
     }
 
+    /**
+     * @todo This should return DateTimeInterface on next major release
+     */
     public function nextClose(DateTimeInterface $dateTime): DateTime
     {
+        if (! ($dateTime instanceof DateTimeImmutable)) {
+            $dateTime = clone $dateTime;
+        }
+
         $openingHoursForDay = $this->forDate($dateTime);
         $nextClose = $openingHoursForDay->nextClose(Time::fromDateTime($dateTime));
 
-        while ($nextClose == false) {
-            $dateTime
+        while ($nextClose === false) {
+            $dateTime = $dateTime
                 ->modify('+1 day')
                 ->setTime(0, 0, 0);
 
@@ -187,7 +202,7 @@ class OpeningHours
         }
 
         $nextDateTime = $nextClose->toDateTime();
-        $dateTime->setTime($nextDateTime->format('G'), $nextDateTime->format('i'), 0);
+        $dateTime = $dateTime->setTime($nextDateTime->format('G'), $nextDateTime->format('i'), 0);
 
         return $dateTime;
     }

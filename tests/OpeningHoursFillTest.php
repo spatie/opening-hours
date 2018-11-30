@@ -3,6 +3,7 @@
 namespace Spatie\OpeningHours\Test;
 
 use DateTime;
+use DateTimeImmutable;
 use Spatie\OpeningHours\Day;
 use PHPUnit\Framework\TestCase;
 use Spatie\OpeningHours\TimeRange;
@@ -44,6 +45,7 @@ class OpeningHoursFillTest extends TestCase
         $this->assertEquals((string) $openingHours->forDay('friday')[0], '09:00-20:00');
 
         $this->assertCount(0, $openingHours->forDate(new DateTime('2016-09-26 11:00:00')));
+        $this->assertCount(0, $openingHours->forDate(new DateTimeImmutable('2016-09-26 11:00:00')));
     }
 
     /** @test */
