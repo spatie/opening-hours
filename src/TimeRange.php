@@ -2,6 +2,7 @@
 
 namespace Spatie\OpeningHours;
 
+use Spatie\OpeningHours\Exceptions\InvalidTimeRangeList;
 use Spatie\OpeningHours\Exceptions\InvalidTimeRangeString;
 
 class TimeRange
@@ -27,6 +28,35 @@ class TimeRange
         }
 
         return new self(Time::fromString($times[0]), Time::fromString($times[1]));
+    }
+
+    public static function fromList(array $ranges): self
+    {
+        if (count($ranges) === 0) {
+            throw InvalidTimeRangeList::create();
+        }
+
+        foreach ($ranges as $range) {
+            if (! ($range instanceof self)) {
+                throw InvalidTimeRangeList::create();
+            }
+        }
+
+        $start = $ranges[0]->start();
+        $end = $ranges[0]->end();
+
+        foreach (array_slice($ranges, 1) as $range) {
+            $rangeStart = $range->start();
+            if ($rangeStart->format('Gi') < $start->format('Gi')) {
+                $start = $rangeStart;
+            }
+            $rangeEnd = $range->end();
+            if ($rangeEnd->format('Gi') > $end->format('Gi')) {
+                $end = $rangeEnd;
+            }
+        }
+
+        return new self($start, $end);
     }
 
     public function start(): Time
