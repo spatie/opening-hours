@@ -6,12 +6,15 @@ use DateTime;
 use DateTimeZone;
 use DateTimeInterface;
 use Spatie\OpeningHours\Helpers\Arr;
+use Spatie\OpeningHours\Helpers\DataTrait;
 use Spatie\OpeningHours\Exceptions\Exception;
 use Spatie\OpeningHours\Exceptions\InvalidDate;
 use Spatie\OpeningHours\Exceptions\InvalidDayName;
 
 class OpeningHours
 {
+    use DataTrait;
+
     /** @var \Spatie\OpeningHours\Day[] */
     protected $openingHours = [];
 
@@ -58,7 +61,7 @@ class OpeningHours
 
     public function fill(array $data)
     {
-        list($openingHours, $exceptions) = $this->parseOpeningHoursAndExceptions($data);
+        list($openingHours, $exceptions, $metaData) = $this->parseOpeningHoursAndExceptions($data);
 
         foreach ($openingHours as $day => $openingHoursForThisDay) {
             $this->setOpeningHoursFromStrings($day, $openingHoursForThisDay);
@@ -66,7 +69,7 @@ class OpeningHours
 
         $this->setExceptionsFromStrings($exceptions);
 
-        return $this;
+        return $this->setData($metaData);
     }
 
     public function forWeek(): array
@@ -222,6 +225,7 @@ class OpeningHours
 
     protected function parseOpeningHoursAndExceptions(array $data): array
     {
+        $metaData = Arr::pull($data, 'data', null);
         $exceptions = Arr::pull($data, 'exceptions', []);
         $openingHours = [];
 
@@ -229,14 +233,21 @@ class OpeningHours
             $openingHours[$this->normalizeDayName($day)] = $openingHoursData;
         }
 
-        return [$openingHours, $exceptions];
+        return [$openingHours, $exceptions, $metaData];
     }
 
     protected function setOpeningHoursFromStrings(string $day, array $openingHours)
     {
         $day = $this->normalizeDayName($day);
 
-        $this->openingHours[$day] = OpeningHoursForDay::fromStrings($openingHours);
+        $data = null;
+
+        if (isset($openingHours['data'])) {
+            $data = $openingHours['data'];
+            unset($openingHours['data']);
+        }
+
+        $this->openingHours[$day] = OpeningHoursForDay::fromStrings($openingHours)->setData($data);
     }
 
     protected function setExceptionsFromStrings(array $exceptions)

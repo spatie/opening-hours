@@ -4,10 +4,13 @@ namespace Spatie\OpeningHours;
 
 use DateTime;
 use DateTimeInterface;
+use Spatie\OpeningHours\Helpers\DataTrait;
 use Spatie\OpeningHours\Exceptions\InvalidTimeString;
 
 class Time
 {
+    use DataTrait;
+
     /** @var int */
     protected $hours;
 
@@ -43,7 +46,7 @@ class Time
 
     public static function fromDateTime(DateTimeInterface $dateTime): self
     {
-        return self::fromString($dateTime->format('H:i'));
+        return static::fromString($dateTime->format('H:i'));
     }
 
     public function isSame(self $time): bool
