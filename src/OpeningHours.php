@@ -91,7 +91,7 @@ class OpeningHours
      *
      * @return static
      */
-    public static function createFromOverlappingRanges(array $data)
+    public static function createAndMergeOverlappingRanges(array $data)
     {
         return static::create(static::mergeOverlappingRanges($data));
     }

@@ -95,7 +95,7 @@ class OpeningHoursFillTest extends TestCase
     /** @test */
     public function it_should_merge_ranges_on_explicitly_create_from_overlapping_ranges()
     {
-        $hours = OpeningHours::createFromOverlappingRanges([
+        $hours = OpeningHours::createAndMergeOverlappingRanges([
             'monday' => [
                 '08:00-12:00',
                 '11:30-13:30',
