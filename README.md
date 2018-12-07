@@ -68,6 +68,62 @@ $openingHours->forDate(new DateTime('2016-12-25'));
 $openingHours->exceptions();
 ```
 
+You can add data in definitions then retrieve them:
+
+```php
+$openingHours = OpeningHours::create([
+    'monday' => [
+        'data' => 'Tipical monday',
+        '09:00-12:00',
+        '13:00-18:00',
+    ],
+    'tuesday' => [
+        '09:00-12:00',
+        '13:00-18:00',
+        [
+            '19:00-21:00',
+            'data' => 'Extra on Tuesday evening',
+        ],
+    ],
+    'exceptions' => [
+        '2016-12-25' => [
+            'data' => 'Closed for Christmas',
+        ],
+    ],
+]);
+
+echo $openingHours->forDay('monday')->getData(); // Tipical monday
+echo $openingHours->forDate(new DateTime('2016-12-25'))->getData(); // Closed for Christmas
+echo $openingHours->forDay('tuesday')[2]->getData(); // Extra on Tuesday evening
+```
+
+In the example above, data are string but it can be any kind of values. So you can embed multiple properties in an array.
+
+For structure convenience, the data-hours couple can be a fully-associative array, so the example above is strictly equivalent to the following:
+
+```php
+$openingHours = OpeningHours::create([
+    'monday' => [
+        'hours' => [
+            '09:00-12:00',
+            '13:00-18:00',
+        ],
+        'data' => 'Tipical monday',
+    ],
+    'tuesday' => [
+        ['hours' => '09:00-12:00'],
+        ['hours' => '13:00-18:00'],
+        ['hours' => '19:00-21:00', 'data' => 'Extra on Tuesday evening'],
+    ],
+    'exceptions' => [
+        '2016-12-25' => [
+            'hours' => [], 
+            'data' => 'Closed for Christmas',
+        ],
+    ],
+]);
+```
+
 It can also return the next open or close `DateTime` from a given `DateTime`.
 
 ```php

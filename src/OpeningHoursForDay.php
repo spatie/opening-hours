@@ -7,19 +7,31 @@ use ArrayAccess;
 use ArrayIterator;
 use IteratorAggregate;
 use Spatie\OpeningHours\Helpers\Arr;
+use Spatie\OpeningHours\Helpers\DataTrait;
 use Spatie\OpeningHours\Exceptions\OverlappingTimeRanges;
 
 class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
 {
+    use DataTrait;
+
     /** @var \Spatie\OpeningHours\TimeRange[] */
     protected $openingHours = [];
 
     public static function fromStrings(array $strings)
     {
+        if (isset($strings['hours'])) {
+            return static::fromStrings($strings['hours'])->setData($strings['data'] ?? null);
+        }
+
         $openingHoursForDay = new static();
 
+        if (isset($strings['data'])) {
+            $openingHoursForDay->setData($strings['data'] ?? null);
+            unset($strings['data']);
+        }
+
         $timeRanges = Arr::map($strings, function ($string) {
-            return TimeRange::fromString($string);
+            return TimeRange::fromDefinition($string);
         });
 
         $openingHoursForDay->guardAgainstTimeRangeOverlaps($timeRanges);

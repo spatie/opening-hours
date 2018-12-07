@@ -95,6 +95,59 @@ class OpeningHoursFillTest extends TestCase
     }
 
     /** @test */
+    public function it_store_meta_data()
+    {
+        $hours = OpeningHours::create([
+            'monday' => [
+                '09:00-12:00',
+                '13:00-18:00',
+            ],
+            'tuesday' => [
+                '09:00-12:00',
+                '13:00-18:00',
+                'data' => 'foobar',
+            ],
+            'wednesday' => [
+                'hours' => ['09:00-12:00'],
+                'data' => ['foobar'],
+            ],
+            'thursday' => [
+                [
+                    'hours' => '09:00-12:00',
+                    'data' => ['foobar'],
+                ],
+                '13:00-18:00',
+            ],
+            'exceptions' => [
+                '2011-01-01' => [
+                    'hours' => ['13:00-18:00'],
+                    'data' => 'Newyearsday opening times',
+                ],
+                '2011-01-02' => [
+                    '13:00-18:00',
+                    'data' => 'Newyearsday next day',
+                ],
+                '12-25' => [
+                    'data' => 'Christmas',
+                ],
+            ],
+        ]);
+
+        $this->assertSame('Newyearsday opening times', $hours->exceptions()['2011-01-01']->getData());
+        $this->assertSame('Newyearsday opening times', $hours->forDate(new DateTime('2011-01-01'))->getData());
+        $this->assertSame('Newyearsday next day', $hours->exceptions()['2011-01-02']->getData());
+        $this->assertSame('Christmas', $hours->exceptions()['12-25']->getData());
+        $this->assertSame('Christmas', $hours->forDate(new DateTime('2011-12-25'))->getData());
+        $this->assertNull($hours->forDay('monday')->getData());
+        $this->assertSame('foobar', $hours->forDay('tuesday')->getData());
+        $this->assertSame(2, $hours->forDay('tuesday')->count());
+        $this->assertSame(['foobar'], $hours->forDay('wednesday')->getData());
+        $this->assertSame(1, $hours->forDay('wednesday')->count());
+        $this->assertSame(['foobar'], $hours->forDay('thursday')[0]->getData());
+        $this->assertNull($hours->forDay('thursday')[1]->getData());
+    }
+
+    /** @test */
     public function it_should_merge_ranges_on_explicitly_create_from_overlapping_ranges()
     {
         $hours = OpeningHours::createAndMergeOverlappingRanges([
