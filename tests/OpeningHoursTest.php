@@ -279,8 +279,6 @@ class OpeningHoursTest extends TestCase
     /** @test */
     public function it_can_determine_next_open_hours_from_non_working_date_time_immutable()
     {
-        $this->markTestIncomplete('Not supported in v1.x');
-
         $openingHours = OpeningHours::create([
             'monday' => ['09:00-11:00', '13:00-19:00'],
         ]);
@@ -313,8 +311,6 @@ class OpeningHoursTest extends TestCase
     /** @test */
     public function it_can_determine_next_close_hours_from_non_working_date_time_immutable()
     {
-        $this->markTestIncomplete('Not supported in v1.x');
-
         $openingHours = OpeningHours::create([
             'monday' => ['09:00-11:00', '13:00-19:00'],
         ]);
@@ -342,8 +338,6 @@ class OpeningHoursTest extends TestCase
     /** @test */
     public function it_can_determine_next_open_hours_from_working_date_time_immutable()
     {
-        $this->markTestIncomplete('Not supported in v1.x');
-
         $openingHours = OpeningHours::create([
             'monday' => ['09:00-11:00', '13:00-19:00'],
             'tuesday' => ['10:00-11:00', '14:00-19:00'],
@@ -372,8 +366,6 @@ class OpeningHoursTest extends TestCase
     /** @test */
     public function it_can_determine_next_close_hours_from_working_date_time_immutable()
     {
-        $this->markTestIncomplete('Not supported in v1.x');
-
         $openingHours = OpeningHours::create([
             'monday' => ['09:00-11:00', '13:00-19:00'],
             'tuesday' => ['10:00-11:00', '14:00-19:00'],
@@ -405,8 +397,6 @@ class OpeningHoursTest extends TestCase
     /** @test */
     public function it_can_determine_next_open_hours_from_early_morning_immutable()
     {
-        $this->markTestIncomplete('Not supported in v1.x');
-
         $openingHours = OpeningHours::create([
             'monday' => ['09:00-11:00', '13:00-19:00'],
             'tuesday' => ['10:00-11:00', '14:00-19:00'],
@@ -441,8 +431,6 @@ class OpeningHoursTest extends TestCase
     /** @test */
     public function it_can_determine_next_close_hours_from_early_morning_immutable()
     {
-        $this->markTestIncomplete('Not supported in v1.x');
-
         $openingHours = OpeningHours::create([
             'monday' => ['09:00-11:00', '13:00-19:00'],
             'tuesday' => ['10:00-11:00', '14:00-19:00'],
@@ -593,8 +581,6 @@ class OpeningHoursTest extends TestCase
     /** @test */
     public function it_works_when_starting_at_midnight_immutable()
     {
-        $this->markTestIncomplete('Not supported in v1.x');
-
         $openingHours = OpeningHours::create([
             'monday' => ['00:00-16:00'],
         ]);

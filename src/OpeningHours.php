@@ -210,7 +210,7 @@ class OpeningHours
         return $this->isClosedAt(new DateTime());
     }
 
-    public function nextOpen(DateTimeInterface $dateTime): DateTime
+    public function nextOpen(DateTimeInterface $dateTime): DateTimeInterface
     {
         if (! ($dateTime instanceof DateTimeImmutable)) {
             $dateTime = clone $dateTime;
@@ -235,7 +235,7 @@ class OpeningHours
         return $dateTime;
     }
 
-    public function nextClose(DateTimeInterface $dateTime): DateTime
+    public function nextClose(DateTimeInterface $dateTime): DateTimeInterface
     {
         if (! ($dateTime instanceof DateTimeImmutable)) {
             $dateTime = clone $dateTime;

@@ -87,7 +87,7 @@ class Time
         return $this->toDateTime()->diff($time->toDateTime());
     }
 
-    public function toDateTime(DateTime $date = null): DateTime
+    public function toDateTime(DateTimeInterface $date = null): DateTimeInterface
     {
         if (! $date) {
             $date = new DateTime('1970-01-01 00:00:00');
