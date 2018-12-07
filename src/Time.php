@@ -84,9 +84,6 @@ class Time
         return $this->toDateTime()->diff($time->toDateTime());
     }
 
-    /**
-     * @TODO This should returns DateTime on next major release
-     */
     public function toDateTime(DateTime $date = null): DateTime
     {
         if (! $date) {

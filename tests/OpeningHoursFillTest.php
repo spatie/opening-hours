@@ -93,4 +93,40 @@ class OpeningHoursFillTest extends TestCase
             ],
         ]);
     }
+
+    /** @test */
+    public function it_should_merge_ranges_on_explicitly_create_from_overlapping_ranges()
+    {
+        $hours = OpeningHours::createAndMergeOverlappingRanges([
+            'monday' => [
+                '08:00-12:00',
+                '11:30-13:30',
+                '13:00-18:00',
+            ],
+            'tuesday' => [
+                '08:00-12:00',
+                '11:30-13:30',
+                '15:00-18:00',
+                '16:00-17:00',
+                '19:00-20:00',
+                '20:00-21:00',
+            ],
+        ]);
+        $dump = [];
+        foreach (['monday', 'tuesday'] as $day) {
+            $dump[$day] = [];
+            foreach ($hours->forDay($day) as $range) {
+                $dump[$day][] = $range->format();
+            }
+        }
+
+        $this->assertSame([
+            '08:00-18:00',
+        ], $dump['monday']);
+        $this->assertSame([
+            '08:00-13:30',
+            '15:00-18:00',
+            '19:00-21:00',
+        ], $dump['tuesday']);
+    }
 }

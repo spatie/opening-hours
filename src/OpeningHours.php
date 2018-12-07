@@ -44,6 +44,62 @@ class OpeningHours
     /**
      * @param array $data
      *
+     * @return array
+     */
+    public static function mergeOverlappingRanges(array $data)
+    {
+        $result = [];
+        $ranges = [];
+        foreach ($data as $key => $value) {
+            $value = is_array($value)
+                ? static::mergeOverlappingRanges($value)
+                : (is_string($value) ? TimeRange::fromString($value) : $value);
+
+            if ($value instanceof TimeRange) {
+                $newRanges = [];
+                foreach ($ranges as $range) {
+                    if ($value->format() === $range->format()) {
+                        continue 2;
+                    }
+
+                    if ($value->overlaps($range) || $range->overlaps($value)) {
+                        $value = TimeRange::fromList([$value, $range]);
+
+                        continue;
+                    }
+
+                    $newRanges[] = $range;
+                }
+
+                $newRanges[] = $value;
+                $ranges = $newRanges;
+
+                continue;
+            }
+
+            $result[$key] = $value;
+        }
+
+        foreach ($ranges as $range) {
+            $result[] = $range;
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param array $data
+     *
+     * @return static
+     */
+    public static function createAndMergeOverlappingRanges(array $data)
+    {
+        return static::create(static::mergeOverlappingRanges($data));
+    }
+
+    /**
+     * @param array $data
+     *
      * @return bool
      */
     public static function isValid(array $data): bool
@@ -151,9 +207,6 @@ class OpeningHours
         return $this->isClosedAt(new DateTime());
     }
 
-    /**
-     * @TODO This should returns DateTimeInterface on next major release
-     */
     public function nextOpen(DateTimeInterface $dateTime): DateTime
     {
         if (! ($dateTime instanceof DateTimeImmutable)) {
@@ -179,9 +232,6 @@ class OpeningHours
         return $dateTime;
     }
 
-    /**
-     * @TODO This should returns DateTimeInterface on next major release
-     */
     public function nextClose(DateTimeInterface $dateTime): DateTime
     {
         if (! ($dateTime instanceof DateTimeImmutable)) {
