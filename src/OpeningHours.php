@@ -208,7 +208,10 @@ class OpeningHours
     }
 
     /**
-     * @todo This should return DateTimeInterface on next major release
+     * Returns the next open time.
+     *
+     * Notice: This will return DateTimeInterface on next major release
+     * https://github.com/spatie/opening-hours/pull/75
      */
     public function nextOpen(DateTimeInterface $dateTime): DateTime
     {
@@ -236,7 +239,10 @@ class OpeningHours
     }
 
     /**
-     * @todo This should return DateTimeInterface on next major release
+     * Returns the next closed time.
+     *
+     * Notice: This will return DateTimeInterface on next major release
+     * https://github.com/spatie/opening-hours/pull/75
      */
     public function nextClose(DateTimeInterface $dateTime): DateTime
     {
