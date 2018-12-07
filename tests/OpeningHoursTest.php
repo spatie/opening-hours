@@ -289,6 +289,12 @@ class OpeningHoursTest extends TestCase
 
         $this->assertInstanceOf(DateTime::class, $nextTimeOpen);
         $this->assertEquals('2016-09-26 13:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
+
+        /** @var CustomDate $nextTimeOpen */
+        $nextTimeOpen = $openingHours->nextOpen(new CustomDate('2016-09-26 12:00:00'));
+
+        $this->assertInstanceOf(CustomDate::class, $nextTimeOpen);
+        $this->assertEquals('2016-09-26 13:00:00', $nextTimeOpen->foo());
     }
 
     /** @test */

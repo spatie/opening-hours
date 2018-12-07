@@ -207,12 +207,6 @@ class OpeningHours
         return $this->isClosedAt(new DateTime());
     }
 
-    /**
-     * Returns the next open time.
-     *
-     * Notice: This will return DateTimeInterface on next major release
-     * https://github.com/spatie/opening-hours/pull/75
-     */
     public function nextOpen(DateTimeInterface $dateTime): DateTime
     {
         if (! ($dateTime instanceof DateTimeImmutable)) {
@@ -238,12 +232,6 @@ class OpeningHours
         return $dateTime;
     }
 
-    /**
-     * Returns the next closed time.
-     *
-     * Notice: This will return DateTimeInterface on next major release
-     * https://github.com/spatie/opening-hours/pull/75
-     */
     public function nextClose(DateTimeInterface $dateTime): DateTime
     {
         if (! ($dateTime instanceof DateTimeImmutable)) {

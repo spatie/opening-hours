@@ -84,12 +84,6 @@ class Time
         return $this->toDateTime()->diff($time->toDateTime());
     }
 
-    /**
-     * Convert to DateTime object.
-     *
-     * Notice: This will return DateTime, DateTimeImmutable or any DateTimeInterface on next major release
-     * https://github.com/spatie/opening-hours/pull/75
-     */
     public function toDateTime(DateTime $date = null): DateTime
     {
         if (! $date) {
