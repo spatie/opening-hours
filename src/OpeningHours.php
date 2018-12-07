@@ -4,6 +4,7 @@ namespace Spatie\OpeningHours;
 
 use DateTime;
 use DateTimeZone;
+use DateTimeImmutable;
 use DateTimeInterface;
 use Spatie\OpeningHours\Helpers\Arr;
 use Spatie\OpeningHours\Helpers\DataTrait;
@@ -41,6 +42,62 @@ class OpeningHours
     public static function create(array $data)
     {
         return (new static())->fill($data);
+    }
+
+    /**
+     * @param array $data
+     *
+     * @return array
+     */
+    public static function mergeOverlappingRanges(array $data)
+    {
+        $result = [];
+        $ranges = [];
+        foreach ($data as $key => $value) {
+            $value = is_array($value)
+                ? static::mergeOverlappingRanges($value)
+                : (is_string($value) ? TimeRange::fromString($value) : $value);
+
+            if ($value instanceof TimeRange) {
+                $newRanges = [];
+                foreach ($ranges as $range) {
+                    if ($value->format() === $range->format()) {
+                        continue 2;
+                    }
+
+                    if ($value->overlaps($range) || $range->overlaps($value)) {
+                        $value = TimeRange::fromList([$value, $range]);
+
+                        continue;
+                    }
+
+                    $newRanges[] = $range;
+                }
+
+                $newRanges[] = $value;
+                $ranges = $newRanges;
+
+                continue;
+            }
+
+            $result[$key] = $value;
+        }
+
+        foreach ($ranges as $range) {
+            $result[] = $range;
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param array $data
+     *
+     * @return static
+     */
+    public static function createAndMergeOverlappingRanges(array $data)
+    {
+        return static::create(static::mergeOverlappingRanges($data));
     }
 
     /**
@@ -153,13 +210,23 @@ class OpeningHours
         return $this->isClosedAt(new DateTime());
     }
 
+    /**
+     * Returns the next open time.
+     *
+     * Notice: This will return DateTimeInterface on next major release
+     * https://github.com/spatie/opening-hours/pull/75
+     */
     public function nextOpen(DateTimeInterface $dateTime): DateTime
     {
+        if (! ($dateTime instanceof DateTimeImmutable)) {
+            $dateTime = clone $dateTime;
+        }
+
         $openingHoursForDay = $this->forDate($dateTime);
         $nextOpen = $openingHoursForDay->nextOpen(Time::fromDateTime($dateTime));
 
-        while ($nextOpen == false) {
-            $dateTime
+        while ($nextOpen === false) {
+            $dateTime = $dateTime
                 ->modify('+1 day')
                 ->setTime(0, 0, 0);
 
@@ -169,18 +236,28 @@ class OpeningHours
         }
 
         $nextDateTime = $nextOpen->toDateTime();
-        $dateTime->setTime($nextDateTime->format('G'), $nextDateTime->format('i'), 0);
+        $dateTime = $dateTime->setTime($nextDateTime->format('G'), $nextDateTime->format('i'), 0);
 
         return $dateTime;
     }
 
+    /**
+     * Returns the next closed time.
+     *
+     * Notice: This will return DateTimeInterface on next major release
+     * https://github.com/spatie/opening-hours/pull/75
+     */
     public function nextClose(DateTimeInterface $dateTime): DateTime
     {
+        if (! ($dateTime instanceof DateTimeImmutable)) {
+            $dateTime = clone $dateTime;
+        }
+
         $openingHoursForDay = $this->forDate($dateTime);
         $nextClose = $openingHoursForDay->nextClose(Time::fromDateTime($dateTime));
 
-        while ($nextClose == false) {
-            $dateTime
+        while ($nextClose === false) {
+            $dateTime = $dateTime
                 ->modify('+1 day')
                 ->setTime(0, 0, 0);
 
@@ -190,7 +267,7 @@ class OpeningHours
         }
 
         $nextDateTime = $nextClose->toDateTime();
-        $dateTime->setTime($nextDateTime->format('G'), $nextDateTime->format('i'), 0);
+        $dateTime = $dateTime->setTime($nextDateTime->format('G'), $nextDateTime->format('i'), 0);
 
         return $dateTime;
     }

@@ -3,6 +3,7 @@
 namespace Spatie\OpeningHours\Test;
 
 use DateTime;
+use DateTimeImmutable;
 use Spatie\OpeningHours\Day;
 use PHPUnit\Framework\TestCase;
 use Spatie\OpeningHours\TimeRange;
@@ -44,6 +45,7 @@ class OpeningHoursFillTest extends TestCase
         $this->assertEquals((string) $openingHours->forDay('friday')[0], '09:00-20:00');
 
         $this->assertCount(0, $openingHours->forDate(new DateTime('2016-09-26 11:00:00')));
+        $this->assertCount(0, $openingHours->forDate(new DateTimeImmutable('2016-09-26 11:00:00')));
     }
 
     /** @test */
@@ -143,5 +145,41 @@ class OpeningHoursFillTest extends TestCase
         $this->assertSame(1, $hours->forDay('wednesday')->count());
         $this->assertSame(['foobar'], $hours->forDay('thursday')[0]->getData());
         $this->assertNull($hours->forDay('thursday')[1]->getData());
+    }
+
+    /** @test */
+    public function it_should_merge_ranges_on_explicitly_create_from_overlapping_ranges()
+    {
+        $hours = OpeningHours::createAndMergeOverlappingRanges([
+            'monday' => [
+                '08:00-12:00',
+                '11:30-13:30',
+                '13:00-18:00',
+            ],
+            'tuesday' => [
+                '08:00-12:00',
+                '11:30-13:30',
+                '15:00-18:00',
+                '16:00-17:00',
+                '19:00-20:00',
+                '20:00-21:00',
+            ],
+        ]);
+        $dump = [];
+        foreach (['monday', 'tuesday'] as $day) {
+            $dump[$day] = [];
+            foreach ($hours->forDay($day) as $range) {
+                $dump[$day][] = $range->format();
+            }
+        }
+
+        $this->assertSame([
+            '08:00-18:00',
+        ], $dump['monday']);
+        $this->assertSame([
+            '08:00-13:30',
+            '15:00-18:00',
+            '19:00-21:00',
+        ], $dump['tuesday']);
     }
 }

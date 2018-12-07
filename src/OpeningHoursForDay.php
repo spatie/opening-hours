@@ -56,10 +56,14 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
     {
         foreach ($this->openingHours as $timeRange) {
             if ($nextOpen = $this->findNextOpenInWorkingHours($time, $timeRange)) {
+                reset($timeRange);
+
                 return $nextOpen;
             }
 
             if ($nextOpen = $this->findNextOpenInFreeTime($time, $timeRange)) {
+                reset($timeRange);
+
                 return $nextOpen;
             }
         }
@@ -71,10 +75,14 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
     {
         foreach ($this->openingHours as $timeRange) {
             if ($nextClose = $this->findNextCloseInWorkingHours($time, $timeRange)) {
+                reset($timeRange);
+
                 return $nextClose;
             }
 
             if ($nextClose = $this->findNextCloseInFreeTime($time, $timeRange)) {
+                reset($timeRange);
+
                 return $nextClose;
             }
         }

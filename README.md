@@ -170,6 +170,21 @@ $openingHours = OpeningHours::create([
 ]);
 ```
 
+#### `OpeningHours::mergeOverlappingRanges(array $schedule) : array`
+
+For safety sake, creating `OpeningHours` object with overlapping ranges will throw an exception. But you can explicitly merge them.
+
+``` php
+$ranges = [
+  'monday' => ['08:00-11:00', '10:00-12:00'],
+];
+$mergedRanges = OpeningHours::mergeOverlappingRanges($ranges); // monday become ['08:00-12:00']
+
+OpeningHours::create($mergedRanges);
+// Or use the following shortcut to create from ranges that possibly overlap:
+OpeningHours::createAndMergeOverlappingRanges($ranges);
+```
+
 Not all days are mandatory, if a day is missing, it will be set as closed.
 
 #### `OpeningHours::fill(array $data): Spatie\OpeningHours\OpeningHours`
