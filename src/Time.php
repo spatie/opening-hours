@@ -3,6 +3,7 @@
 namespace Spatie\OpeningHours;
 
 use DateTime;
+use DateTimeImmutable;
 use DateTimeInterface;
 use Spatie\OpeningHours\Exceptions\InvalidTimeString;
 
@@ -83,9 +84,19 @@ class Time
         return $this->toDateTime()->diff($time->toDateTime());
     }
 
+    /**
+     * Convert to DateTime object.
+     *
+     * Notice: This will return DateTime, DateTimeImmutable or any DateTimeInterface on next major release
+     * https://github.com/spatie/opening-hours/pull/75
+     */
     public function toDateTime(DateTime $date = null): DateTime
     {
-        $date = $date ? (clone $date) : new DateTime('1970-01-01 00:00:00');
+        if (! $date) {
+            $date = new DateTime('1970-01-01 00:00:00');
+        } elseif (! ($date instanceof DateTimeImmutable)) {
+            $date = clone $date;
+        }
 
         return $date->setTime($this->hours, $this->minutes);
     }
