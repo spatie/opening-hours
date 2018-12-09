@@ -2,6 +2,8 @@
 
 namespace Spatie\OpeningHours\Test;
 
+use Spatie\OpeningHours\Exceptions\InvalidTimeRangeArray;
+use Spatie\OpeningHours\Exceptions\InvalidTimeRangeList;
 use Spatie\OpeningHours\Time;
 use PHPUnit\Framework\TestCase;
 use Spatie\OpeningHours\TimeRange;
@@ -21,6 +23,32 @@ class TimeRangeTest extends TestCase
         $this->expectException(InvalidTimeRangeString::class);
 
         TimeRange::fromString('16:00/18:00');
+    }
+
+    /** @test */
+    public function it_will_throw_an_exception_when_passing_a_invalid_array()
+    {
+        $this->expectException(InvalidTimeRangeArray::class);
+
+        TimeRange::fromArray([]);
+    }
+
+    /** @test */
+    public function it_will_throw_an_exception_when_passing_a_empty_array_to_list()
+    {
+        $this->expectException(InvalidTimeRangeList::class);
+
+        TimeRange::fromList([]);
+    }
+
+    /** @test */
+    public function it_will_throw_an_exception_when_passing_a_invalid_array_to_list()
+    {
+        $this->expectException(InvalidTimeRangeList::class);
+
+        TimeRange::fromList([
+            'foo',
+        ]);
     }
 
     /** @test */

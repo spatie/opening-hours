@@ -277,6 +277,50 @@ class OpeningHoursTest extends TestCase
     }
 
     /** @test */
+    public function it_can_determine_next_open_hours_from_edges_time()
+    {
+        $openingHours = OpeningHours::create([
+            'monday' => ['09:00-11:00', '13:00-19:00'],
+            'tuesday' => ['09:00-11:00', '13:00-19:00'],
+        ]);
+
+        $nextTimeOpen = $openingHours->nextOpen(new DateTime('2016-09-26 00:00:00'));
+
+        $this->assertInstanceOf(DateTime::class, $nextTimeOpen);
+        $this->assertEquals('2016-09-26 09:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
+
+        $nextTimeOpen = $openingHours->nextOpen(new DateTime('2016-09-26 09:00:00'));
+
+        $this->assertInstanceOf(DateTime::class, $nextTimeOpen);
+        $this->assertEquals('2016-09-26 13:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
+
+        $nextTimeOpen = $openingHours->nextOpen(new DateTime('2016-09-26 11:00:00'));
+
+        $this->assertInstanceOf(DateTime::class, $nextTimeOpen);
+        $this->assertEquals('2016-09-26 13:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
+
+        $nextTimeOpen = $openingHours->nextOpen(new DateTime('2016-09-26 12:00:00'));
+
+        $this->assertInstanceOf(DateTime::class, $nextTimeOpen);
+        $this->assertEquals('2016-09-26 13:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
+
+        $nextTimeOpen = $openingHours->nextOpen(new DateTime('2016-09-26 13:00:00'));
+
+        $this->assertInstanceOf(DateTime::class, $nextTimeOpen);
+        $this->assertEquals('2016-09-27 09:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
+
+        $nextTimeOpen = $openingHours->nextOpen(new DateTime('2016-09-26 19:00:00'));
+
+        $this->assertInstanceOf(DateTime::class, $nextTimeOpen);
+        $this->assertEquals('2016-09-27 09:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
+
+        $nextTimeOpen = $openingHours->nextOpen(new DateTime('2016-09-26 23:00:00'));
+
+        $this->assertInstanceOf(DateTime::class, $nextTimeOpen);
+        $this->assertEquals('2016-09-27 09:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
+    }
+
+    /** @test */
     public function it_can_determine_next_open_hours_from_non_working_date_time_immutable()
     {
         $openingHours = OpeningHours::create([
