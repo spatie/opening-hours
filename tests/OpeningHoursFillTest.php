@@ -6,9 +6,9 @@ use DateTime;
 use DateTimeImmutable;
 use Spatie\OpeningHours\Day;
 use PHPUnit\Framework\TestCase;
-use Spatie\OpeningHours\OpeningHoursForDay;
 use Spatie\OpeningHours\TimeRange;
 use Spatie\OpeningHours\OpeningHours;
+use Spatie\OpeningHours\OpeningHoursForDay;
 use Spatie\OpeningHours\Exceptions\InvalidDate;
 use Spatie\OpeningHours\Exceptions\InvalidDayName;
 
@@ -63,7 +63,7 @@ class OpeningHoursFillTest extends TestCase
             ],
         ]);
 
-        $this->assertSame( [
+        $this->assertSame([
             'monday' => 9,
             'tuesday' => 10,
             'wednesday' => 9,
@@ -91,7 +91,7 @@ class OpeningHoursFillTest extends TestCase
             ],
         ]);
 
-        $this->assertSame( [
+        $this->assertSame([
             '2016-09-26' => null,
             '10-10' => 14,
         ], $openingHours->mapExceptions(function (OpeningHoursForDay $ranges) {

@@ -2,11 +2,11 @@
 
 namespace Spatie\OpeningHours\Test;
 
-use Spatie\OpeningHours\Exceptions\InvalidTimeRangeArray;
-use Spatie\OpeningHours\Exceptions\InvalidTimeRangeList;
 use Spatie\OpeningHours\Time;
 use PHPUnit\Framework\TestCase;
 use Spatie\OpeningHours\TimeRange;
+use Spatie\OpeningHours\Exceptions\InvalidTimeRangeList;
+use Spatie\OpeningHours\Exceptions\InvalidTimeRangeArray;
 use Spatie\OpeningHours\Exceptions\InvalidTimeRangeString;
 
 class TimeRangeTest extends TestCase
