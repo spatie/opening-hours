@@ -124,6 +124,31 @@ $openingHours = OpeningHours::create([
 ]);
 ```
 
+The last structure tool is the filter, it allows you to pass closures (or callable function/method reference) that take a date as parameter and returns the settings for the given date.
+
+```php
+$openingHours = OpeningHours::create([
+    'monday' => [
+       '09:00-12:00',
+    ],
+    'filters' => [
+        function ($date) {
+            $year = intval($date->format('Y'));
+            $easterMonday = new DateTimeImmutable('2018-03-21 +'.(easter_days($year) + 1).'days');
+            if ($date->format('m-d') === $easterMonday->format('m-d')) {
+                return []; // Closed on Easter monday
+                // Any valid exception-array can be returned here (range of hours, with or without data) 
+            }
+            // Else the filter does not apply to te given date
+        },
+    ],
+]);
+```
+
+If a callable is found in the `"exceptions"` property, it will be added automatically to filters so you can mix filters and exceptions both in the **exceptions** array. The first filter that returns a non-null value will have precedence over next filters and the **filters** array has precedence over the filters inside the **exceptions** array.
+
+Warning: as we will loop on all filters for each date we need to retrieve opening hours and cannot neither predicate or cache the result (can be random function) you must be careful with filters, too many filters or long process inside filters can have a significant impact on the performance.
+
 It can also return the next open or close `DateTime` from a given `DateTime`.
 
 ```php
