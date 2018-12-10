@@ -147,7 +147,7 @@ $openingHours = OpeningHours::create([
 
 If a callable is found in the `"exceptions"` property, it will be added automatically to filters so you can mix filters and exceptions both in the **exceptions** array. The first filter that returns a non-null value will have precedence over next filters and the **filters** array has precedence over the filters inside the **exceptions** array.
 
-Warning: as we will loop on all filters for each date we need to retrieve opening hours and cannot neither predicate or cache the result (can be random function) you must be careful with filters, too many filters or long process inside filters can have a significant impact on the performance.
+Warning: as we will loop on all filters for each date from which we need to retrieve opening hours and cannot neither predicate nor cache the result (can be random function) so you must be careful with filters, too many filters or long process inside filters can have a significant impact on the performance.
 
 It can also return the next open or close `DateTime` from a given `DateTime`.
 
