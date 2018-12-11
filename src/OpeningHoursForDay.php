@@ -8,6 +8,7 @@ use ArrayIterator;
 use IteratorAggregate;
 use Spatie\OpeningHours\Helpers\Arr;
 use Spatie\OpeningHours\Helpers\DataTrait;
+use Spatie\OpeningHours\Exceptions\NonMutableOffsets;
 use Spatie\OpeningHours\Exceptions\OverlappingTimeRanges;
 
 class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
@@ -142,7 +143,7 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
 
     public function offsetSet($offset, $value)
     {
-        throw new \Exception();
+        throw NonMutableOffsets::forClass(static::class);
     }
 
     public function offsetUnset($offset)

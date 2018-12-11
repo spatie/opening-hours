@@ -19,8 +19,11 @@ class OpeningHours
     /** @var \Spatie\OpeningHours\Day[] */
     protected $openingHours = [];
 
-    /** @var array */
+    /** @var \Spatie\OpeningHours\OpeningHoursForDay[] */
     protected $exceptions = [];
+
+    /** @var callable[] */
+    protected $filters = [];
 
     /** @var DateTimeZone|null */
     protected $timezone = null;
@@ -116,9 +119,21 @@ class OpeningHours
         }
     }
 
+    public function setFilters(array $filters)
+    {
+        $this->filters = $filters;
+
+        return $this;
+    }
+
+    public function getFilters(): array
+    {
+        return $this->filters;
+    }
+
     public function fill(array $data)
     {
-        list($openingHours, $exceptions, $metaData) = $this->parseOpeningHoursAndExceptions($data);
+        list($openingHours, $exceptions, $metaData, $filters) = $this->parseOpeningHoursAndExceptions($data);
 
         foreach ($openingHours as $day => $openingHoursForThisDay) {
             $this->setOpeningHoursFromStrings($day, $openingHoursForThisDay);
@@ -126,7 +141,7 @@ class OpeningHours
 
         $this->setExceptionsFromStrings($exceptions);
 
-        return $this->setData($metaData);
+        return $this->setFilters($filters)->setData($metaData);
     }
 
     public function forWeek(): array
@@ -167,6 +182,14 @@ class OpeningHours
     public function forDate(DateTimeInterface $date): OpeningHoursForDay
     {
         $date = $this->applyTimezone($date);
+
+        foreach ($this->filters as $filter) {
+            $result = $filter($date);
+
+            if (is_array($result)) {
+                return OpeningHoursForDay::fromStrings($result);
+            }
+        }
 
         return $this->exceptions[$date->format('Y-m-d')] ?? ($this->exceptions[$date->format('m-d')] ?? $this->forDay(Day::onDateTime($date)));
     }
@@ -291,14 +314,24 @@ class OpeningHours
     protected function parseOpeningHoursAndExceptions(array $data): array
     {
         $metaData = Arr::pull($data, 'data', null);
-        $exceptions = Arr::pull($data, 'exceptions', []);
+        $exceptions = [];
+        $filters = Arr::pull($data, 'filters', []);
+        foreach (Arr::pull($data, 'exceptions', []) as $key => $exception) {
+            if (is_callable($exception)) {
+                $filters[] = $exception;
+
+                continue;
+            }
+
+            $exceptions[$key] = $exception;
+        }
         $openingHours = [];
 
         foreach ($data as $day => $openingHoursData) {
             $openingHours[$this->normalizeDayName($day)] = $openingHoursData;
         }
 
-        return [$openingHours, $exceptions, $metaData];
+        return [$openingHours, $exceptions, $metaData, $filters];
     }
 
     protected function setOpeningHoursFromStrings(string $day, array $openingHours)
@@ -337,7 +370,7 @@ class OpeningHours
         $day = strtolower($day);
 
         if (! Day::isValid($day)) {
-            throw new InvalidDayName();
+            throw InvalidDayName::invalidDayName($day);
         }
 
         return $day;

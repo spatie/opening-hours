@@ -6,6 +6,7 @@ use Spatie\OpeningHours\Time;
 use PHPUnit\Framework\TestCase;
 use Spatie\OpeningHours\TimeRange;
 use Spatie\OpeningHours\OpeningHoursForDay;
+use Spatie\OpeningHours\Exceptions\NonMutableOffsets;
 use Spatie\OpeningHours\Exceptions\OverlappingTimeRanges;
 
 class OpeningHoursForDayTest extends TestCase
@@ -76,5 +77,15 @@ class OpeningHoursForDayTest extends TestCase
         $openingHoursForDay = OpeningHoursForDay::fromStrings(['09:00-12:00', '13:00-18:00']);
 
         $this->assertCount(2, $openingHoursForDay->getIterator()->getArrayCopy());
+    }
+
+    /** @test */
+    public function it_cant_set_iterator_item()
+    {
+        $this->expectException(NonMutableOffsets::class);
+
+        $openingHoursForDay = OpeningHoursForDay::fromStrings(['09:00-12:00', '13:00-18:00']);
+
+        $openingHoursForDay[0] = TimeRange::fromString('07:00-11:00');
     }
 }
