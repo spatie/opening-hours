@@ -2,11 +2,15 @@
 
 namespace Spatie\OpeningHours;
 
+use Spatie\OpeningHours\Helpers\DataTrait;
 use Spatie\OpeningHours\Exceptions\InvalidTimeRangeList;
+use Spatie\OpeningHours\Exceptions\InvalidTimeRangeArray;
 use Spatie\OpeningHours\Exceptions\InvalidTimeRangeString;
 
 class TimeRange
 {
+    use DataTrait;
+
     /** @var \Spatie\OpeningHours\Time */
     protected $start;
 
@@ -28,6 +32,35 @@ class TimeRange
         }
 
         return new self(Time::fromString($times[0]), Time::fromString($times[1]));
+    }
+
+    public static function fromArray(array $array): self
+    {
+        $values = [];
+        $keys = ['hours', 'data'];
+
+        foreach ($keys as $key) {
+            if (isset($array[$key])) {
+                $values[] = $array[$key];
+                unset($array[$key]);
+            }
+        }
+
+        if (count($array)) {
+            array_push($values, ...$array);
+        }
+        list($hours, $data) = array_pad($values, count($keys), null);
+
+        if (! $hours) {
+            throw InvalidTimeRangeArray::create();
+        }
+
+        return static::fromString($hours)->setData($data);
+    }
+
+    public static function fromDefinition($value): self
+    {
+        return is_array($value) ? static::fromArray($value) : static::fromString($value);
     }
 
     public static function fromList(array $ranges): self

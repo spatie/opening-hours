@@ -121,8 +121,6 @@ class TimeTest extends TestCase
     /** @test */
     public function it_should_not_mutate_passed_datetime_immutable()
     {
-        $this->markTestIncomplete('Not supported in v1.x');
-
         $dateTime = new DateTimeImmutable('2016-09-27 12:00:00');
         $time = Time::fromString('15:00');
         $this->assertEquals('2016-09-27 15:00:00', $time->toDateTime($dateTime)->format('Y-m-d H:i:s'));

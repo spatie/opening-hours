@@ -5,10 +5,13 @@ namespace Spatie\OpeningHours;
 use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
+use Spatie\OpeningHours\Helpers\DataTrait;
 use Spatie\OpeningHours\Exceptions\InvalidTimeString;
 
 class Time
 {
+    use DataTrait;
+
     /** @var int */
     protected $hours;
 
@@ -44,7 +47,7 @@ class Time
 
     public static function fromDateTime(DateTimeInterface $dateTime): self
     {
-        return self::fromString($dateTime->format('H:i'));
+        return static::fromString($dateTime->format('H:i'));
     }
 
     public function isSame(self $time): bool
@@ -84,13 +87,7 @@ class Time
         return $this->toDateTime()->diff($time->toDateTime());
     }
 
-    /**
-     * Convert to DateTime object.
-     *
-     * Notice: This will return DateTime, DateTimeImmutable or any DateTimeInterface on next major release
-     * https://github.com/spatie/opening-hours/pull/75
-     */
-    public function toDateTime(DateTime $date = null): DateTime
+    public function toDateTime(DateTimeInterface $date = null): DateTimeInterface
     {
         if (! $date) {
             $date = new DateTime('1970-01-01 00:00:00');
