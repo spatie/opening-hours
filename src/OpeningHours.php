@@ -242,10 +242,14 @@ class OpeningHours
         $openingHoursForDay = $this->forDate($dateTime);
         $nextOpen = $openingHoursForDay->nextOpen(Time::fromDateTime($dateTime));
 
-        while ($nextOpen === false) {
+        while ($nextOpen === false || $nextOpen->hours() >= 24 || $nextOpen->hours() <= 0) {
             $dateTime = $dateTime
                 ->modify('+1 day')
                 ->setTime(0, 0, 0);
+
+            if ($this->isOpenAt($dateTime)) {
+                return $dateTime;
+            }
 
             $openingHoursForDay = $this->forDate($dateTime);
 
@@ -267,16 +271,22 @@ class OpeningHours
         $openingHoursForDay = $this->forDate($dateTime);
         $nextClose = $openingHoursForDay->nextClose(Time::fromDateTime($dateTime));
 
-        while ($nextClose === false) {
+        while ($nextClose === false || $nextClose->hours() >= 24 || $nextClose->hours() <= 0) {
             $dateTime = $dateTime
                 ->modify('+1 day')
                 ->setTime(0, 0, 0);
+
+            if ($this->isClosedAt($dateTime)) {
+                var_dump($this->forDate($dateTime));
+                return $dateTime;
+            }
 
             $openingHoursForDay = $this->forDate($dateTime);
 
             $nextClose = $openingHoursForDay->nextClose(Time::fromDateTime($dateTime));
         }
 
+        var_dump($nextClose);
         $nextDateTime = $nextClose->toDateTime();
         $dateTime = $dateTime->setTime($nextDateTime->format('G'), $nextDateTime->format('i'), 0);
 

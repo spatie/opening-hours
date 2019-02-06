@@ -53,42 +53,59 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
         return false;
     }
 
-    public function nextOpen(Time $time)
+    /**
+     * @param callable[] $filters
+     *
+     * @return Time|bool
+     */
+    public function openingHoursFilter(array $filters)
     {
         foreach ($this->openingHours as $timeRange) {
-            if ($nextOpen = $this->findNextOpenInWorkingHours($time, $timeRange)) {
-                reset($timeRange);
+            foreach ($filters as $filter) {
+                if ($result = $filter($timeRange)) {
+                    reset($timeRange);
 
-                return $nextOpen;
-            }
-
-            if ($nextOpen = $this->findNextOpenInFreeTime($time, $timeRange)) {
-                reset($timeRange);
-
-                return $nextOpen;
+                    return $result;
+                }
             }
         }
 
         return false;
     }
 
+    /**
+     * @param Time $time
+     *
+     * @return bool|Time
+     */
+    public function nextOpen(Time $time)
+    {
+        return $this->openingHoursFilter([
+            function ($timeRange) use ($time) {
+                return $this->findNextOpenInWorkingHours($time, $timeRange);
+            },
+            function ($timeRange) use ($time) {
+                return $this->findNextOpenInFreeTime($time, $timeRange);
+            }
+        ]);
+    }
+
+
+    /**
+     * @param Time $time
+     *
+     * @return bool|Time
+     */
     public function nextClose(Time $time)
     {
-        foreach ($this->openingHours as $timeRange) {
-            if ($nextClose = $this->findNextCloseInWorkingHours($time, $timeRange)) {
-                reset($timeRange);
-
-                return $nextClose;
+        return $this->openingHoursFilter([
+            function ($timeRange) use ($time) {
+                return $this->findNextCloseInWorkingHours($time, $timeRange);
+            },
+            function ($timeRange) use ($time) {
+                return $this->findNextCloseInFreeTime($time, $timeRange);
             }
-
-            if ($nextClose = $this->findNextCloseInFreeTime($time, $timeRange)) {
-                reset($timeRange);
-
-                return $nextClose;
-            }
-        }
-
-        return false;
+        ]);
     }
 
     protected function findNextOpenInWorkingHours(Time $time, TimeRange $timeRange)
