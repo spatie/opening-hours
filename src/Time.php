@@ -52,7 +52,7 @@ class Time
 
     public function isSame(self $time): bool
     {
-        return (string) $this === (string) $time;
+        return $this->hours === $time->hours && $this->minutes === $time->minutes;
     }
 
     public function isAfter(self $time): bool

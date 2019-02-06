@@ -242,18 +242,19 @@ class OpeningHours
         $openingHoursForDay = $this->forDate($dateTime);
         $nextOpen = $openingHoursForDay->nextOpen(Time::fromDateTime($dateTime));
 
-        while ($nextOpen === false || $nextOpen->hours() >= 24 || $nextOpen->hours() <= 0) {
+        while ($nextOpen === false || $nextOpen->hours() >= 24) {
             $dateTime = $dateTime
                 ->modify('+1 day')
                 ->setTime(0, 0, 0);
 
-            if ($this->isOpenAt($dateTime)) {
+            if ($this->isOpenAt($dateTime) && !$openingHoursForDay->isOpenAt(Time::fromString('23:59'))) {
                 return $dateTime;
             }
 
             $openingHoursForDay = $this->forDate($dateTime);
 
             $nextOpen = $openingHoursForDay->nextOpen(Time::fromDateTime($dateTime));
+            var_dump($openingHoursForDay, $dateTime, Time::fromDateTime($dateTime), $nextOpen);
         }
 
         $nextDateTime = $nextOpen->toDateTime();
@@ -271,13 +272,12 @@ class OpeningHours
         $openingHoursForDay = $this->forDate($dateTime);
         $nextClose = $openingHoursForDay->nextClose(Time::fromDateTime($dateTime));
 
-        while ($nextClose === false || $nextClose->hours() >= 24 || $nextClose->hours() <= 0) {
+        while ($nextClose === false || $nextClose->hours() >= 24) {
             $dateTime = $dateTime
                 ->modify('+1 day')
                 ->setTime(0, 0, 0);
 
             if ($this->isClosedAt($dateTime)) {
-                var_dump($this->forDate($dateTime));
                 return $dateTime;
             }
 
@@ -286,7 +286,6 @@ class OpeningHours
             $nextClose = $openingHoursForDay->nextClose(Time::fromDateTime($dateTime));
         }
 
-        var_dump($nextClose);
         $nextDateTime = $nextClose->toDateTime();
         $dateTime = $dateTime->setTime($nextDateTime->format('G'), $nextDateTime->format('i'), 0);
 

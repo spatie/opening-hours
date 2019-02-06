@@ -86,7 +86,7 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
             },
             function ($timeRange) use ($time) {
                 return $this->findNextOpenInFreeTime($time, $timeRange);
-            }
+            },
         ]);
     }
 
@@ -104,7 +104,7 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
             },
             function ($timeRange) use ($time) {
                 return $this->findNextCloseInFreeTime($time, $timeRange);
-            }
+            },
         ]);
     }
 

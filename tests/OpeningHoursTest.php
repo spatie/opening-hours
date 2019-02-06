@@ -277,8 +277,6 @@ class OpeningHoursTest extends TestCase
         ]);
 
         $monday = new DateTime('2019-02-04 11:00:00');
-        echo $openingHours->nextClose($monday)->format('Y-m-d H:i:s');
-        exit;
         $this->assertTrue($openingHours->isOpenAt($monday));
         $this->assertFalse($openingHours->isClosedAt($monday));
         $this->assertEquals('2019-02-06 03:00:00', $openingHours->nextClose($monday)->format('Y-m-d H:i:s'));
