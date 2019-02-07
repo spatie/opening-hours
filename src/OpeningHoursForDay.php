@@ -90,7 +90,6 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
         ]);
     }
 
-
     /**
      * @param Time $time
      *

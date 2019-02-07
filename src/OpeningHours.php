@@ -247,7 +247,7 @@ class OpeningHours
                 ->modify('+1 day')
                 ->setTime(0, 0, 0);
 
-            if ($this->isOpenAt($dateTime) && !$openingHoursForDay->isOpenAt(Time::fromString('23:59'))) {
+            if ($this->isOpenAt($dateTime) && ! $openingHoursForDay->isOpenAt(Time::fromString('23:59'))) {
                 return $dateTime;
             }
 
