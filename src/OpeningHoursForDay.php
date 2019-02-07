@@ -97,7 +97,7 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
             if (! $next instanceof Time) {
                 next($timeRange);
             }
-        
+
             return next($timeRange);
         }
     }
