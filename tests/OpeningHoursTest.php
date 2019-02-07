@@ -280,7 +280,13 @@ class OpeningHoursTest extends TestCase
     public function it_can_determine_next_open_hours_from_edges_time()
     {
         $openingHours = OpeningHours::create([
-            'monday' => ['09:00-11:00', '13:00-19:00'],
+            'monday' => [
+                [
+                    'hours' => '09:00-11:00',
+                    'data' => ['foobar'],
+                ],
+                '13:00-19:00',
+            ],
             'tuesday' => ['09:00-11:00', '13:00-19:00'],
         ]);
 

@@ -93,7 +93,11 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
 
     protected function findNextOpenInWorkingHours(Time $time, TimeRange $timeRange)
     {
-        if ($timeRange->containsTime($time) && next($timeRange) !== $timeRange) {
+        if ($timeRange->containsTime($time) && $next = next($timeRange) !== $timeRange) {
+            if (! $next instanceof Time) {
+                next($timeRange);
+            }
+        
             return next($timeRange);
         }
     }
