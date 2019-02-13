@@ -22,6 +22,7 @@
         "php": "^7.0"
     },
     "require-dev": {
+        "kylekatarnls/multi-tester": "^1.0",
         "phpunit/phpunit": "^6.4"
     },
     "autoload": {

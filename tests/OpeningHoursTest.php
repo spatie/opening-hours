@@ -263,10 +263,7 @@ class OpeningHoursTest extends TestCase
         $this->assertTrue($openingHours->isClosedAt($closedOnNewYearDay2019));
     }
 
-    /**
-     * @group i
-     * @test
-     */
+    /** @test */
     public function it_can_handle_consecutive_open_hours()
     {
         $openingHours = OpeningHours::create([
@@ -288,17 +285,17 @@ class OpeningHoursTest extends TestCase
         $this->assertEquals('2019-02-06 03:00:00', $openingHours->nextClose($monday)->format('Y-m-d H:i:s'));
         $this->assertEquals('2019-02-06 09:00:00', $openingHours->nextOpen($monday)->format('Y-m-d H:i:s'));
 
-        $monday = new DateTime('2019-02-06 09:00:00');
-        $this->assertTrue($openingHours->isOpenAt($monday));
-        $this->assertFalse($openingHours->isClosedAt($monday));
-        $this->assertEquals('2019-02-06 03:00:00', $openingHours->nextClose($monday)->format('Y-m-d H:i:s'));
-        $this->assertEquals('2019-02-06 09:00:00', $openingHours->nextOpen($monday)->format('Y-m-d H:i:s'));
+        $wednesday = new DateTime('2019-02-06 09:00:00');
+        $this->assertTrue($openingHours->isOpenAt($wednesday));
+        $this->assertFalse($openingHours->isClosedAt($wednesday));
+        $this->assertEquals('2019-02-07 00:00:00', $openingHours->nextClose($wednesday)->format('Y-m-d H:i:s'));
+        $this->assertEquals('2019-02-08 00:00:00', $openingHours->nextOpen($wednesday)->format('Y-m-d H:i:s'));
 
-        $monday = new DateTimeImmutable('2019-02-06 09:00:00');
-        $this->assertTrue($openingHours->isOpenAt($monday));
-        $this->assertFalse($openingHours->isClosedAt($monday));
-        $this->assertEquals('2019-02-06 03:00:00', $openingHours->nextClose($monday)->format('Y-m-d H:i:s'));
-        $this->assertEquals('2019-02-06 09:00:00', $openingHours->nextOpen($monday)->format('Y-m-d H:i:s'));
+        $wednesday = new DateTimeImmutable('2019-02-06 09:00:00');
+        $this->assertTrue($openingHours->isOpenAt($wednesday));
+        $this->assertFalse($openingHours->isClosedAt($wednesday));
+        $this->assertEquals('2019-02-07 00:00:00', $openingHours->nextClose($wednesday)->format('Y-m-d H:i:s'));
+        $this->assertEquals('2019-02-08 00:00:00', $openingHours->nextOpen($wednesday)->format('Y-m-d H:i:s'));
     }
 
     /** @test */

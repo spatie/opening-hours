@@ -254,7 +254,10 @@ class OpeningHours
             $openingHoursForDay = $this->forDate($dateTime);
 
             $nextOpen = $openingHoursForDay->nextOpen(Time::fromDateTime($dateTime));
-            var_dump($openingHoursForDay, $dateTime, Time::fromDateTime($dateTime), $nextOpen);
+        }
+
+        if ($dateTime->format('H:i') === '00:00' && $this->isOpenAt((clone $dateTime)->modify('-1 second'))) {
+            return $this->nextOpen($dateTime->modify('+1 minute'));
         }
 
         $nextDateTime = $nextOpen->toDateTime();
