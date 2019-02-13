@@ -280,7 +280,7 @@ class OpeningHours
                 ->modify('+1 day')
                 ->setTime(0, 0, 0);
 
-            if ($this->isClosedAt($dateTime)) {
+            if ($this->isClosedAt($dateTime) && $openingHoursForDay->isOpenAt(Time::fromString('23:59'))) {
                 return $dateTime;
             }
 
@@ -309,7 +309,7 @@ class OpeningHours
 
     public function exceptionalClosingDates(): array
     {
-        $dates = array_keys($this->filterExceptions(function (OpeningHoursForDay $openingHoursForDay, $date) {
+        $dates = array_keys($this->filterExceptions(function (OpeningHoursForDay $openingHoursForDay) {
             return $openingHoursForDay->isEmpty();
         }));
 

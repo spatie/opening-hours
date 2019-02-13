@@ -537,10 +537,10 @@ class OpeningHoursTest extends TestCase
             ],
         ]);
 
-        $nextTimeOpen = $openingHours->nextClose(new DateTime('2016-09-26 04:00:00'));
+        $nextClosedTime = $openingHours->nextClose(new DateTime('2016-09-26 04:00:00'));
 
-        $this->assertInstanceOf(DateTime::class, $nextTimeOpen);
-        $this->assertEquals('2016-09-27 11:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
+        $this->assertInstanceOf(DateTime::class, $nextClosedTime);
+        $this->assertEquals('2016-09-27 11:00:00', $nextClosedTime->format('Y-m-d H:i:s'));
     }
 
     /** @test */
@@ -554,10 +554,10 @@ class OpeningHoursTest extends TestCase
             ],
         ]);
 
-        $nextTimeOpen = $openingHours->nextClose(new DateTimeImmutable('2016-09-26 04:00:00'));
+        $nextClosedTime = $openingHours->nextClose(new DateTimeImmutable('2016-09-26 04:00:00'));
 
-        $this->assertInstanceOf(DateTimeImmutable::class, $nextTimeOpen);
-        $this->assertEquals('2016-09-27 11:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
+        $this->assertInstanceOf(DateTimeImmutable::class, $nextClosedTime);
+        $this->assertEquals('2016-09-27 11:00:00', $nextClosedTime->format('Y-m-d H:i:s'));
     }
 
     /** @test */
