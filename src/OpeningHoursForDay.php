@@ -82,9 +82,6 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
     {
         return $this->openingHoursFilter([
             function ($timeRange) use ($time) {
-                return $this->findNextOpenInWorkingHours($time, $timeRange);
-            },
-            function ($timeRange) use ($time) {
                 return $this->findNextOpenInFreeTime($time, $timeRange);
             },
         ]);
@@ -107,24 +104,11 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
         ]);
     }
 
-    protected function findNextOpenInWorkingHours(Time $time, TimeRange $timeRange)
+    protected function findNextOpenInFreeTime(Time $time, TimeRange $timeRange)
     {
-        if ($timeRange->containsTime($time) && $timeRange->start()->isAfter($time) && next($timeRange) !== $timeRange) {
-            return next($timeRange);
-        }
-    }
-
-    protected function findNextOpenInFreeTime(Time $time, TimeRange $timeRange, TimeRange &$prevTimeRange = null)
-    {
-        $timeOffRange = $prevTimeRange ?
-            TimeRange::fromString($prevTimeRange->end().'-'.$timeRange->start()) :
-            TimeRange::fromString('00:00-'.$timeRange->start());
-
-        if ($timeOffRange->containsTime($time) && $timeRange->start()->isAfter($time) || $timeOffRange->start()->isSame($time)) {
+        if (TimeRange::fromString('00:00-'.$timeRange->start())->containsTime($time)) {
             return $timeRange->start();
         }
-
-        $prevTimeRange = $timeRange;
     }
 
     protected function findNextCloseInWorkingHours(Time $time, TimeRange $timeRange)
@@ -134,17 +118,11 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
         }
     }
 
-    protected function findNextCloseInFreeTime(Time $time, TimeRange $timeRange, TimeRange &$prevTimeRange = null)
+    protected function findNextCloseInFreeTime(Time $time, TimeRange $timeRange)
     {
-        $timeOffRange = $prevTimeRange ?
-            TimeRange::fromString($prevTimeRange->end().'-'.$timeRange->start()) :
-            TimeRange::fromString('00:00-'.$timeRange->start());
-
-        if ($timeOffRange->containsTime($time) || $timeOffRange->start()->isSame($time)) {
+        if (TimeRange::fromString('00:00-'.$timeRange->start())->containsTime($time)) {
             return $timeRange->end();
         }
-
-        $prevTimeRange = $timeRange;
     }
 
     public function offsetExists($offset): bool
