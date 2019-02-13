@@ -115,6 +115,9 @@ $openingHours = OpeningHours::create([
         ['hours' => '13:00-18:00'],
         ['hours' => '19:00-21:00', 'data' => 'Extra on Tuesday evening'],
     ],
+    // Open by night from Wednesday 22h to Thursday 7h:
+    'wednesday' => ['22:00-24:00'], // use the special "24:00" to reach midnight included
+    'thursday' => ['00:00-07:00'],
     'exceptions' => [
         '2016-12-25' => [
             'hours' => [],
