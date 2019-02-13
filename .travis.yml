@@ -5,23 +5,33 @@ php:
   - 7.1
   - 7.2
   - 7.3
-  - nightly
 
 matrix:
-    allow_failures:
-      - php: nightly
+  include:
+    - php: 8.0
+      env: COMPOSER_PLATEFORM_REQS="--ignore-platform-reqs"
+    - php: nightly
+      env: COMPOSER_PLATEFORM_REQS="--ignore-platform-reqs"
+    - php: 7.3
+      env: MULTITEST='on'
+  allow_failures:
+    - php: 8.0
+    - php: nightly
+  fast_finish: true
 
 env:
+  - COMPOSER_PLATEFORM_REQS=""
   matrix:
     - COMPOSER_FLAGS="--prefer-lowest"
     - COMPOSER_FLAGS=""
 
 before_script:
   - travis_retry composer self-update
-  - travis_retry composer update ${COMPOSER_FLAGS} --no-interaction --prefer-source
+  - travis_retry composer update ${COMPOSER_FLAGS} ${COMPOSER_PLATEFORM_REQS} --no-interaction --prefer-source
 
 script:
-  - phpunit --coverage-text --coverage-clover=coverage.clover
+  - if [ "$MULTITEST" != "on" ]; then phpunit --coverage-text --coverage-clover=coverage.clover; fi;
+  - if [ "$MULTITEST" = "on" ]; then vendor/bin/multi-tester; fi;
 
 after_script:
   - php vendor/bin/ocular code-coverage:upload --format=php-clover coverage.clover

@@ -264,6 +264,41 @@ class OpeningHoursTest extends TestCase
     }
 
     /** @test */
+    public function it_can_handle_consecutive_open_hours()
+    {
+        $openingHours = OpeningHours::create([
+            'monday'     => ['09:00-24:00'],
+            'tuesday'    => ['00:00-24:00'],
+            'wednesday'  => ['00:00-03:00', '09:00-24:00'],
+            'friday'     => ['00:00-03:00'],
+        ]);
+
+        $monday = new DateTime('2019-02-04 11:00:00');
+        $this->assertTrue($openingHours->isOpenAt($monday));
+        $this->assertFalse($openingHours->isClosedAt($monday));
+        $this->assertEquals('2019-02-06 03:00:00', $openingHours->nextClose($monday)->format('Y-m-d H:i:s'));
+        $this->assertEquals('2019-02-06 09:00:00', $openingHours->nextOpen($monday)->format('Y-m-d H:i:s'));
+
+        $monday = new DateTimeImmutable('2019-02-04 11:00:00');
+        $this->assertTrue($openingHours->isOpenAt($monday));
+        $this->assertFalse($openingHours->isClosedAt($monday));
+        $this->assertEquals('2019-02-06 03:00:00', $openingHours->nextClose($monday)->format('Y-m-d H:i:s'));
+        $this->assertEquals('2019-02-06 09:00:00', $openingHours->nextOpen($monday)->format('Y-m-d H:i:s'));
+
+        $wednesday = new DateTime('2019-02-06 09:00:00');
+        $this->assertTrue($openingHours->isOpenAt($wednesday));
+        $this->assertFalse($openingHours->isClosedAt($wednesday));
+        $this->assertEquals('2019-02-07 00:00:00', $openingHours->nextClose($wednesday)->format('Y-m-d H:i:s'));
+        $this->assertEquals('2019-02-08 00:00:00', $openingHours->nextOpen($wednesday)->format('Y-m-d H:i:s'));
+
+        $wednesday = new DateTimeImmutable('2019-02-06 09:00:00');
+        $this->assertTrue($openingHours->isOpenAt($wednesday));
+        $this->assertFalse($openingHours->isClosedAt($wednesday));
+        $this->assertEquals('2019-02-07 00:00:00', $openingHours->nextClose($wednesday)->format('Y-m-d H:i:s'));
+        $this->assertEquals('2019-02-08 00:00:00', $openingHours->nextOpen($wednesday)->format('Y-m-d H:i:s'));
+    }
+
+    /** @test */
     public function it_can_determine_next_open_hours_from_non_working_date_time()
     {
         $openingHours = OpeningHours::create([
@@ -348,14 +383,50 @@ class OpeningHoursTest extends TestCase
     /** @test */
     public function it_can_determine_next_close_hours_from_non_working_date_time()
     {
-        $openingHours = OpeningHours::create([
-            'monday' => ['09:00-11:00', '13:00-19:00'],
-        ]);
+        $ranges = [
+            'monday' => ['09:00-18:00'],
+            /* all the default week settings */
+            'exceptions' => [
+                // add non-dynamic exceptions, else let empty
+            ],
+        ];
+        $dynamicClosedRanges = [
+            '2016-11-07' => ['12:30-13:00'],
+        ];
+        foreach ($dynamicClosedRanges as $day => $closedRanges) {
+            $weekDay = strtolower((new DateTime($day))->format('l'));
+            $dayRanges = \Spatie\OpeningHours\OpeningHoursForDay::fromStrings($ranges[$weekDay]);
+            $newRanges = [];
 
-        $nextTimeOpen = $openingHours->nextClose(new DateTime('2016-09-26 12:00:00'));
+            foreach ($dayRanges as $dayRange) {
+                /* @var \Spatie\OpeningHours\TimeRange $dayRange */
+                foreach ($closedRanges as $exceptionRange) {
+                    $range = \Spatie\OpeningHours\TimeRange::fromString($exceptionRange);
+                    if ($dayRange->containsTime($range->start()) && $dayRange->containsTime($range->end())) {
+                        $newRanges[] = \Spatie\OpeningHours\TimeRange::fromString($dayRange->start()->format().'-'.$range->start()->format())->format();
+                        $newRanges[] = \Spatie\OpeningHours\TimeRange::fromString($range->end()->format().'-'.$dayRange->end()->format())->format();
+                        continue 2;
+                    }
+                    if ($dayRange->containsTime($range->start())) {
+                        $newRanges[] = \Spatie\OpeningHours\TimeRange::fromString($dayRange->start()->format().'-'.$range->start()->format())->format();
+                        continue 2;
+                    }
+                    if ($dayRange->containsTime($range->end())) {
+                        $newRanges[] = \Spatie\OpeningHours\TimeRange::fromString($range->end()->format().'-'.$dayRange->end()->format())->format();
+                        continue 2;
+                    }
+                }
 
-        $this->assertInstanceOf(DateTime::class, $nextTimeOpen);
-        $this->assertEquals('2016-09-26 19:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
+                $newRanges[] = $dayRange->format();
+            }
+
+            $ranges['exceptions'][$day] = $newRanges;
+        }
+
+        $openingHours = OpeningHours::createAndMergeOverlappingRanges($ranges);
+
+        $this->assertEquals('09:00-12:30,13:00-18:00', strval($openingHours->forDate(new DateTime('2016-11-07'))));
+        $this->assertEquals('09:00-18:00', strval($openingHours->forDate(new DateTime('2016-11-14'))));
     }
 
     /** @test */
@@ -472,10 +543,10 @@ class OpeningHoursTest extends TestCase
             ],
         ]);
 
-        $nextTimeOpen = $openingHours->nextClose(new DateTime('2016-09-26 04:00:00'));
+        $nextClosedTime = $openingHours->nextClose(new DateTime('2016-09-26 04:00:00'));
 
-        $this->assertInstanceOf(DateTime::class, $nextTimeOpen);
-        $this->assertEquals('2016-09-27 11:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
+        $this->assertInstanceOf(DateTime::class, $nextClosedTime);
+        $this->assertEquals('2016-09-27 11:00:00', $nextClosedTime->format('Y-m-d H:i:s'));
     }
 
     /** @test */
@@ -489,10 +560,10 @@ class OpeningHoursTest extends TestCase
             ],
         ]);
 
-        $nextTimeOpen = $openingHours->nextClose(new DateTimeImmutable('2016-09-26 04:00:00'));
+        $nextClosedTime = $openingHours->nextClose(new DateTimeImmutable('2016-09-26 04:00:00'));
 
-        $this->assertInstanceOf(DateTimeImmutable::class, $nextTimeOpen);
-        $this->assertEquals('2016-09-27 11:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
+        $this->assertInstanceOf(DateTimeImmutable::class, $nextClosedTime);
+        $this->assertEquals('2016-09-27 11:00:00', $nextClosedTime->format('Y-m-d H:i:s'));
     }
 
     /** @test */
