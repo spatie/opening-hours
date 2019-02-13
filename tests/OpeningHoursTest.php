@@ -310,6 +310,7 @@ class OpeningHoursTest extends TestCase
         $this->assertInstanceOf(DateTime::class, $nextTimeOpen);
         $this->assertEquals('2016-09-26 13:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
     }
+
     /** @test */
     public function it_can_determine_next_open_hours_from_edges_time()
     {
