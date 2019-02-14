@@ -1,19 +1,20 @@
 language: php
 
 env:
-  - COMPOSER_PLATEFORM_REQS=""
   matrix:
     - COMPOSER_FLAGS="--prefer-lowest"
     - COMPOSER_FLAGS=""
 
-php:
-  - 7.0
-  - 7.1
-  - 7.2
-  - 7.3
-
 matrix:
   include:
+    - php: 7.0
+      env: COMPOSER_PLATEFORM_REQS=""
+    - php: 7.1
+      env: COMPOSER_PLATEFORM_REQS=""
+    - php: 7.2
+      env: COMPOSER_PLATEFORM_REQS=""
+    - php: 7.3
+      env: COMPOSER_PLATEFORM_REQS=""
     - php: 8.0
       env: COMPOSER_PLATEFORM_REQS="--ignore-platform-reqs"
     - php: nightly
