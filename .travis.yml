@@ -1,5 +1,11 @@
 language: php
 
+env:
+  - COMPOSER_PLATEFORM_REQS=""
+  matrix:
+    - COMPOSER_FLAGS="--prefer-lowest"
+    - COMPOSER_FLAGS=""
+
 php:
   - 7.0
   - 7.1
@@ -18,12 +24,6 @@ matrix:
     - php: 8.0
     - php: nightly
   fast_finish: true
-
-env:
-  - COMPOSER_PLATEFORM_REQS=""
-  matrix:
-    - COMPOSER_FLAGS="--prefer-lowest"
-    - COMPOSER_FLAGS=""
 
 before_script:
   - travis_retry composer self-update
