@@ -18,26 +18,12 @@ matrix:
       env: COMPOSER_FLAGS="--prefer-lowest"
     - php: 7.3
       env: COMPOSER_FLAGS=""
-    - php: 8.0.0-dev
-      env: COMPOSER_FLAGS="--prefer-lowest --ignore-platform-reqs"
-    - php: 8.0.0-dev
-      env: COMPOSER_FLAGS="--ignore-platform-reqs"
     - php: nightly
       env: COMPOSER_FLAGS="--prefer-lowest --ignore-platform-reqs"
     - php: nightly
       env: COMPOSER_FLAGS="--ignore-platform-reqs"
     - php: 7.3
       env: MULTITEST='on'
-  allow_failures:
-    - php: 8.0.0-dev
-      env: COMPOSER_FLAGS="--prefer-lowest --ignore-platform-reqs"
-    - php: 8.0.0-dev
-      env: COMPOSER_FLAGS="--ignore-platform-reqs"
-    - php: nightly
-      env: COMPOSER_FLAGS="--prefer-lowest --ignore-platform-reqs"
-    - php: nightly
-      env: COMPOSER_FLAGS="--ignore-platform-reqs"
-  fast_finish: true
 
 before_script:
   - travis_retry composer self-update
