@@ -22,7 +22,9 @@ matrix:
       env: MULTITEST='on'
   allow_failures:
     - php: 8.0
+      env: COMPOSER_PLATEFORM_REQS="--ignore-platform-reqs"
     - php: nightly
+      env: COMPOSER_PLATEFORM_REQS="--ignore-platform-reqs"
   fast_finish: true
 
 before_script:
