@@ -1,33 +1,33 @@
 language: php
 
-php:
-  - 7.0
-  - 7.1
-  - 7.2
-  - 7.3
-
 matrix:
   include:
-    - php: 8.0
-      env: COMPOSER_PLATEFORM_REQS="--ignore-platform-reqs"
+    - php: 7.0
+      env: COMPOSER_FLAGS="--prefer-lowest"
+    - php: 7.0
+      env: COMPOSER_FLAGS=""
+    - php: 7.1
+      env: COMPOSER_FLAGS="--prefer-lowest"
+    - php: 7.1
+      env: COMPOSER_FLAGS=""
+    - php: 7.2
+      env: COMPOSER_FLAGS="--prefer-lowest"
+    - php: 7.2
+      env: COMPOSER_FLAGS=""
+    - php: 7.3
+      env: COMPOSER_FLAGS="--prefer-lowest"
+    - php: 7.3
+      env: COMPOSER_FLAGS=""
     - php: nightly
-      env: COMPOSER_PLATEFORM_REQS="--ignore-platform-reqs"
+      env: COMPOSER_FLAGS="--prefer-lowest --ignore-platform-reqs"
+    - php: nightly
+      env: COMPOSER_FLAGS="--ignore-platform-reqs"
     - php: 7.3
       env: MULTITEST='on'
-  allow_failures:
-    - php: 8.0
-    - php: nightly
-  fast_finish: true
-
-env:
-  - COMPOSER_PLATEFORM_REQS=""
-  matrix:
-    - COMPOSER_FLAGS="--prefer-lowest"
-    - COMPOSER_FLAGS=""
 
 before_script:
   - travis_retry composer self-update
-  - travis_retry composer update ${COMPOSER_FLAGS} ${COMPOSER_PLATEFORM_REQS} --no-interaction --prefer-source
+  - travis_retry composer update ${COMPOSER_FLAGS} --no-interaction --prefer-source
 
 script:
   - if [ "$MULTITEST" != "on" ]; then phpunit --coverage-text --coverage-clover=coverage.clover; fi;
