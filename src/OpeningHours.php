@@ -242,14 +242,22 @@ class OpeningHours
         $openingHoursForDay = $this->forDate($dateTime);
         $nextOpen = $openingHoursForDay->nextOpen(Time::fromDateTime($dateTime));
 
-        while ($nextOpen === false) {
+        while ($nextOpen === false || $nextOpen->hours() >= 24) {
             $dateTime = $dateTime
                 ->modify('+1 day')
                 ->setTime(0, 0, 0);
 
+            if ($this->isOpenAt($dateTime) && ! $openingHoursForDay->isOpenAt(Time::fromString('23:59'))) {
+                return $dateTime;
+            }
+
             $openingHoursForDay = $this->forDate($dateTime);
 
             $nextOpen = $openingHoursForDay->nextOpen(Time::fromDateTime($dateTime));
+        }
+
+        if ($dateTime->format('H:i') === '00:00' && $this->isOpenAt((clone $dateTime)->modify('-1 second'))) {
+            return $this->nextOpen($dateTime->modify('+1 minute'));
         }
 
         $nextDateTime = $nextOpen->toDateTime();
@@ -267,10 +275,14 @@ class OpeningHours
         $openingHoursForDay = $this->forDate($dateTime);
         $nextClose = $openingHoursForDay->nextClose(Time::fromDateTime($dateTime));
 
-        while ($nextClose === false) {
+        while ($nextClose === false || $nextClose->hours() >= 24) {
             $dateTime = $dateTime
                 ->modify('+1 day')
                 ->setTime(0, 0, 0);
+
+            if ($this->isClosedAt($dateTime) && $openingHoursForDay->isOpenAt(Time::fromString('23:59'))) {
+                return $dateTime;
+            }
 
             $openingHoursForDay = $this->forDate($dateTime);
 
@@ -297,7 +309,7 @@ class OpeningHours
 
     public function exceptionalClosingDates(): array
     {
-        $dates = array_keys($this->filterExceptions(function (OpeningHoursForDay $openingHoursForDay, $date) {
+        $dates = array_keys($this->filterExceptions(function (OpeningHoursForDay $openingHoursForDay) {
             return $openingHoursForDay->isEmpty();
         }));
 

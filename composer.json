@@ -19,9 +19,10 @@
         }
     ],
     "require": {
-        "php": "^7.0"
+        "php": "^7.0 || ^8.0"
     },
     "require-dev": {
+        "kylekatarnls/multi-tester": "^1.1",
         "phpunit/phpunit": "^6.4"
     },
     "autoload": {

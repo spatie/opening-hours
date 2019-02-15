@@ -53,62 +53,62 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
         return false;
     }
 
+    /**
+     * @param callable[] $filters
+     *
+     * @return Time|bool
+     */
+    public function openingHoursFilter(array $filters)
+    {
+        foreach ($this->openingHours as $timeRange) {
+            foreach ($filters as $filter) {
+                if ($result = $filter($timeRange)) {
+                    reset($timeRange);
+
+                    return $result;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param Time $time
+     *
+     * @return bool|Time
+     */
     public function nextOpen(Time $time)
     {
-        foreach ($this->openingHours as $timeRange) {
-            if ($nextOpen = $this->findNextOpenInWorkingHours($time, $timeRange)) {
-                reset($timeRange);
-
-                return $nextOpen;
-            }
-
-            if ($nextOpen = $this->findNextOpenInFreeTime($time, $timeRange)) {
-                reset($timeRange);
-
-                return $nextOpen;
-            }
-        }
-
-        return false;
+        return $this->openingHoursFilter([
+            function ($timeRange) use ($time) {
+                return $this->findNextOpenInFreeTime($time, $timeRange);
+            },
+        ]);
     }
 
+    /**
+     * @param Time $time
+     *
+     * @return bool|Time
+     */
     public function nextClose(Time $time)
     {
-        foreach ($this->openingHours as $timeRange) {
-            if ($nextClose = $this->findNextCloseInWorkingHours($time, $timeRange)) {
-                reset($timeRange);
-
-                return $nextClose;
-            }
-
-            if ($nextClose = $this->findNextCloseInFreeTime($time, $timeRange)) {
-                reset($timeRange);
-
-                return $nextClose;
-            }
-        }
-
-        return false;
+        return $this->openingHoursFilter([
+            function ($timeRange) use ($time) {
+                return $this->findNextCloseInWorkingHours($time, $timeRange);
+            },
+            function ($timeRange) use ($time) {
+                return $this->findNextCloseInFreeTime($time, $timeRange);
+            },
+        ]);
     }
 
-    protected function findNextOpenInWorkingHours(Time $time, TimeRange $timeRange)
+    protected function findNextOpenInFreeTime(Time $time, TimeRange $timeRange)
     {
-        if ($timeRange->containsTime($time) && next($timeRange) !== $timeRange) {
-            return next($timeRange);
-        }
-    }
-
-    protected function findNextOpenInFreeTime(Time $time, TimeRange $timeRange, TimeRange &$prevTimeRange = null)
-    {
-        $timeOffRange = $prevTimeRange ?
-            TimeRange::fromString($prevTimeRange->end().'-'.$timeRange->start()) :
-            TimeRange::fromString('00:00-'.$timeRange->start());
-
-        if ($timeOffRange->containsTime($time) || $timeOffRange->start()->isSame($time)) {
+        if (TimeRange::fromString('00:00-'.$timeRange->start())->containsTime($time)) {
             return $timeRange->start();
         }
-
-        $prevTimeRange = $timeRange;
     }
 
     protected function findNextCloseInWorkingHours(Time $time, TimeRange $timeRange)
@@ -118,17 +118,11 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
         }
     }
 
-    protected function findNextCloseInFreeTime(Time $time, TimeRange $timeRange, TimeRange &$prevTimeRange = null)
+    protected function findNextCloseInFreeTime(Time $time, TimeRange $timeRange)
     {
-        $timeOffRange = $prevTimeRange ?
-            TimeRange::fromString($prevTimeRange->end().'-'.$timeRange->start()) :
-            TimeRange::fromString('00:00-'.$timeRange->start());
-
-        if ($timeOffRange->containsTime($time) || $timeOffRange->start()->isSame($time)) {
+        if (TimeRange::fromString('00:00-'.$timeRange->start())->containsTime($time)) {
             return $timeRange->end();
         }
-
-        $prevTimeRange = $timeRange;
     }
 
     public function offsetExists($offset): bool

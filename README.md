@@ -13,18 +13,18 @@ A set of opening hours is created by passing in a regular schedule, and a list o
 
 ```php
 $openingHours = OpeningHours::create([
-    'monday' => ['09:00-12:00', '13:00-18:00'],
-    'tuesday' => ['09:00-12:00', '13:00-18:00'],
-    'wednesday' => ['09:00-12:00'],
-    'thursday' => ['09:00-12:00', '13:00-18:00'],
-    'friday' => ['09:00-12:00', '13:00-20:00'],
-    'saturday' => ['09:00-12:00', '13:00-16:00'],
-    'sunday' => [],
+    'monday'     => ['09:00-12:00', '13:00-18:00'],
+    'tuesday'    => ['09:00-12:00', '13:00-18:00'],
+    'wednesday'  => ['09:00-12:00'],
+    'thursday'   => ['09:00-12:00', '13:00-18:00'],
+    'friday'     => ['09:00-12:00', '13:00-20:00'],
+    'saturday'   => ['09:00-12:00', '13:00-16:00'],
+    'sunday'     => [],
     'exceptions' => [
         '2016-11-11' => ['09:00-12:00'],
         '2016-12-25' => [],
-        '01-01' => [], // Recurring on each 1st of january
-        '12-25' => ['09:00-12:00'], // Recurring on each 25th of december
+        '01-01'      => [],                // Recurring on each 1st of January
+        '12-25'      => ['09:00-12:00'],   // Recurring on each 25th of December
     ],
 ]);
 ```
@@ -73,7 +73,7 @@ You can add data in definitions then retrieve them:
 ```php
 $openingHours = OpeningHours::create([
     'monday' => [
-        'data' => 'Tipical monday',
+        'data' => 'Typical Monday',
         '09:00-12:00',
         '13:00-18:00',
     ],
@@ -92,12 +92,12 @@ $openingHours = OpeningHours::create([
     ],
 ]);
 
-echo $openingHours->forDay('monday')->getData(); // Tipical monday
+echo $openingHours->forDay('monday')->getData(); // Typical Monday
 echo $openingHours->forDate(new DateTime('2016-12-25'))->getData(); // Closed for Christmas
 echo $openingHours->forDay('tuesday')[2]->getData(); // Extra on Tuesday evening
 ```
 
-In the example above, data are string but it can be any kind of values. So you can embed multiple properties in an array.
+In the example above, data are strings but it can be any kind of value. So you can embed multiple properties in an array.
 
 For structure convenience, the data-hours couple can be a fully-associative array, so the example above is strictly equivalent to the following:
 
@@ -108,23 +108,26 @@ $openingHours = OpeningHours::create([
             '09:00-12:00',
             '13:00-18:00',
         ],
-        'data' => 'Tipical monday',
+        'data' => 'Typical Monday',
     ],
     'tuesday' => [
         ['hours' => '09:00-12:00'],
         ['hours' => '13:00-18:00'],
         ['hours' => '19:00-21:00', 'data' => 'Extra on Tuesday evening'],
     ],
+    // Open by night from Wednesday 22h to Thursday 7h:
+    'wednesday' => ['22:00-24:00'], // use the special "24:00" to reach midnight included
+    'thursday' => ['00:00-07:00'],
     'exceptions' => [
         '2016-12-25' => [
-            'hours' => [], 
-            'data' => 'Closed for Christmas',
+            'hours' => [],
+            'data'  => 'Closed for Christmas',
         ],
     ],
 ]);
 ```
 
-The last structure tool is the filter, it allows you to pass closures (or callable function/method reference) that take a date as parameter and returns the settings for the given date.
+The last structure tool is the filter, it allows you to pass closures (or callable function/method reference) that take a date as a parameter and returns the settings for the given date.
 
 ```php
 $openingHours = OpeningHours::create([
@@ -133,21 +136,21 @@ $openingHours = OpeningHours::create([
     ],
     'filters' => [
         function ($date) {
-            $year = intval($date->format('Y'));
+            $year         = intval($date->format('Y'));
             $easterMonday = new DateTimeImmutable('2018-03-21 +'.(easter_days($year) + 1).'days');
             if ($date->format('m-d') === $easterMonday->format('m-d')) {
-                return []; // Closed on Easter monday
+                return []; // Closed on Easter Monday
                 // Any valid exception-array can be returned here (range of hours, with or without data) 
             }
-            // Else the filter does not apply to te given date
+            // Else the filter does not apply to the given date
         },
     ],
 ]);
 ```
 
-If a callable is found in the `"exceptions"` property, it will be added automatically to filters so you can mix filters and exceptions both in the **exceptions** array. The first filter that returns a non-null value will have precedence over next filters and the **filters** array has precedence over the filters inside the **exceptions** array.
+If a callable is found in the `"exceptions"` property, it will be added automatically to filters so you can mix filters and exceptions both in the **exceptions** array. The first filter that returns a non-null value will have precedence over the next filters and the **filters** array has precedence over the filters inside the **exceptions** array.
 
-Warning: as we will loop on all filters for each date from which we need to retrieve opening hours and cannot neither predicate nor cache the result (can be random function) so you must be careful with filters, too many filters or long process inside filters can have a significant impact on the performance.
+Warning: We will loop on all filters for each date from which we need to retrieve opening hours and can neither predicate nor cache the result (can be a random function) so you must be careful with filters, too many filters or long process inside filters can have a significant impact on the performance.
 
 It can also return the next open or close `DateTime` from a given `DateTime`.
 
@@ -203,7 +206,7 @@ For safety sake, creating `OpeningHours` object with overlapping ranges will thr
 $ranges = [
   'monday' => ['08:00-11:00', '10:00-12:00'],
 ];
-$mergedRanges = OpeningHours::mergeOverlappingRanges($ranges); // monday become ['08:00-12:00']
+$mergedRanges = OpeningHours::mergeOverlappingRanges($ranges); // Monday becomes ['08:00-12:00']
 
 OpeningHours::create($mergedRanges);
 // Or use the following shortcut to create from ranges that possibly overlap:
@@ -333,15 +336,15 @@ This class is meant as read-only. It implements `ArrayAccess`, `Countable` and `
 
 ### `Spatie\OpeningHours\TimeRange`
 
-Value object describing a period with a start and an end time. Can be casted to a string in a `H:i-H:i` format.
+Value object describing a period with a start and an end time. Can be cast to a string in a `H:i-H:i` format.
 
 ### `Spatie\OpeningHours\Time`
 
-Value object describing a single time. Can be casted to a string in a `H:i` format.
+Value object describing a single time. Can be cast to a string in a `H:i` format.
 
 ## Changelog
 
-Please see [CHANGELOG](CHANGELOG.md) for more information what has changed recently.
+Please see [CHANGELOG](CHANGELOG.md) for more information about what has changed recently.
 
 ## Testing
 
