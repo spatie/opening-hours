@@ -206,6 +206,21 @@ class OpeningHoursFillTest extends TestCase
 
         $this->assertSame('morning', $hours->forDay('monday')[0]->getData());
         $this->assertSame('afternoon', $hours->forDay('monday')[1]->getData());
+
+        $hours = OpeningHours::create([
+            'tuesday' => [
+                '09:00-12:00',
+                '13:00-18:00',
+                [
+                    '19:00-21:00',
+                    'data' => 'Extra on Tuesday evening',
+                ],
+            ],
+        ]);
+
+        $this->assertSame('09:00-12:00,13:00-18:00,19:00-21:00', strval($hours->forDay('tuesday')));
+        $this->assertNull($hours->forDay('tuesday')[1]->getData());
+        $this->assertSame('Extra on Tuesday evening', $hours->forDay('tuesday')[2]->getData());
     }
 
     /** @test */

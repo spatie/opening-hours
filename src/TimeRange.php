@@ -41,21 +41,24 @@ class TimeRange
 
         foreach ($keys as $key) {
             if (isset($array[$key])) {
-                $values[] = $array[$key];
+                $values[$key] = $array[$key];
                 unset($array[$key]);
+
+                continue;
             }
         }
 
-        if (count($array)) {
-            array_push($values, ...$array);
+        foreach ($keys as $key) {
+            if (! isset($values[$key])) {
+                $values[$key] = array_shift($array);
+            }
         }
-        list($hours, $data) = array_pad($values, count($keys), null);
 
-        if (! $hours) {
+        if (! $values['hours']) {
             throw InvalidTimeRangeArray::create();
         }
 
-        return static::fromString($hours)->setData($data);
+        return static::fromString($values['hours'])->setData($values['data']);
     }
 
     public static function fromDefinition($value): self
