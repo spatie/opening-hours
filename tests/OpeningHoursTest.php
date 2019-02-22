@@ -356,6 +356,110 @@ class OpeningHoursTest extends TestCase
     }
 
     /** @test */
+    public function it_can_determine_next_open_hours_from_mixed_structures()
+    {
+        $openingHours = OpeningHours::create([
+            'monday' => [
+                [
+                    'hours' => '09:00-11:00',
+                    'data' => ['foobar'],
+                ],
+                '13:00-19:00',
+            ],
+        ]);
+
+        $nextTimeOpen = $openingHours->nextOpen(new DateTime('2019-02-11 00:00:00'));
+
+        $this->assertInstanceOf(DateTime::class, $nextTimeOpen);
+        $this->assertEquals('2019-02-11 09:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
+
+        $nextTimeClose = $openingHours->nextClose(new DateTime('2019-02-11 00:00:00'));
+
+        $this->assertInstanceOf(DateTime::class, $nextTimeClose);
+        $this->assertEquals('2019-02-11 11:00:00', $nextTimeClose->format('Y-m-d H:i:s'));
+
+        $nextTimeOpen = $openingHours->nextOpen(new DateTime('2019-02-11 09:00:00'));
+
+        $this->assertInstanceOf(DateTime::class, $nextTimeOpen);
+        $this->assertEquals('2019-02-11 13:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
+
+        $nextTimeClose = $openingHours->nextClose(new DateTime('2019-02-11 09:00:00'));
+
+        $this->assertInstanceOf(DateTime::class, $nextTimeClose);
+        $this->assertEquals('2019-02-11 11:00:00', $nextTimeClose->format('Y-m-d H:i:s'));
+
+        $nextTimeOpen = $openingHours->nextOpen(new DateTime('2019-02-11 10:00:00'));
+
+        $this->assertInstanceOf(DateTime::class, $nextTimeOpen);
+        $this->assertEquals('2019-02-11 13:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
+
+        $nextTimeClose = $openingHours->nextClose(new DateTime('2019-02-11 10:00:00'));
+
+        $this->assertInstanceOf(DateTime::class, $nextTimeClose);
+        $this->assertEquals('2019-02-11 11:00:00', $nextTimeClose->format('Y-m-d H:i:s'));
+
+        $nextTimeOpen = $openingHours->nextOpen(new DateTime('2019-02-11 11:00:00'));
+
+        $this->assertInstanceOf(DateTime::class, $nextTimeOpen);
+        $this->assertEquals('2019-02-11 13:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
+
+        $nextTimeClose = $openingHours->nextClose(new DateTime('2019-02-11 11:00:00'));
+
+        $this->assertInstanceOf(DateTime::class, $nextTimeClose);
+        $this->assertEquals('2019-02-11 19:00:00', $nextTimeClose->format('Y-m-d H:i:s'));
+
+        $nextTimeOpen = $openingHours->nextOpen(new DateTime('2019-02-11 12:00:00'));
+
+        $this->assertInstanceOf(DateTime::class, $nextTimeOpen);
+        $this->assertEquals('2019-02-11 13:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
+
+        $nextTimeClose = $openingHours->nextClose(new DateTime('2019-02-11 12:00:00'));
+
+        $this->assertInstanceOf(DateTime::class, $nextTimeClose);
+        $this->assertEquals('2019-02-11 19:00:00', $nextTimeClose->format('Y-m-d H:i:s'));
+
+        $nextTimeOpen = $openingHours->nextOpen(new DateTime('2019-02-11 13:00:00'));
+
+        $this->assertInstanceOf(DateTime::class, $nextTimeOpen);
+        $this->assertEquals('2019-02-18 09:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
+
+        $nextTimeClose = $openingHours->nextClose(new DateTime('2019-02-11 13:00:00'));
+
+        $this->assertInstanceOf(DateTime::class, $nextTimeClose);
+        $this->assertEquals('2019-02-11 19:00:00', $nextTimeClose->format('Y-m-d H:i:s'));
+
+        $nextTimeOpen = $openingHours->nextOpen(new DateTime('2019-02-11 15:00:00'));
+
+        $this->assertInstanceOf(DateTime::class, $nextTimeOpen);
+        $this->assertEquals('2019-02-18 09:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
+
+        $nextTimeClose = $openingHours->nextClose(new DateTime('2019-02-11 15:00:00'));
+
+        $this->assertInstanceOf(DateTime::class, $nextTimeClose);
+        $this->assertEquals('2019-02-11 19:00:00', $nextTimeClose->format('Y-m-d H:i:s'));
+
+        $nextTimeOpen = $openingHours->nextOpen(new DateTime('2019-02-11 19:00:00'));
+
+        $this->assertInstanceOf(DateTime::class, $nextTimeOpen);
+        $this->assertEquals('2019-02-18 09:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
+
+        $nextTimeClose = $openingHours->nextClose(new DateTime('2019-02-11 19:00:00'));
+
+        $this->assertInstanceOf(DateTime::class, $nextTimeClose);
+        $this->assertEquals('2019-02-18 11:00:00', $nextTimeClose->format('Y-m-d H:i:s'));
+
+        $nextTimeOpen = $openingHours->nextOpen(new DateTime('2019-02-11 21:00:00'));
+
+        $this->assertInstanceOf(DateTime::class, $nextTimeOpen);
+        $this->assertEquals('2019-02-18 09:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
+
+        $nextTimeClose = $openingHours->nextClose(new DateTime('2019-02-11 21:00:00'));
+
+        $this->assertInstanceOf(DateTime::class, $nextTimeClose);
+        $this->assertEquals('2019-02-18 11:00:00', $nextTimeClose->format('Y-m-d H:i:s'));
+    }
+
+    /** @test */
     public function it_can_determine_next_open_hours_from_non_working_date_time_immutable()
     {
         $openingHours = OpeningHours::create([
