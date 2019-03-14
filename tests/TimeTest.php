@@ -25,6 +25,30 @@ class TimeTest extends TestCase
     }
 
     /** @test */
+    public function it_cant_be_created_from_an_invalid_hour()
+    {
+        $this->expectException(InvalidTimeString::class);
+
+        Time::fromString('26:00');
+    }
+
+    /** @test */
+    public function it_cant_be_created_from_an_out_of_bound_hour()
+    {
+        $this->expectException(InvalidTimeString::class);
+
+        Time::fromString('24:01');
+    }
+
+    /** @test */
+    public function it_cant_be_created_from_an_invalid_minute()
+    {
+        $this->expectException(InvalidTimeString::class);
+
+        Time::fromString('14:60');
+    }
+
+    /** @test */
     public function it_can_be_created_from_a_date_time_instance()
     {
         $dateTime = new DateTime('2016-09-27 16:00:00');
