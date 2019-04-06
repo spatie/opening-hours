@@ -12,6 +12,9 @@ With `spatie/opening-hours` you create an object that describes a business' open
 A set of opening hours is created by passing in a regular schedule, and a list of exceptions.
 
 ```php
+// Add the use at the top of each file where you want to use the OpeningHours class:
+use Spatie\OpeningHours\OpeningHours;
+
 $openingHours = OpeningHours::create([
     'monday'     => ['09:00-12:00', '13:00-18:00'],
     'tuesday'    => ['09:00-12:00', '13:00-18:00'],
