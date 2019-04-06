@@ -18,10 +18,6 @@ matrix:
       env: COMPOSER_FLAGS="--prefer-lowest"
     - php: 7.3
       env: COMPOSER_FLAGS=""
-    - php: nightly
-      env: COMPOSER_FLAGS="--prefer-lowest --ignore-platform-reqs"
-    - php: nightly
-      env: COMPOSER_FLAGS="--ignore-platform-reqs"
     - php: 7.3
       env: MULTITEST='on'
 
