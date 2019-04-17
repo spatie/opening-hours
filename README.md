@@ -143,7 +143,7 @@ $openingHours = OpeningHours::create([
             $easterMonday = new DateTimeImmutable('2018-03-21 +'.(easter_days($year) + 1).'days');
             if ($date->format('m-d') === $easterMonday->format('m-d')) {
                 return []; // Closed on Easter Monday
-                // Any valid exception-array can be returned here (range of hours, with or without data) 
+                // Any valid exception-array can be returned here (range of hours, with or without data)
             }
             // Else the filter does not apply to the given date
         },
@@ -239,7 +239,7 @@ $openingHours->forWeek();
 
 #### `OpeningHours::forWeekCombined(): array`
 
-Returns an array of days. Array key is first day with same hours, array values are days that have the same working hours and `OpeningHoursForDay` object. 
+Returns an array of days. Array key is first day with same hours, array values are days that have the same working hours and `OpeningHoursForDay` object.
 
 ```php
 $openingHours->forWeekCombined();
@@ -352,7 +352,7 @@ Please see [CHANGELOG](CHANGELOG.md) for more information about what has changed
 ## Testing
 
 ``` bash
-$ composer test
+composer test
 ```
 
 ## Contributing
@@ -380,7 +380,7 @@ We publish all received postcards [on our company website](https://spatie.be/en/
 
 Spatie is a webdesign agency based in Antwerp, Belgium. You'll find an overview of all our open source projects [on our website](https://spatie.be/opensource).
 
-Does your business depend on our contributions? Reach out and support us on [Patreon](https://www.patreon.com/spatie). 
+Does your business depend on our contributions? Reach out and support us on [Patreon](https://www.patreon.com/spatie).
 All pledges will be dedicated to allocating workforce on maintenance and new awesome stuff.
 
 ## License
