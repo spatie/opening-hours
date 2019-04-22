@@ -333,6 +333,14 @@ Returns next close DateTime from the given DateTime
 $openingHours->nextClose(new DateTime('2016-12-24 11:00:00'));
 ```
 
+#### `asStructuredData() : array`
+
+Returns a (OpeningHoursSpecification)[https://schema.org/openingHoursSpecification] as an array.
+
+```php
+$openingHours->asStructuredData();
+```
+
 ### `Spatie\OpeningHours\OpeningHoursForDay`
 
 This class is meant as read-only. It implements `ArrayAccess`, `Countable` and `IteratorAggregate` so you can process the list of `TimeRange`s in an array-like way.
