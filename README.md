@@ -71,7 +71,7 @@ $openingHours->forDate(new DateTime('2016-12-25'));
 $openingHours->exceptions();
 ```
 
-On construction you can set a flag for overlapping times. A night club opens that opens till 3am on Friday and Saturday:
+On construction you can set a flag for overflowing times across days. For example, for a night club opens that opens till 3am on Friday and Saturday:
 
  ```php
  $openingHours = \Spatie\OpeningHours\OpeningHours::create([
@@ -214,7 +214,7 @@ $openingHours = OpeningHours::create([
 
 #### `OpeningHours::mergeOverlappingRanges(array $schedule) : array`
 
-For safety sake, creating `OpeningHours` object with overlapping ranges will throw an exception. But you can explicitly merge them. This will not cope with overlapping times across days.
+For safety sake, creating `OpeningHours` object with overlapping ranges will throw an exception. But you can explicitly merge them. This will not cope with overflowing times across days.
 
 ``` php
 $ranges = [
