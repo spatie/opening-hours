@@ -35,9 +35,9 @@ class OpeningHours
     {
         if ($timezone instanceof DateTimeZone) {
             $this->timezone = $timezone;
-        } else if (is_string($timezone)) {
+        } elseif (is_string($timezone)) {
             $this->timezone = new DateTimeZone($timezone);
-        } else if ($timezone) {
+        } elseif ($timezone) {
             throw new \InvalidArgumentException('Invalid Timezone');
         }
         $this->overflow = $overflow;
@@ -227,7 +227,7 @@ class OpeningHours
 
         if ($this->overflow) {
             $yesterdayDateTime = $dateTime;
-            if (!($yesterdayDateTime instanceof DateTimeImmutable)) {
+            if (! ($yesterdayDateTime instanceof DateTimeImmutable)) {
                 $yesterdayDateTime = clone $yesterdayDateTime;
             }
             $dateTimeMinus1Day = $yesterdayDateTime->sub(new \DateInterval('P1D'));
@@ -310,7 +310,7 @@ class OpeningHours
         }
 
         $openingHoursForDay = $this->forDate($dateTime);
-        if (!$nextClose) {
+        if (! $nextClose) {
             $nextClose = $openingHoursForDay->nextClose(Time::fromDateTime($dateTime));
         }
 
