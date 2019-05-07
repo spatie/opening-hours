@@ -14,8 +14,9 @@ class OpeningHoursOverflowTest extends TestCase
     public function it_fills_opening_hours_with_overflow()
     {
         $openingHours = OpeningHours::create([
+            'overflow' => true,
             'monday' => ['09:00-02:00'],
-        ], null, true);
+        ], null);
 
         $this->assertInstanceOf(TimeRange::class, $openingHours->forDay('monday')[0]);
         $this->assertEquals((string) $openingHours->forDay('monday')[0], '09:00-02:00');
@@ -25,8 +26,9 @@ class OpeningHoursOverflowTest extends TestCase
     public function check_open_with_overflow()
     {
         $openingHours = OpeningHours::create([
+            'overflow' => true,
             'monday' => ['09:00-02:00'],
-        ], null, true);
+        ], null);
 
         $shouldBeOpen = new DateTime('2019-04-23 01:00:00');
         $this->assertTrue($openingHours->isOpenAt($shouldBeOpen));
@@ -36,8 +38,9 @@ class OpeningHoursOverflowTest extends TestCase
     public function check_open_with_overflow_immutable()
     {
         $openingHours = OpeningHours::create([
+            'overflow' => true,
             'monday' => ['09:00-02:00'],
-        ], null, true);
+        ], null);
 
         $shouldBeOpen = new DateTimeImmutable('2019-04-23 01:00:00');
         $this->assertTrue($openingHours->isOpenAt($shouldBeOpen));
@@ -47,8 +50,9 @@ class OpeningHoursOverflowTest extends TestCase
     public function next_close_with_overflow()
     {
         $openingHours = OpeningHours::create([
+            'overflow' => true,
             'monday' => ['09:00-02:00'],
-        ], null, true);
+        ], null);
 
         $shouldBeOpen = new DateTime('2019-04-23 01:00:00');
         $this->assertEquals('2019-04-23 02:00:00', $openingHours->nextClose($shouldBeOpen)->format('Y-m-d H:i:s'));
@@ -58,8 +62,9 @@ class OpeningHoursOverflowTest extends TestCase
     public function next_close_with_overflow_immutable()
     {
         $openingHours = OpeningHours::create([
+            'overflow' => true,
             'monday' => ['09:00-02:00'],
-        ], null, true);
+        ], null);
 
         $shouldBeOpen = new DateTimeImmutable('2019-04-23 01:00:00');
         $nextTimeClosed = $openingHours->nextClose($shouldBeOpen)->format('Y-m-d H:i:s');

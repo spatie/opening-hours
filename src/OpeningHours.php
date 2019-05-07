@@ -31,7 +31,7 @@ class OpeningHours
     /** @var bool Allow for overflowing time ranges which overflow into the next day */
     private $overflow;
 
-    public function __construct($timezone = null, bool $overflow = false)
+    public function __construct($timezone = null)
     {
         if ($timezone instanceof DateTimeZone) {
             $this->timezone = $timezone;
@@ -40,7 +40,6 @@ class OpeningHours
         } elseif ($timezone) {
             throw new \InvalidArgumentException('Invalid Timezone');
         }
-        $this->overflow = $overflow;
 
         $this->openingHours = Day::mapDays(function () {
             return new OpeningHoursForDay();
@@ -50,12 +49,12 @@ class OpeningHours
     /**
      * @param string[][]               $data
      * @param string|DateTimeZone|null $timezone
-     * @param bool                     $overflow
+     *
      * @return static
      */
-    public static function create(array $data, $timezone = null, bool $overflow = false): self
+    public static function create(array $data, $timezone = null): self
     {
-        return (new static($timezone, $overflow))->fill($data);
+        return (new static($timezone))->fill($data);
     }
 
     /**
@@ -107,12 +106,12 @@ class OpeningHours
     /**
      * @param string[][]               $data
      * @param string|DateTimeZone|null $timezone
-     * @param bool                     $overflow
+     *
      * @return static
      */
-    public static function createAndMergeOverlappingRanges(array $data, $timezone = null, bool $overflow = false)
+    public static function createAndMergeOverlappingRanges(array $data, $timezone = null)
     {
-        return static::create(static::mergeOverlappingRanges($data), $timezone, $overflow);
+        return static::create(static::mergeOverlappingRanges($data), $timezone);
     }
 
     /**
@@ -145,7 +144,9 @@ class OpeningHours
 
     public function fill(array $data)
     {
-        list($openingHours, $exceptions, $metaData, $filters) = $this->parseOpeningHoursAndExceptions($data);
+        list($openingHours, $exceptions, $metaData, $filters, $overflow) = $this->parseOpeningHoursAndExceptions($data);
+
+        $this->overflow = $overflow;
 
         foreach ($openingHours as $day => $openingHoursForThisDay) {
             $this->setOpeningHoursFromStrings($day, $openingHoursForThisDay);
@@ -367,6 +368,8 @@ class OpeningHours
         $metaData = Arr::pull($data, 'data', null);
         $exceptions = [];
         $filters = Arr::pull($data, 'filters', []);
+        $overflow = (bool) Arr::pull($data, 'overflow', false);
+
         foreach (Arr::pull($data, 'exceptions', []) as $key => $exception) {
             if (is_callable($exception)) {
                 $filters[] = $exception;
@@ -376,13 +379,14 @@ class OpeningHours
 
             $exceptions[$key] = $exception;
         }
+
         $openingHours = [];
 
         foreach ($data as $day => $openingHoursData) {
             $openingHours[$this->normalizeDayName($day)] = $openingHoursData;
         }
 
-        return [$openingHours, $exceptions, $metaData, $filters];
+        return [$openingHours, $exceptions, $metaData, $filters, $overflow];
     }
 
     protected function setOpeningHoursFromStrings(string $day, array $openingHours)
