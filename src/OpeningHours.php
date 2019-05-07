@@ -28,9 +28,19 @@ class OpeningHours
     /** @var DateTimeZone|null */
     protected $timezone = null;
 
-    public function __construct($timezone = null)
+    /** @var bool Allow for overflowing time ranges which overflow into the next day */
+    private $overflow;
+
+    public function __construct($timezone = null, bool $overflow = false)
     {
-        $this->timezone = $timezone ? new DateTimeZone($timezone) : null;
+        if ($timezone instanceof DateTimeZone) {
+            $this->timezone = $timezone;
+        } elseif (is_string($timezone)) {
+            $this->timezone = new DateTimeZone($timezone);
+        } elseif ($timezone) {
+            throw new \InvalidArgumentException('Invalid Timezone');
+        }
+        $this->overflow = $overflow;
 
         $this->openingHours = Day::mapDays(function () {
             return new OpeningHoursForDay();
@@ -38,13 +48,14 @@ class OpeningHours
     }
 
     /**
-     * @param array $data
-     *
+     * @param string[][]               $data
+     * @param string|DateTimeZone|null $timezone
+     * @param bool                     $overflow
      * @return static
      */
-    public static function create(array $data)
+    public static function create(array $data, $timezone = null, bool $overflow = false): self
     {
-        return (new static())->fill($data);
+        return (new static($timezone, $overflow))->fill($data);
     }
 
     /**
@@ -94,13 +105,14 @@ class OpeningHours
     }
 
     /**
-     * @param array $data
-     *
+     * @param string[][]               $data
+     * @param string|DateTimeZone|null $timezone
+     * @param bool                     $overflow
      * @return static
      */
-    public static function createAndMergeOverlappingRanges(array $data)
+    public static function createAndMergeOverlappingRanges(array $data, $timezone = null, bool $overflow = false)
     {
-        return static::create(static::mergeOverlappingRanges($data));
+        return static::create(static::mergeOverlappingRanges($data), $timezone, $overflow);
     }
 
     /**
@@ -213,6 +225,18 @@ class OpeningHours
     {
         $dateTime = $this->applyTimezone($dateTime);
 
+        if ($this->overflow) {
+            $yesterdayDateTime = $dateTime;
+            if (! ($yesterdayDateTime instanceof DateTimeImmutable)) {
+                $yesterdayDateTime = clone $yesterdayDateTime;
+            }
+            $dateTimeMinus1Day = $yesterdayDateTime->sub(new \DateInterval('P1D'));
+            $openingHoursForDayBefore = $this->forDate($dateTimeMinus1Day);
+            if ($openingHoursForDayBefore->isOpenAt(Time::fromDateTime($dateTimeMinus1Day))) {
+                return true;
+            }
+        }
+
         $openingHoursForDay = $this->forDate($dateTime);
 
         return $openingHoursForDay->isOpenAt(Time::fromDateTime($dateTime));
@@ -272,8 +296,23 @@ class OpeningHours
             $dateTime = clone $dateTime;
         }
 
+        $nextClose = null;
+        if ($this->overflow) {
+            $yesterday = $dateTime;
+            if (! ($dateTime instanceof DateTimeImmutable)) {
+                $yesterday = clone $dateTime;
+            }
+            $dateTimeMinus1Day = $yesterday->sub(new \DateInterval('P1D'));
+            $openingHoursForDayBefore = $this->forDate($dateTimeMinus1Day);
+            if ($openingHoursForDayBefore->isOpenAt(Time::fromDateTime($dateTimeMinus1Day))) {
+                $nextClose = $openingHoursForDayBefore->nextClose(Time::fromDateTime($dateTime));
+            }
+        }
+
         $openingHoursForDay = $this->forDate($dateTime);
-        $nextClose = $openingHoursForDay->nextClose(Time::fromDateTime($dateTime));
+        if (! $nextClose) {
+            $nextClose = $openingHoursForDay->nextClose(Time::fromDateTime($dateTime));
+        }
 
         while ($nextClose === false || $nextClose->hours() >= 24) {
             $dateTime = $dateTime

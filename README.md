@@ -71,6 +71,17 @@ $openingHours->forDate(new DateTime('2016-12-25'));
 $openingHours->exceptions();
 ```
 
+On construction you can set a flag for overflowing times across days. For example, for a night club opens that opens till 3am on Friday and Saturday:
+
+ ```php
+ $openingHours = \Spatie\OpeningHours\OpeningHours::create([
+     'friday'     => ['20:00-03:00'],
+     'saturday'   => ['20:00-03:00'],
+ ], null, true);
+ ```
+
+This allows the API to further at yesterdays data to check if the opening hours are open from yesterdays time range. 
+
 You can add data in definitions then retrieve them:
 
 ```php
@@ -190,7 +201,7 @@ The package should only be used through the `OpeningHours` class. There are also
 
 ### `Spatie\OpeningHours\OpeningHours`
 
-#### `OpeningHours::create(array $data): Spatie\OpeningHours\OpeningHours`
+#### `OpeningHours::create(array $data, $timezone = null, bool $overflow = false): Spatie\OpeningHours\OpeningHours`
 
 Static factory method to fill the set of opening hours.
 
@@ -203,7 +214,7 @@ $openingHours = OpeningHours::create([
 
 #### `OpeningHours::mergeOverlappingRanges(array $schedule) : array`
 
-For safety sake, creating `OpeningHours` object with overlapping ranges will throw an exception. But you can explicitly merge them.
+For safety sake, creating `OpeningHours` object with overlapping ranges will throw an exception. But you can explicitly merge them. This will not cope with overflowing times across days.
 
 ``` php
 $ranges = [
@@ -331,6 +342,14 @@ Returns next close DateTime from the given DateTime
 
 ```php
 $openingHours->nextClose(new DateTime('2016-12-24 11:00:00'));
+```
+
+#### `asStructuredData() : array`
+
+Returns a (OpeningHoursSpecification)[https://schema.org/openingHoursSpecification] as an array.
+
+```php
+$openingHours->asStructuredData();
 ```
 
 ### `Spatie\OpeningHours\OpeningHoursForDay`
