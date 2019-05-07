@@ -145,7 +145,7 @@ class OpeningHours
 
     public function fill(array $data)
     {
-        list($openingHours, $exceptions, $metaData, $filters) = $this->parseOpeningHoursAndExceptions($data);
+        [$openingHours, $exceptions, $metaData, $filters] = $this->parseOpeningHoursAndExceptions($data);
 
         foreach ($openingHours as $day => $openingHoursForThisDay) {
             $this->setOpeningHoursFromStrings($day, $openingHoursForThisDay);
