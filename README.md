@@ -71,14 +71,15 @@ $openingHours->forDate(new DateTime('2016-12-25'));
 $openingHours->exceptions();
 ```
 
-On construction you can set a flag for overflowing times across days. For example, for a night club opens that opens till 3am on Friday and Saturday:
+On construction you can set a flag for overflowing times across days. For example, for a night club opens until 3am on Friday and Saturday:
 
- ```php
- $openingHours = \Spatie\OpeningHours\OpeningHours::create([
-     'friday'     => ['20:00-03:00'],
-     'saturday'   => ['20:00-03:00'],
- ], null, true);
- ```
+```php
+$openingHours = \Spatie\OpeningHours\OpeningHours::create([
+    'overflow' => true,
+    'friday'   => ['20:00-03:00'],
+    'saturday' => ['20:00-03:00'],
+], null);
+```
 
 This allows the API to further at yesterdays data to check if the opening hours are open from yesterdays time range. 
 
@@ -201,7 +202,7 @@ The package should only be used through the `OpeningHours` class. There are also
 
 ### `Spatie\OpeningHours\OpeningHours`
 
-#### `OpeningHours::create(array $data, $timezone = null, bool $overflow = false): Spatie\OpeningHours\OpeningHours`
+#### `OpeningHours::create(array $data, $timezone = null): Spatie\OpeningHours\OpeningHours`
 
 Static factory method to fill the set of opening hours.
 
@@ -214,7 +215,7 @@ $openingHours = OpeningHours::create([
 
 #### `OpeningHours::mergeOverlappingRanges(array $schedule) : array`
 
-For safety sake, creating `OpeningHours` object with overlapping ranges will throw an exception. But you can explicitly merge them. This will not cope with overflowing times across days.
+For safety sake, creating `OpeningHours` object with overlapping ranges will throw an exception unless you pass explicitly `'overflow' => true,` in the opening hours array definition. You can also explicitly merge them.
 
 ``` php
 $ranges = [
