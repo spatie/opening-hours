@@ -368,7 +368,7 @@ class OpeningHours
         $metaData = Arr::pull($data, 'data', null);
         $exceptions = [];
         $filters = Arr::pull($data, 'filters', []);
-        $overflow = !!Arr::pull($data, 'overflow', false);
+        $overflow = (bool) Arr::pull($data, 'overflow', false);
 
         foreach (Arr::pull($data, 'exceptions', []) as $key => $exception) {
             if (is_callable($exception)) {
