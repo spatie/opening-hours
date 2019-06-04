@@ -71,4 +71,26 @@ class OpeningHoursOverflowTest extends TestCase
         $this->assertEquals('2019-04-23 02:00:00', $nextTimeClosed);
         $this->assertEquals('2019-04-23 01:00:00', $shouldBeOpen->format('Y-m-d H:i:s'));
     }
+
+    /** @test */
+    public function overflow_on_simple_ranges()
+    {
+        //Tuesday 4th of June 2019, 11.35 am
+        $time = new DateTime('2019-06-04 11:35:00');
+
+        $openWithOverflow = OpeningHours::create([
+            'overflow' => true,
+            'monday' => ['11:00-18:00'],
+            'tuesday' => ['13:37-15:37'],
+        ]);
+
+        $openWithoutOverflow = OpeningHours::create([
+            'overflow' => false,
+            'monday' => ['11:00-18:00'],
+            'tuesday' => ['13:37-15:37'],
+        ]);
+
+        $this->assertFalse($openWithOverflow->isOpenAt($time));
+        $this->assertFalse($openWithoutOverflow->isOpenAt($time));
+    }
 }

@@ -826,4 +826,51 @@ class OpeningHoursTest extends TestCase
         $this->assertCount(0, $openingHoursForWeek['saturday']);
         $this->assertCount(0, $openingHoursForWeek['sunday']);
     }
+
+    /** @test */
+    public function it_can_set_the_timezone_on_construct_with_date_time_zone()
+    {
+        $openingHours = new OpeningHours(new DateTimeZone('Asia/Taipei'));
+        $openingHours->fill([
+            'monday' => ['00:00-16:00'],
+        ]);
+        $openingHoursForWeek = $openingHours->forWeek();
+
+        $this->assertCount(7, $openingHoursForWeek);
+        $this->assertEquals('00:00-16:00', (string) $openingHoursForWeek['monday'][0]);
+        $this->assertCount(0, $openingHoursForWeek['tuesday']);
+        $this->assertCount(0, $openingHoursForWeek['wednesday']);
+        $this->assertCount(0, $openingHoursForWeek['thursday']);
+        $this->assertCount(0, $openingHoursForWeek['friday']);
+        $this->assertCount(0, $openingHoursForWeek['saturday']);
+        $this->assertCount(0, $openingHoursForWeek['sunday']);
+    }
+
+    /** @test */
+    public function it_can_set_the_timezone_on_construct_with_string()
+    {
+        $openingHours = new OpeningHours('Asia/Taipei');
+        $openingHours->fill([
+            'monday' => ['00:00-16:00'],
+        ]);
+        $openingHoursForWeek = $openingHours->forWeek();
+
+        $this->assertCount(7, $openingHoursForWeek);
+        $this->assertEquals('00:00-16:00', (string) $openingHoursForWeek['monday'][0]);
+        $this->assertCount(0, $openingHoursForWeek['tuesday']);
+        $this->assertCount(0, $openingHoursForWeek['wednesday']);
+        $this->assertCount(0, $openingHoursForWeek['thursday']);
+        $this->assertCount(0, $openingHoursForWeek['friday']);
+        $this->assertCount(0, $openingHoursForWeek['saturday']);
+        $this->assertCount(0, $openingHoursForWeek['sunday']);
+    }
+
+    /** @test */
+    public function it_throw_an_exception_on_invalid_timezone()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid Timezone');
+
+        new OpeningHours(['foo']);
+    }
 }

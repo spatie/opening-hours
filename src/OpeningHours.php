@@ -233,7 +233,7 @@ class OpeningHours
             }
             $dateTimeMinus1Day = $yesterdayDateTime->sub(new \DateInterval('P1D'));
             $openingHoursForDayBefore = $this->forDate($dateTimeMinus1Day);
-            if ($openingHoursForDayBefore->isOpenAt(Time::fromDateTime($dateTimeMinus1Day))) {
+            if ($openingHoursForDayBefore->isOpenAtNight(Time::fromDateTime($dateTimeMinus1Day))) {
                 return true;
             }
         }
@@ -305,7 +305,7 @@ class OpeningHours
             }
             $dateTimeMinus1Day = $yesterday->sub(new \DateInterval('P1D'));
             $openingHoursForDayBefore = $this->forDate($dateTimeMinus1Day);
-            if ($openingHoursForDayBefore->isOpenAt(Time::fromDateTime($dateTimeMinus1Day))) {
+            if ($openingHoursForDayBefore->isOpenAtNight(Time::fromDateTime($dateTimeMinus1Day))) {
                 $nextClose = $openingHoursForDayBefore->nextClose(Time::fromDateTime($dateTime));
             }
         }

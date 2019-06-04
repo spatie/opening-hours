@@ -53,6 +53,17 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
         return false;
     }
 
+    public function isOpenAtNight(Time $time)
+    {
+        foreach ($this->openingHours as $timeRange) {
+            if ($timeRange->overflowsNextDay() && TimeRange::fromMidnight($timeRange->end())->containsTime($time)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /**
      * @param callable[] $filters
      *
