@@ -95,6 +95,11 @@ class TimeRange
         return new self($start, $end);
     }
 
+    public static function fromMidnight(Time $end)
+    {
+        return new self(Time::fromString('00:00'), $end);
+    }
+
     public function start(): Time
     {
         return $this->start;
@@ -131,6 +136,16 @@ class TimeRange
     public function format(string $timeFormat = 'H:i', string $rangeFormat = '%s-%s'): string
     {
         return sprintf($rangeFormat, $this->start->format($timeFormat), $this->end->format($timeFormat));
+    }
+
+    public function isReversed()
+    {
+        return $this->start()->isAfter($this->end());
+    }
+
+    public function overflowsNextDay()
+    {
+        return $this->isReversed();
     }
 
     public function __toString(): string
