@@ -110,22 +110,24 @@ class TimeRange
         return $this->end;
     }
 
+    public function isReversed(): bool
+    {
+        return $this->start()->isAfter($this->end());
+    }
+
+    public function overflowsNextDay(): bool
+    {
+        return $this->isReversed();
+    }
+
     public function spillsOverToNextDay(): bool
     {
-        return $this->end->isBefore($this->start);
+        return $this->isReversed();
     }
 
     public function containsTime(Time $time): bool
     {
-        if ($this->spillsOverToNextDay()) {
-            if ($time->isSameOrAfter($this->start)) {
-                return $time->isAfter($this->end);
-            }
-
-            return $time->isBefore($this->end);
-        }
-
-        return $time->isSameOrAfter($this->start) && $time->isBefore($this->end);
+        return $time->isSameOrAfter($this->start) && ($this->overflowsNextDay() || $time->isBefore($this->end));
     }
 
     public function overlaps(self $timeRange): bool
@@ -136,16 +138,6 @@ class TimeRange
     public function format(string $timeFormat = 'H:i', string $rangeFormat = '%s-%s'): string
     {
         return sprintf($rangeFormat, $this->start->format($timeFormat), $this->end->format($timeFormat));
-    }
-
-    public function isReversed()
-    {
-        return $this->start()->isAfter($this->end());
-    }
-
-    public function overflowsNextDay()
-    {
-        return $this->isReversed();
     }
 
     public function __toString(): string

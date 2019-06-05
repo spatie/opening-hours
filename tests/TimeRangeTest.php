@@ -74,14 +74,18 @@ class TimeRangeTest extends TestCase
         $this->assertTrue(TimeRange::fromString('16:00-18:00')->containsTime(Time::fromString('17:00')));
         $this->assertFalse(TimeRange::fromString('16:00-18:00')->containsTime(Time::fromString('18:00')));
 
-        $this->assertTrue(TimeRange::fromString('18:00-01:00')->containsTime(Time::fromString('00:30')));
+        $this->assertFalse(TimeRange::fromString('18:00-01:00')->containsTime(Time::fromString('00:30')));
+        $this->assertTrue(TimeRange::fromMidnight(Time::fromString('01:00'))->containsTime(Time::fromString('00:30')));
         $this->assertTrue(TimeRange::fromString('18:00-01:00')->containsTime(Time::fromString('22:00')));
         $this->assertFalse(TimeRange::fromString('18:00-01:00')->containsTime(Time::fromString('17:00')));
         $this->assertFalse(TimeRange::fromString('18:00-01:00')->containsTime(Time::fromString('02:00')));
+        $this->assertFalse(TimeRange::fromMidnight(Time::fromString('01:00'))->containsTime(Time::fromString('02:00')));
 
         $this->assertTrue(TimeRange::fromString('18:00-01:00')->containsTime(Time::fromString('18:00')));
-        $this->assertTrue(TimeRange::fromString('18:00-01:00')->containsTime(Time::fromString('00:59')));
+        $this->assertFalse(TimeRange::fromString('18:00-01:00')->containsTime(Time::fromString('00:59')));
         $this->assertFalse(TimeRange::fromString('18:00-01:00')->containsTime(Time::fromString('01:00')));
+        $this->assertTrue(TimeRange::fromMidnight(Time::fromString('01:00'))->containsTime(Time::fromString('00:59')));
+        $this->assertFalse(TimeRange::fromMidnight(Time::fromString('01:00'))->containsTime(Time::fromString('01:00')));
     }
 
     /** @test */
@@ -92,7 +96,7 @@ class TimeRangeTest extends TestCase
         $this->assertTrue(TimeRange::fromString('16:00-18:00')->overlaps(TimeRange::fromString('17:00-17:30')));
 
         $this->assertTrue(TimeRange::fromString('22:00-02:00')->overlaps(TimeRange::fromString('21:00-23:00')));
-        $this->assertTrue(TimeRange::fromString('22:00-02:00')->overlaps(TimeRange::fromString('01:00-02:00')));
+        $this->assertFalse(TimeRange::fromString('22:00-02:00')->overlaps(TimeRange::fromString('01:00-02:00')));
         $this->assertTrue(TimeRange::fromString('22:00-02:00')->overlaps(TimeRange::fromString('23:00-23:30')));
 
         $this->assertFalse(TimeRange::fromString('16:00-18:00')->overlaps(TimeRange::fromString('14:00-15:00')));

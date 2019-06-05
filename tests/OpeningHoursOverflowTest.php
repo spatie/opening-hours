@@ -28,9 +28,35 @@ class OpeningHoursOverflowTest extends TestCase
         $openingHours = OpeningHours::create([
             'overflow' => true,
             'monday' => ['09:00-02:00'],
+            'tuesday' => ['19:00-04:00'],
+            'wednesday' => ['09:00-02:00'],
         ], null);
 
         $shouldBeOpen = new DateTime('2019-04-23 01:00:00');
+        $this->assertTrue($openingHours->isOpenAt($shouldBeOpen));
+
+        $shouldBeOpen = new DateTime('2019-04-23 03:00:00');
+        $this->assertFalse($openingHours->isOpenAt($shouldBeOpen));
+
+        $shouldBeOpen = new DateTime('2019-04-23 18:00:00');
+        $this->assertFalse($openingHours->isOpenAt($shouldBeOpen));
+
+        $shouldBeOpen = new DateTime('2019-04-23 20:00:00');
+        $this->assertTrue($openingHours->isOpenAt($shouldBeOpen));
+
+        $shouldBeOpen = new DateTime('2019-04-23 23:00:00');
+        $this->assertTrue($openingHours->isOpenAt($shouldBeOpen));
+
+        $shouldBeOpen = new DateTime('2019-04-24 02:00:00');
+        $this->assertTrue($openingHours->isOpenAt($shouldBeOpen));
+
+        $shouldBeOpen = new DateTime('2019-04-24 03:59:00');
+        $this->assertTrue($openingHours->isOpenAt($shouldBeOpen));
+
+        $shouldBeOpen = new DateTime('2019-04-24 04:00:00');
+        $this->assertFalse($openingHours->isOpenAt($shouldBeOpen));
+
+        $shouldBeOpen = new DateTime('2019-04-24 09:00:00');
         $this->assertTrue($openingHours->isOpenAt($shouldBeOpen));
     }
 
