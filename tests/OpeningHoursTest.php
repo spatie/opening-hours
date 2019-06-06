@@ -6,8 +6,8 @@ use DateTime;
 use DateTimeZone;
 use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
-use Spatie\OpeningHours\Exceptions\MaximumLimitExceeded;
 use Spatie\OpeningHours\OpeningHours;
+use Spatie\OpeningHours\Exceptions\MaximumLimitExceeded;
 
 class OpeningHoursTest extends TestCase
 {

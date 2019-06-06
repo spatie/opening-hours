@@ -6,12 +6,12 @@ use DateTime;
 use DateTimeZone;
 use DateTimeImmutable;
 use DateTimeInterface;
-use Spatie\OpeningHours\Exceptions\MaximumLimitExceeded;
 use Spatie\OpeningHours\Helpers\Arr;
 use Spatie\OpeningHours\Helpers\DataTrait;
 use Spatie\OpeningHours\Exceptions\Exception;
 use Spatie\OpeningHours\Exceptions\InvalidDate;
 use Spatie\OpeningHours\Exceptions\InvalidDayName;
+use Spatie\OpeningHours\Exceptions\MaximumLimitExceeded;
 
 class OpeningHours
 {
@@ -452,7 +452,7 @@ class OpeningHours
             return;
         }
 
-        if (!$this->dayLimit) {
+        if (! $this->dayLimit) {
             $this->dayLimit = 366;
         }
 
