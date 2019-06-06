@@ -6,6 +6,7 @@ use DateTime;
 use DateTimeZone;
 use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
+use Spatie\OpeningHours\Exceptions\MaximumLimitExceeded;
 use Spatie\OpeningHours\OpeningHours;
 
 class OpeningHoursTest extends TestCase
@@ -872,5 +873,114 @@ class OpeningHoursTest extends TestCase
         $this->expectExceptionMessage('Invalid Timezone');
 
         new OpeningHours(['foo']);
+    }
+
+    /** @test */
+    public function it_throw_an_exception_on_limit_exceeded_void_array_next_open()
+    {
+        $this->expectException(MaximumLimitExceeded::class);
+        $this->expectExceptionMessage('No open date/time found in the next 8 days, use $openingHours->setDayLimit() to increase the limit.');
+
+        OpeningHours::create([])->nextOpen(new DateTime('2019-06-06 19:02:00'));
+    }
+
+    /** @test */
+    public function it_throw_an_exception_on_limit_exceeded_full_array_next_open()
+    {
+        $this->expectException(MaximumLimitExceeded::class);
+        $this->expectExceptionMessage('No open date/time found in the next 8 days, use $openingHours->setDayLimit() to increase the limit.');
+
+        OpeningHours::create([
+            'monday' => ['00:00-24:00'],
+            'tuesday' => ['00:00-24:00'],
+            'wednesday' => ['00:00-24:00'],
+            'thursday' => ['00:00-24:00'],
+            'friday' => ['00:00-24:00'],
+            'saturday' => ['00:00-24:00'],
+            'sunday' => ['00:00-24:00'],
+        ])->nextOpen(new DateTime('2019-06-06 19:02:00'));
+    }
+
+    /** @test */
+    public function it_throw_an_exception_on_limit_exceeded_full_array_next_open_with_exceptions()
+    {
+        $this->expectException(MaximumLimitExceeded::class);
+        $this->expectExceptionMessage('No open date/time found in the next 366 days, use $openingHours->setDayLimit() to increase the limit.');
+
+        OpeningHours::create([
+            'monday' => ['00:00-24:00'],
+            'tuesday' => ['00:00-24:00'],
+            'wednesday' => ['00:00-24:00'],
+            'thursday' => ['00:00-24:00'],
+            'friday' => ['00:00-24:00'],
+            'saturday' => ['00:00-24:00'],
+            'sunday' => ['00:00-24:00'],
+            'exceptions' => [
+                '2022-09-05' => [],
+            ],
+        ])->nextOpen(new DateTime('2019-06-06 19:02:00'));
+    }
+
+    /** @test */
+    public function it_throw_an_exception_on_limit_exceeded_void_array_next_close()
+    {
+        $this->expectException(MaximumLimitExceeded::class);
+        $this->expectExceptionMessage('No close date/time found in the next 8 days, use $openingHours->setDayLimit() to increase the limit.');
+
+        OpeningHours::create([])->nextClose(new DateTime('2019-06-06 19:02:00'));
+    }
+
+    /** @test */
+    public function it_throw_an_exception_on_limit_exceeded_full_array_next_close()
+    {
+        $this->expectException(MaximumLimitExceeded::class);
+        $this->expectExceptionMessage('No close date/time found in the next 8 days, use $openingHours->setDayLimit() to increase the limit.');
+
+        OpeningHours::create([
+            'monday' => ['00:00-24:00'],
+            'tuesday' => ['00:00-24:00'],
+            'wednesday' => ['00:00-24:00'],
+            'thursday' => ['00:00-24:00'],
+            'friday' => ['00:00-24:00'],
+            'saturday' => ['00:00-24:00'],
+            'sunday' => ['00:00-24:00'],
+        ])->nextClose(new DateTime('2019-06-06 19:02:00'));
+    }
+
+    /** @test */
+    public function it_should_handle_far_exception()
+    {
+        $this->assertEquals('2019-12-25 00:00:00', OpeningHours::create([
+            'monday' => ['00:00-24:00'],
+            'tuesday' => ['00:00-24:00'],
+            'wednesday' => ['00:00-24:00'],
+            'thursday' => ['00:00-24:00'],
+            'friday' => ['00:00-24:00'],
+            'saturday' => ['00:00-24:00'],
+            'sunday' => ['00:00-24:00'],
+            'exceptions' => [
+                '12-25' => [],
+            ],
+        ])->nextClose(new DateTime('2019-06-06 19:02:00'))->format('Y-m-d H:i:s'));
+    }
+
+    /** @test */
+    public function it_should_handle_very_far_exception_by_changing_limit()
+    {
+        $openingHours = OpeningHours::create([
+            'monday' => ['00:00-24:00'],
+            'tuesday' => ['00:00-24:00'],
+            'wednesday' => ['00:00-24:00'],
+            'thursday' => ['00:00-24:00'],
+            'friday' => ['00:00-24:00'],
+            'saturday' => ['00:00-24:00'],
+            'sunday' => ['00:00-24:00'],
+            'exceptions' => [
+                '2022-12-25' => [],
+            ],
+        ]);
+        $openingHours->setDayLimit(3000);
+
+        $this->assertEquals('2022-12-25 00:00:00', $openingHours->nextClose(new DateTime('2019-06-06 19:02:00'))->format('Y-m-d H:i:s'));
     }
 }

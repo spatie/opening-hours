@@ -6,6 +6,7 @@ use DateTime;
 use DateTimeZone;
 use DateTimeImmutable;
 use DateTimeInterface;
+use Spatie\OpeningHours\Exceptions\MaximumLimitExceeded;
 use Spatie\OpeningHours\Helpers\Arr;
 use Spatie\OpeningHours\Helpers\DataTrait;
 use Spatie\OpeningHours\Exceptions\Exception;
@@ -14,6 +15,8 @@ use Spatie\OpeningHours\Exceptions\InvalidDayName;
 
 class OpeningHours
 {
+    const DEFAULT_DAY_LIMIT = 8;
+
     use DataTrait;
 
     /** @var \Spatie\OpeningHours\Day[] */
@@ -29,7 +32,10 @@ class OpeningHours
     protected $timezone = null;
 
     /** @var bool Allow for overflowing time ranges which overflow into the next day */
-    private $overflow;
+    protected $overflow;
+
+    /** @var int Number of days to try before abandoning the search of the next close/open time */
+    protected $dayLimit = null;
 
     public function __construct($timezone = null)
     {
@@ -128,6 +134,26 @@ class OpeningHours
         } catch (Exception $exception) {
             return false;
         }
+    }
+
+    /**
+     * Set the number of days to try before abandoning the search of the next close/open time.
+     *
+     * @param int $dayLimit number of days
+     */
+    public function setDayLimit(int $dayLimit)
+    {
+        $this->dayLimit = $dayLimit;
+    }
+
+    /**
+     * Get the number of days to try before abandoning the search of the next close/open time.
+     *
+     * @return int
+     */
+    public function getDayLimit(): int
+    {
+        return $this->dayLimit ?: static::DEFAULT_DAY_LIMIT;
     }
 
     public function setFilters(array $filters)
@@ -266,8 +292,16 @@ class OpeningHours
 
         $openingHoursForDay = $this->forDate($dateTime);
         $nextOpen = $openingHoursForDay->nextOpen(Time::fromDateTime($dateTime));
+        $tries = $this->getDayLimit();
 
         while ($nextOpen === false || $nextOpen->hours() >= 24) {
+            if (--$tries < 0) {
+                throw MaximumLimitExceeded::forString(
+                    'No open date/time found in the next '.$this->getDayLimit().' days,'.
+                    ' use $openingHours->setDayLimit() to increase the limit.'
+                );
+            }
+
             $dateTime = $dateTime
                 ->modify('+1 day')
                 ->setTime(0, 0, 0);
@@ -315,7 +349,16 @@ class OpeningHours
             $nextClose = $openingHoursForDay->nextClose(Time::fromDateTime($dateTime));
         }
 
+        $tries = $this->getDayLimit();
+
         while ($nextClose === false || $nextClose->hours() >= 24) {
+            if (--$tries < 0) {
+                throw MaximumLimitExceeded::forString(
+                    'No close date/time found in the next '.$this->getDayLimit().' days,'.
+                    ' use $openingHours->setDayLimit() to increase the limit.'
+                );
+            }
+
             $dateTime = $dateTime
                 ->modify('+1 day')
                 ->setTime(0, 0, 0);
@@ -405,6 +448,14 @@ class OpeningHours
 
     protected function setExceptionsFromStrings(array $exceptions)
     {
+        if (empty($exceptions)) {
+            return;
+        }
+
+        if (!$this->dayLimit) {
+            $this->dayLimit = 366;
+        }
+
         $this->exceptions = Arr::map($exceptions, function (array $openingHours, string $date) {
             $recurring = DateTime::createFromFormat('m-d', $date);
 
