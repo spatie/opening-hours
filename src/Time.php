@@ -100,6 +100,10 @@ class Time
 
     public function format(string $format = 'H:i'): string
     {
+        if ($format === 'H:i' && $this->hours === 24 && $this->minutes === 0) {
+            return '24:00';
+        }
+
         return $this->toDateTime()->format($format);
     }
 

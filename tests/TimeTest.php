@@ -13,7 +13,9 @@ class TimeTest extends TestCase
     /** @test */
     public function it_can_be_created_from_a_string()
     {
-        $this->assertEquals('16:00', (string) Time::fromString('16:00'));
+        $this->assertEquals('00:00', (string) Time::fromString('00:00'));
+        $this->assertEquals('16:32', (string) Time::fromString('16:32'));
+        $this->assertEquals('24:00', (string) Time::fromString('24:00'));
     }
 
     /** @test */
