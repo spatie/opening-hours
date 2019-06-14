@@ -312,4 +312,23 @@ class OpeningHoursFillTest extends TestCase
             '19:00-21:00',
         ], $dump['tuesday']);
     }
+
+    /** @test */
+    public function it_should_merge_ranges_including_explicit_24_00()
+    {
+        $hours = OpeningHours::createAndMergeOverlappingRanges([
+            'monday' => [
+                '08:00-12:00',
+                '12:00-24:00',
+            ],
+        ]);
+        $dump = [];
+        foreach ($hours->forDay('monday') as $range) {
+            $dump[] = $range->format();
+        }
+
+        $this->assertSame([
+            '08:00-24:00',
+        ], $dump);
+    }
 }

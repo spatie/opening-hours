@@ -83,11 +83,11 @@ class TimeRange
 
         foreach (array_slice($ranges, 1) as $range) {
             $rangeStart = $range->start();
-            if ($rangeStart->format('Gi') < $start->format('Gi')) {
+            if ($rangeStart->isBefore($start)) {
                 $start = $rangeStart;
             }
             $rangeEnd = $range->end();
-            if ($rangeEnd->format('Gi') > $end->format('Gi')) {
+            if ($rangeEnd->isAfter($end)) {
                 $end = $rangeEnd;
             }
         }
