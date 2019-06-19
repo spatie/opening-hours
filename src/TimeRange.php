@@ -135,9 +135,9 @@ class TimeRange
         return $this->containsTime($timeRange->start) || $this->containsTime($timeRange->end);
     }
 
-    public function format(string $timeFormat = 'H:i', string $rangeFormat = '%s-%s'): string
+    public function format(string $timeFormat = 'H:i', string $rangeFormat = '%s-%s', $timezone = null): string
     {
-        return sprintf($rangeFormat, $this->start->format($timeFormat), $this->end->format($timeFormat));
+        return sprintf($rangeFormat, $this->start->format($timeFormat, $timezone), $this->end->format($timeFormat, $timezone));
     }
 
     public function __toString(): string
