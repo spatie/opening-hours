@@ -3,6 +3,7 @@
 namespace Spatie\OpeningHours;
 
 use DateTime;
+use DateTimeZone;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Spatie\OpeningHours\Helpers\DataTrait;
@@ -98,13 +99,20 @@ class Time
         return $date->setTime($this->hours, $this->minutes);
     }
 
-    public function format(string $format = 'H:i'): string
+    public function format(string $format = 'H:i', $timezone = null): string
     {
+        $date = $timezone
+            ? new DateTime('1970-01-01 00:00:00', $timezone instanceof DateTimeZone
+                ? $timezone
+                : new DateTimeZone($timezone)
+            )
+            : null;
+
         if ($format === 'H:i' && $this->hours === 24 && $this->minutes === 0) {
             return '24:00';
         }
 
-        return $this->toDateTime()->format($format);
+        return $this->toDateTime($date)->format($format);
     }
 
     public function __toString(): string
