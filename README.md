@@ -347,7 +347,7 @@ $openingHours->nextClose(new DateTime('2016-12-24 11:00:00'));
 
 #### `asStructuredData(strinf $format = 'H:i', string|DateTimeZone $timezone) : array`
 
-Returns a (OpeningHoursSpecification)[https://schema.org/openingHoursSpecification] as an array.
+Returns a [OpeningHoursSpecification](https://schema.org/openingHoursSpecification) as an array.
 
 ```php
 $openingHours->asStructuredData();
