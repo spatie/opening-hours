@@ -345,12 +345,17 @@ Returns next close DateTime from the given DateTime
 $openingHours->nextClose(new DateTime('2016-12-24 11:00:00'));
 ```
 
-#### `asStructuredData() : array`
+#### `asStructuredData(strinf $format = 'H:i', string|DateTimeZone $timezone) : array`
 
 Returns a (OpeningHoursSpecification)[https://schema.org/openingHoursSpecification] as an array.
 
 ```php
 $openingHours->asStructuredData();
+$openingHours->asStructuredData('H:i:s'); // Customize time format, could be 'h:i a', 'G:i', etc.
+$openingHours->asStructuredData('H:iP', '-05:00'); // Add a timezon
+// Timezone can be numeric or string like "America/Toronto" or a DateTimeZone instance
+// But be careful, the time is arbitrary applied on 1970-01-01, so it does not handle daylight
+// saving time, meaning Europe/Paris is always +01:00 even in summer time.
 ```
 
 ### `Spatie\OpeningHours\OpeningHoursForDay`

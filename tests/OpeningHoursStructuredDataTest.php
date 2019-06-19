@@ -2,6 +2,7 @@
 
 namespace Spatie\OpeningHours\Test;
 
+use DateTimeZone;
 use PHPUnit\Framework\TestCase;
 use Spatie\OpeningHours\OpeningHours;
 
@@ -79,6 +80,6 @@ class OpeningHoursStructuredDataTest extends TestCase
 
         $this->assertEquals('17:00:00+01:00', $openingHours->asStructuredData('H:i:sP', 'Europe/Paris')[0]['closes']);
 
-        $this->assertEquals('17:00:00+12:45', $openingHours->asStructuredData('H:i:sP', new \DateTimeZone('+12:45'))[0]['closes']);
+        $this->assertEquals('17:00:00+12:45', $openingHours->asStructuredData('H:i:sP', new DateTimeZone('+12:45'))[0]['closes']);
     }
 }
