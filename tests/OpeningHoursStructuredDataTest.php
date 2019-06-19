@@ -74,6 +74,5 @@ class OpeningHoursStructuredDataTest extends TestCase
         ]);
 
         $this->assertEquals('17:00:00+00:00', $openingHours->asStructuredData('H:i:sP')[0]['closes']);
-
     }
 }
