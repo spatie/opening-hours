@@ -3,9 +3,9 @@
 namespace Spatie\OpeningHours;
 
 use DateTime;
+use DateTimeZone;
 use DateTimeImmutable;
 use DateTimeInterface;
-use DateTimeZone;
 use Spatie\OpeningHours\Helpers\DataTrait;
 use Spatie\OpeningHours\Exceptions\InvalidTimeString;
 
