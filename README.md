@@ -352,7 +352,7 @@ Returns a [OpeningHoursSpecification](https://schema.org/openingHoursSpecificati
 ```php
 $openingHours->asStructuredData();
 $openingHours->asStructuredData('H:i:s'); // Customize time format, could be 'h:i a', 'G:i', etc.
-$openingHours->asStructuredData('H:iP', '-05:00'); // Add a timezon
+$openingHours->asStructuredData('H:iP', '-05:00'); // Add a timezone
 // Timezone can be numeric or string like "America/Toronto" or a DateTimeZone instance
 // But be careful, the time is arbitrary applied on 1970-01-01, so it does not handle daylight
 // saving time, meaning Europe/Paris is always +01:00 even in summer time.
