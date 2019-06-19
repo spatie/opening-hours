@@ -521,35 +521,37 @@ class OpeningHours
         return Arr::flatMap($this->exceptions, $callback);
     }
 
-    public function asStructuredData(): array
+    public function asStructuredData(string $format = 'H:i'): array
     {
-        $regularHours = $this->flatMap(function (OpeningHoursForDay $openingHoursForDay, string $day) {
-            return $openingHoursForDay->map(function (TimeRange $timeRange) use ($day) {
+        $regularHours = $this->flatMap(function (OpeningHoursForDay $openingHoursForDay, string $day) use ($format) {
+            return $openingHoursForDay->map(function (TimeRange $timeRange) use ($format, $day) {
                 return [
                     '@type' => 'OpeningHoursSpecification',
                     'dayOfWeek' => ucfirst($day),
-                    'opens' => (string) $timeRange->start(),
-                    'closes' => (string) $timeRange->end(),
+                    'opens' => $timeRange->start()->format($format),
+                    'closes' => $timeRange->end()->format($format),
                 ];
             });
         });
 
-        $exceptions = $this->flatMapExceptions(function (OpeningHoursForDay $openingHoursForDay, string $date) {
+        $exceptions = $this->flatMapExceptions(function (OpeningHoursForDay $openingHoursForDay, string $date) use ($format) {
             if ($openingHoursForDay->isEmpty()) {
+                $zero = (new DateTime('2000-01-01 00:00:00'))->format($format);
+
                 return [[
                     '@type' => 'OpeningHoursSpecification',
-                    'opens' => '00:00',
-                    'closes' => '00:00',
+                    'opens' => $zero,
+                    'closes' => $zero,
                     'validFrom' => $date,
                     'validThrough' => $date,
                 ]];
             }
 
-            return $openingHoursForDay->map(function (TimeRange $timeRange) use ($date) {
+            return $openingHoursForDay->map(function (TimeRange $timeRange) use ($format, $date) {
                 return [
                     '@type' => 'OpeningHoursSpecification',
-                    'opens' => (string) $timeRange->start(),
-                    'closes' => (string) $timeRange->end(),
+                    'opens' => $timeRange->start()->format($format),
+                    'closes' => $timeRange->end()->format($format),
                     'validFrom' => $date,
                     'validThrough' => $date,
                 ];

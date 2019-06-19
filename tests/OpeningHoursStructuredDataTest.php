@@ -64,5 +64,16 @@ class OpeningHoursStructuredDataTest extends TestCase
         ];
 
         $this->assertEquals($expected, $openingHours->asStructuredData());
+
+        $openingHours = OpeningHours::create([
+            'monday' => [
+                'hours' =>  [
+                    '09:00-17:00',
+                ],
+            ],
+        ]);
+
+        $this->assertEquals('17:00:00+00:00', $openingHours->asStructuredData('H:i:sP')[0]['closes']);
+
     }
 }
