@@ -31,6 +31,10 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
             unset($strings['data']);
         }
 
+        uasort($strings, function ($a, $b) {
+            return strcmp(static::getHoursFromRange($a), static::getHoursFromRange($b));
+        });
+
         $timeRanges = Arr::map($strings, function ($string) {
             return TimeRange::fromDefinition($string);
         });
@@ -134,6 +138,14 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
         if (TimeRange::fromString('00:00-'.$timeRange->start())->containsTime($time)) {
             return $timeRange->end();
         }
+    }
+
+    protected static function getHoursFromRange($range)
+    {
+        return strval((is_array($range)
+            ? ($range['hours'] ?? array_values($range)[0] ?? null)
+            : null
+        ) ?: $range);
     }
 
     public function offsetExists($offset): bool

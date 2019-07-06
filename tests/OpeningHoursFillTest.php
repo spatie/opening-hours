@@ -331,4 +331,17 @@ class OpeningHoursFillTest extends TestCase
             '08:00-24:00',
         ], $dump);
     }
+
+    /** @test */
+    public function it_should_reorder_ranges()
+    {
+        $hours = OpeningHours::createAndMergeOverlappingRanges([
+            'monday' => [
+                '13:00-24:00',
+                '08:00-12:00',
+            ],
+        ]);
+
+        $this->assertSame('08:00', $hours->nextOpen(new DateTime('2019-07-06 07:25'))->format('H:i'));
+    }
 }
