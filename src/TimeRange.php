@@ -130,6 +130,11 @@ class TimeRange
         return $time->isSameOrAfter($this->start) && ($this->overflowsNextDay() || $time->isBefore($this->end));
     }
 
+    public function containsNightTime(Time $time): bool
+    {
+        return $this->overflowsNextDay() && self::fromMidnight($this->end())->containsTime($time);
+    }
+
     public function overlaps(self $timeRange): bool
     {
         return $this->containsTime($timeRange->start) || $this->containsTime($timeRange->end);

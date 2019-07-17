@@ -89,6 +89,15 @@ class TimeRangeTest extends TestCase
     }
 
     /** @test */
+    public function it_can_determine_that_it_contains_a_time_over_midnight()
+    {
+        $this->assertFalse(TimeRange::fromString('10:00-18:00')->containsNightTime(Time::fromString('17:00')));
+        $this->assertFalse(TimeRange::fromString('18:00-10:00')->containsNightTime(Time::fromString('17:00')));
+        $this->assertFalse(TimeRange::fromString('10:00-18:00')->containsNightTime(Time::fromString('08:00')));
+        $this->assertTrue(TimeRange::fromString('18:00-10:00')->containsNightTime(Time::fromString('08:00')));
+    }
+
+    /** @test */
     public function it_can_determine_that_it_overlaps_another_time_range()
     {
         $this->assertTrue(TimeRange::fromString('16:00-18:00')->overlaps(TimeRange::fromString('15:00-17:00')));

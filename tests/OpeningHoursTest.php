@@ -5,6 +5,7 @@ namespace Spatie\OpeningHours\Test;
 use DateTime;
 use DateTimeZone;
 use DateTimeImmutable;
+use Spatie\OpeningHours\Time;
 use PHPUnit\Framework\TestCase;
 use Spatie\OpeningHours\OpeningHours;
 use Spatie\OpeningHours\Exceptions\MaximumLimitExceeded;
@@ -275,28 +276,33 @@ class OpeningHoursTest extends TestCase
         ]);
 
         $monday = new DateTime('2019-02-04 11:00:00');
+        $dayHours = $openingHours->forDay('monday');
         $this->assertTrue($openingHours->isOpenAt($monday));
         $this->assertFalse($openingHours->isClosedAt($monday));
-        $this->assertEquals('2019-02-06 03:00:00', $openingHours->nextClose($monday)->format('Y-m-d H:i:s'));
-        $this->assertEquals('2019-02-06 09:00:00', $openingHours->nextOpen($monday)->format('Y-m-d H:i:s'));
+        $this->assertSame('09:00-24:00', $dayHours->nextOpenRange(Time::fromString('08:00'))->format());
+        $this->assertFalse($dayHours->nextOpenRange(Time::fromString('10:00')));
+        $this->assertSame('09:00-24:00', $dayHours->nextCloseRange(Time::fromString('08:00'))->format());
+        $this->assertSame('09:00-24:00', $dayHours->nextCloseRange(Time::fromString('10:00'))->format());
+        $this->assertSame('2019-02-06 03:00:00', $openingHours->nextClose($monday)->format('Y-m-d H:i:s'));
+        $this->assertSame('2019-02-06 09:00:00', $openingHours->nextOpen($monday)->format('Y-m-d H:i:s'));
 
         $monday = new DateTimeImmutable('2019-02-04 11:00:00');
         $this->assertTrue($openingHours->isOpenAt($monday));
         $this->assertFalse($openingHours->isClosedAt($monday));
-        $this->assertEquals('2019-02-06 03:00:00', $openingHours->nextClose($monday)->format('Y-m-d H:i:s'));
-        $this->assertEquals('2019-02-06 09:00:00', $openingHours->nextOpen($monday)->format('Y-m-d H:i:s'));
+        $this->assertSame('2019-02-06 03:00:00', $openingHours->nextClose($monday)->format('Y-m-d H:i:s'));
+        $this->assertSame('2019-02-06 09:00:00', $openingHours->nextOpen($monday)->format('Y-m-d H:i:s'));
 
         $wednesday = new DateTime('2019-02-06 09:00:00');
         $this->assertTrue($openingHours->isOpenAt($wednesday));
         $this->assertFalse($openingHours->isClosedAt($wednesday));
-        $this->assertEquals('2019-02-07 00:00:00', $openingHours->nextClose($wednesday)->format('Y-m-d H:i:s'));
-        $this->assertEquals('2019-02-08 00:00:00', $openingHours->nextOpen($wednesday)->format('Y-m-d H:i:s'));
+        $this->assertSame('2019-02-07 00:00:00', $openingHours->nextClose($wednesday)->format('Y-m-d H:i:s'));
+        $this->assertSame('2019-02-08 00:00:00', $openingHours->nextOpen($wednesday)->format('Y-m-d H:i:s'));
 
         $wednesday = new DateTimeImmutable('2019-02-06 09:00:00');
         $this->assertTrue($openingHours->isOpenAt($wednesday));
         $this->assertFalse($openingHours->isClosedAt($wednesday));
-        $this->assertEquals('2019-02-07 00:00:00', $openingHours->nextClose($wednesday)->format('Y-m-d H:i:s'));
-        $this->assertEquals('2019-02-08 00:00:00', $openingHours->nextOpen($wednesday)->format('Y-m-d H:i:s'));
+        $this->assertSame('2019-02-07 00:00:00', $openingHours->nextClose($wednesday)->format('Y-m-d H:i:s'));
+        $this->assertSame('2019-02-08 00:00:00', $openingHours->nextOpen($wednesday)->format('Y-m-d H:i:s'));
     }
 
     /** @test */
@@ -982,5 +988,80 @@ class OpeningHoursTest extends TestCase
         $openingHours->setDayLimit(3000);
 
         $this->assertEquals('2022-12-25 00:00:00', $openingHours->nextClose(new DateTime('2019-06-06 19:02:00'))->format('Y-m-d H:i:s'));
+    }
+
+    /** @test */
+    public function it_should_handle_open_range()
+    {
+        $openingHours = OpeningHours::create([
+            'monday' => ['10:00-16:00', '19:30-20:30'],
+            'tuesday' => ['22:30-04:00'],
+            'wednesday' => ['07:00-10:00'],
+            'thursday' => ['09:00-12:00'],
+            'friday' => ['09:00-12:00'],
+            'saturday' => [],
+            'sunday' => [],
+        ]);
+
+        $this->assertFalse($openingHours->currentOpenRange(new DateTime('2019-07-15 08:00:00')));
+        $this->assertFalse($openingHours->currentOpenRange(new DateTime('2019-07-15 17:00:00')));
+        $this->assertFalse($openingHours->currentOpenRange(new DateTime('2019-07-16 22:00:00')));
+        $this->assertFalse($openingHours->currentOpenRange(new DateTime('2019-07-17 04:00:00')));
+        $this->assertSame('10:00-16:00', $openingHours->currentOpenRange(new DateTime('2019-07-15 11:00:00'))->format());
+        $this->assertSame('19:30-20:30', $openingHours->currentOpenRange(new DateTime('2019-07-15 20:00:00'))->format());
+        $this->assertSame('22:30-04:00', $openingHours->currentOpenRange(new DateTime('2019-07-16 22:30:00'))->format());
+        $this->assertSame('22:30-04:00', $openingHours->currentOpenRange(new DateTime('2019-07-16 22:40:00'))->format());
+        $this->assertSame('22:30-04:00', $openingHours->currentOpenRange(new DateTime('2019-07-17 03:59:59'))->format());
+        $this->assertSame('07:00-10:00', $openingHours->currentOpenRange(new DateTime('2019-07-17 07:59:59'))->format());
+    }
+
+    /** @test */
+    public function it_should_handle_open_start_date_time()
+    {
+        $openingHours = OpeningHours::create([
+            'monday' => ['10:00-16:00', '19:30-20:30'],
+            'tuesday' => ['22:30-04:00'],
+            'wednesday' => ['07:00-10:00'],
+            'thursday' => ['09:00-12:00'],
+            'friday' => ['09:00-12:00'],
+            'saturday' => [],
+            'sunday' => [],
+        ]);
+
+        $this->assertFalse($openingHours->currentOpenRangeStart(new DateTime('2019-07-15 08:00:00')));
+        $this->assertFalse($openingHours->currentOpenRangeStart(new DateTime('2019-07-15 17:00:00')));
+        $this->assertFalse($openingHours->currentOpenRangeStart(new DateTime('2019-07-16 22:00:00')));
+        $this->assertFalse($openingHours->currentOpenRangeStart(new DateTime('2019-07-17 04:00:00')));
+        $this->assertSame('2019-07-15 10:00:00', $openingHours->currentOpenRangeStart(new DateTime('2019-07-15 11:00:00'))->format('Y-m-d H:i:s'));
+        $this->assertSame('2019-07-15 19:30:00', $openingHours->currentOpenRangeStart(new DateTime('2019-07-15 20:00:00'))->format('Y-m-d H:i:s'));
+        $this->assertSame('2019-07-16 22:30:00', $openingHours->currentOpenRangeStart(new DateTime('2019-07-16 22:30:00'))->format('Y-m-d H:i:s'));
+        $this->assertSame('2019-07-16 22:30:00', $openingHours->currentOpenRangeStart(new DateTime('2019-07-16 22:40:00'))->format('Y-m-d H:i:s'));
+        $this->assertSame('2019-07-16 22:30:00', $openingHours->currentOpenRangeStart(new DateTime('2019-07-17 03:59:59'))->format('Y-m-d H:i:s'));
+        $this->assertSame('2019-07-17 07:00:00', $openingHours->currentOpenRangeStart(new DateTime('2019-07-17 07:59:59'))->format('Y-m-d H:i:s'));
+    }
+
+    /** @test */
+    public function it_should_handle_open_end_date_time()
+    {
+        $openingHours = OpeningHours::create([
+            'monday' => ['10:00-16:00', '19:30-20:30'],
+            'tuesday' => ['22:30-04:00'],
+            'wednesday' => ['07:00-10:00'],
+            'thursday' => ['09:00-12:00'],
+            'friday' => ['09:00-12:00'],
+            'saturday' => [],
+            'sunday' => [],
+        ]);
+
+        $this->assertFalse($openingHours->currentOpenRangeEnd(new DateTime('2019-07-15 08:00:00')));
+        $this->assertFalse($openingHours->currentOpenRangeEnd(new DateTime('2019-07-15 17:00:00')));
+        $this->assertFalse($openingHours->currentOpenRangeEnd(new DateTime('2019-07-16 22:00:00')));
+        $this->assertFalse($openingHours->currentOpenRangeEnd(new DateTime('2019-07-17 04:00:00')));
+        $this->assertSame('2019-07-15 16:00:00', $openingHours->currentOpenRangeEnd(new DateTime('2019-07-15 11:00:00'))->format('Y-m-d H:i:s'));
+        $this->assertSame('2019-07-15 20:30:00', $openingHours->currentOpenRangeEnd(new DateTime('2019-07-15 20:00:00'))->format('Y-m-d H:i:s'));
+        $this->assertSame('2019-07-17 04:00:00', $openingHours->currentOpenRangeEnd(new DateTime('2019-07-16 22:30:00'))->format('Y-m-d H:i:s'));
+        $this->assertSame('2019-07-17 04:00:00', $openingHours->currentOpenRangeEnd(new DateTime('2019-07-16 22:40:00'))->format('Y-m-d H:i:s'));
+        $this->assertSame('2019-07-17 04:00:00', $openingHours->currentOpenRangeEnd(new DateTime('2019-07-17 03:59:59'))->format('Y-m-d H:i:s'));
+        $this->assertSame('2019-07-17 10:00:00', $openingHours->currentOpenRangeEnd(new DateTime('2019-07-17 07:59:59'))->format('Y-m-d H:i:s'));
     }
 }

@@ -9,6 +9,10 @@
 
 With `spatie/opening-hours` you create an object that describes a business' opening hours, which you can query for `open` or `closed` on days or specific dates, or use to present the times per day.
 
+`spatie/opening-hours` can be used directly on [Carbon](https://carbon.nesbot.com/) thanks
+to [cmixin/business-time](https://github.com/kylekatarnls/business-time) so you can benefit
+opening hours features directly on your enhanced date objects.
+
 A set of opening hours is created by passing in a regular schedule, and a list of exceptions.
 
 ```php
@@ -30,6 +34,18 @@ $openingHours = OpeningHours::create([
         '12-25'      => ['09:00-12:00'],   // Recurring on each 25th of December
     ],
 ]);
+
+// This will allow you to display things like:
+
+$now = new DateTime('now');
+$range = $openingHours->currentOpenRange($now);
+
+if ($range) {
+    echo "It's open since ".$range->start()."\n";
+    echo "It will close at ".$range->end()."\n";
+} else {
+    echo "It's closed, it will open at ".$openingHours->nextOpen($now)->format('l H:i');
+}
 ```
 
 The object can be queried for a day in the week, which will return a result based on the regular schedule:
@@ -329,7 +345,7 @@ Checks if the business is closed right now.
 $openingHours->isClosed();
 ```
 
-#### `nextOpen(DateTimeInterface $dateTime) : DateTime`
+#### `OpeningHours::nextOpen(DateTimeInterface $dateTime) : DateTime`
 
 Returns next open DateTime from the given DateTime
 
@@ -337,7 +353,7 @@ Returns next open DateTime from the given DateTime
 $openingHours->nextOpen(new DateTime('2016-12-24 11:00:00'));
 ```
 
-#### `nextClose(DateTimeInterface $dateTime) : DateTime`
+#### `OpeningHours::nextClose(DateTimeInterface $dateTime) : DateTime`
 
 Returns next close DateTime from the given DateTime
 
@@ -345,7 +361,57 @@ Returns next close DateTime from the given DateTime
 $openingHours->nextClose(new DateTime('2016-12-24 11:00:00'));
 ```
 
-#### `asStructuredData(strinf $format = 'H:i', string|DateTimeZone $timezone) : array`
+#### `OpeningHours::currentOpenRange(DateTimeInterface $dateTime) : false | TimeRange`
+
+Returns a `Spatie\OpeningHours\TimeRange` instance of the current open range if the
+business is open, false if the business is closed.
+
+```php
+$range = $openingHours->currentOpenRange(new DateTime('2016-12-24 11:00:00'));
+
+if ($range) {
+    echo "It's open since ".$range->start()."\n";
+    echo "It will close at ".$range->end()."\n";
+} else {
+    echo "It's closed";
+}
+```
+
+#### `OpeningHours::currentOpenRangeStart(DateTimeInterface $dateTime) : false | DateTime`
+
+Returns a `DateTime` instance of the date and time since when the business is open if
+the business is open, false if the business is closed.
+
+Note: date can be the previous day if you use night ranges.
+
+```php
+$date = $openingHours->currentOpenRangeStart(new DateTime('2016-12-24 11:00:00'));
+
+if ($date) {
+    echo "It's open since ".$date->format('H:i');
+} else {
+    echo "It's closed";
+}
+```
+
+#### `OpeningHours::currentOpenRangeEnd(DateTimeInterface $dateTime) : false | DateTime`
+
+Returns a `DateTime` instance of the date and time until when the business will be open
+if the business is open, false if the business is closed.
+
+Note: date can be the next day if you use night ranges.
+
+```php
+$date = $openingHours->currentOpenRangeEnd(new DateTime('2016-12-24 11:00:00'));
+
+if ($date) {
+    echo "It will close at ".$date->format('H:i');
+} else {
+    echo "It's closed";
+}
+```
+
+#### `OpeningHours::asStructuredData(strinf $format = 'H:i', string|DateTimeZone $timezone) : array`
 
 Returns a [OpeningHoursSpecification](https://schema.org/openingHoursSpecification) as an array.
 
