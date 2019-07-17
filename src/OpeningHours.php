@@ -233,6 +233,27 @@ class OpeningHours
         return $this->exceptions[$date->format('Y-m-d')] ?? ($this->exceptions[$date->format('m-d')] ?? $this->forDay(Day::onDateTime($date)));
     }
 
+    /**
+     * @param DateTimeInterface $date
+     *
+     * @return TimeRange[]
+     */
+    public function forDateTime(DateTimeInterface $date): array
+    {
+        $yesterday = $date;
+
+        if (! ($yesterday instanceof DateTimeImmutable)) {
+            $yesterday = clone $yesterday;
+        }
+
+        $yesterday = $yesterday->modify('-1 day');
+
+        return array_merge(
+            iterator_to_array($this->forDate($yesterday)->forNightTime(Time::fromDateTime($date))),
+            iterator_to_array($this->forDate($date)->forTime(Time::fromDateTime($date)))
+        );
+    }
+
     public function exceptions(): array
     {
         return $this->exceptions;
@@ -320,9 +341,59 @@ class OpeningHours
         }
 
         $nextDateTime = $nextOpen->toDateTime();
-        $dateTime = $dateTime->setTime($nextDateTime->format('G'), $nextDateTime->format('i'), 0);
 
-        return $dateTime;
+        return $dateTime->setTime($nextDateTime->format('G'), $nextDateTime->format('i'), 0);
+    }
+
+    public function currentOpenRange(DateTimeInterface $dateTime)
+    {
+        $list = $this->forDateTime($dateTime);
+
+        return end($list) ?: false;
+    }
+
+    public function currentOpenRangeStart(DateTimeInterface $dateTime)
+    {
+        /** @var TimeRange $range */
+        $range = $this->currentOpenRange($dateTime);
+
+        if (! $range) {
+            return false;
+        }
+
+        if (! ($dateTime instanceof DateTimeImmutable)) {
+            $dateTime = clone $dateTime;
+        }
+
+        $nextDateTime = $range->start()->toDateTime();
+
+        if ($range->overflowsNextDay() && $nextDateTime->format('Hi') > $dateTime->format('Hi')) {
+            $dateTime = $dateTime->modify('-1 day');
+        }
+
+        return $dateTime->setTime($nextDateTime->format('G'), $nextDateTime->format('i'), 0);
+    }
+
+    public function currentOpenRangeEnd(DateTimeInterface $dateTime)
+    {
+        /** @var TimeRange $range */
+        $range = $this->currentOpenRange($dateTime);
+
+        if (! $range) {
+            return false;
+        }
+
+        if (! ($dateTime instanceof DateTimeImmutable)) {
+            $dateTime = clone $dateTime;
+        }
+
+        $nextDateTime = $range->end()->toDateTime();
+
+        if ($range->overflowsNextDay() && $nextDateTime->format('Hi') < $dateTime->format('Hi')) {
+            $dateTime = $dateTime->modify('+1 day');
+        }
+
+        return $dateTime->setTime($nextDateTime->format('G'), $nextDateTime->format('i'), 0);
     }
 
     public function nextClose(DateTimeInterface $dateTime): DateTimeInterface
@@ -373,9 +444,8 @@ class OpeningHours
         }
 
         $nextDateTime = $nextClose->toDateTime();
-        $dateTime = $dateTime->setTime($nextDateTime->format('G'), $nextDateTime->format('i'), 0);
 
-        return $dateTime;
+        return $dateTime->setTime($nextDateTime->format('G'), $nextDateTime->format('i'), 0);
     }
 
     public function regularClosingDays(): array

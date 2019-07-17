@@ -3,6 +3,7 @@
 namespace Spatie\OpeningHours;
 
 use Countable;
+use Generator;
 use ArrayAccess;
 use ArrayIterator;
 use IteratorAggregate;
@@ -60,7 +61,7 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
     public function isOpenAtNight(Time $time)
     {
         foreach ($this->openingHours as $timeRange) {
-            if ($timeRange->overflowsNextDay() && TimeRange::fromMidnight($timeRange->end())->containsTime($time)) {
+            if ($timeRange->containsNightTime($time)) {
                 return true;
             }
         }
@@ -105,6 +106,20 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
     /**
      * @param Time $time
      *
+     * @return bool|TimeRange
+     */
+    public function nextOpenRange(Time $time)
+    {
+        return $this->openingHoursFilter([
+            function ($timeRange) use ($time) {
+                return $this->findNextOpenRangeInFreeTime($time, $timeRange);
+            },
+        ]);
+    }
+
+    /**
+     * @param Time $time
+     *
      * @return bool|Time
      */
     public function nextClose(Time $time)
@@ -119,10 +134,36 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
         ]);
     }
 
-    protected function findNextOpenInFreeTime(Time $time, TimeRange $timeRange)
+    /**
+     * @param Time $time
+     *
+     * @return bool|TimeRange
+     */
+    public function nextCloseRange(Time $time)
+    {
+        return $this->openingHoursFilter([
+            function ($timeRange) use ($time) {
+                return $this->findNextCloseInWorkingHours($time, $timeRange);
+            },
+            function ($timeRange) use ($time) {
+                return $this->findNextCloseRangeInFreeTime($time, $timeRange);
+            },
+        ]);
+    }
+
+    protected function findNextOpenRangeInFreeTime(Time $time, TimeRange $timeRange)
     {
         if (TimeRange::fromString('00:00-'.$timeRange->start())->containsTime($time)) {
-            return $timeRange->start();
+            return $timeRange;
+        }
+    }
+
+    protected function findNextOpenInFreeTime(Time $time, TimeRange $timeRange)
+    {
+        $range = $this->findNextOpenRangeInFreeTime($time, $timeRange);
+
+        if ($range) {
+            return $range->start();
         }
     }
 
@@ -133,10 +174,19 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
         }
     }
 
-    protected function findNextCloseInFreeTime(Time $time, TimeRange $timeRange)
+    protected function findNextCloseRangeInFreeTime(Time $time, TimeRange $timeRange)
     {
         if (TimeRange::fromString('00:00-'.$timeRange->start())->containsTime($time)) {
-            return $timeRange->end();
+            return $timeRange;
+        }
+    }
+
+    protected function findNextCloseInFreeTime(Time $time, TimeRange $timeRange)
+    {
+        $range = $this->findNextCloseRangeInFreeTime($time, $timeRange);
+
+        if ($range) {
+            return $range->end();
         }
     }
 
@@ -176,6 +226,43 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
     public function getIterator()
     {
         return new ArrayIterator($this->openingHours);
+    }
+
+    /**
+     * @param Time $time
+     *
+     * @return TimeRange[]
+     */
+    public function forTime(Time $time): Generator
+    {
+        foreach ($this as $range) {
+            /* @var TimeRange $range */
+
+            if ($range->containsTime($time)) {
+                yield $range;
+            }
+        }
+    }
+
+    /**
+     * @param Time $time
+     *
+     * @return TimeRange[]
+     */
+    public function forNightTime(Time $time): Generator
+    {
+        foreach ($this as $range) {
+            /* @var TimeRange $range */
+
+            if ($range->containsNightTime($time)) {
+                yield $range;
+            }
+        }
+    }
+
+    public function getReversedIterator()
+    {
+        return new ArrayIterator(array_reverse($this->openingHours));
     }
 
     public function isEmpty(): bool
