@@ -402,7 +402,7 @@ if the business is open, false if the business is closed.
 Note: date can be the next day if you use night ranges.
 
 ```php
-$date = $openingHours->currentOpenRangeStart(new DateTime('2016-12-24 11:00:00'));
+$date = $openingHours->currentOpenRangeEnd(new DateTime('2016-12-24 11:00:00'));
 
 if ($date) {
     echo "It will close at ".$date->format('H:i');

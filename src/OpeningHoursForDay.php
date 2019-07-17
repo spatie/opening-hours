@@ -143,7 +143,7 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
     {
         return $this->openingHoursFilter([
             function ($timeRange) use ($time) {
-                return $this->findNextCloseInWorkingHours($time, $timeRange);
+                return $this->findNextCloseRangeInWorkingHours($time, $timeRange);
             },
             function ($timeRange) use ($time) {
                 return $this->findNextCloseRangeInFreeTime($time, $timeRange);
@@ -171,6 +171,13 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
     {
         if ($timeRange->containsTime($time)) {
             return next($timeRange);
+        }
+    }
+
+    protected function findNextCloseRangeInWorkingHours(Time $time, TimeRange $timeRange)
+    {
+        if ($timeRange->containsTime($time)) {
+            return $timeRange;
         }
     }
 
@@ -258,11 +265,6 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
                 yield $range;
             }
         }
-    }
-
-    public function getReversedIterator()
-    {
-        return new ArrayIterator(array_reverse($this->openingHours));
     }
 
     public function isEmpty(): bool

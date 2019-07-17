@@ -5,6 +5,7 @@ namespace Spatie\OpeningHours\Test;
 use DateTime;
 use DateTimeZone;
 use DateTimeImmutable;
+use Spatie\OpeningHours\Time;
 use PHPUnit\Framework\TestCase;
 use Spatie\OpeningHours\OpeningHours;
 use Spatie\OpeningHours\Exceptions\MaximumLimitExceeded;
@@ -275,28 +276,33 @@ class OpeningHoursTest extends TestCase
         ]);
 
         $monday = new DateTime('2019-02-04 11:00:00');
+        $dayHours = $openingHours->forDay('monday');
         $this->assertTrue($openingHours->isOpenAt($monday));
         $this->assertFalse($openingHours->isClosedAt($monday));
-        $this->assertEquals('2019-02-06 03:00:00', $openingHours->nextClose($monday)->format('Y-m-d H:i:s'));
-        $this->assertEquals('2019-02-06 09:00:00', $openingHours->nextOpen($monday)->format('Y-m-d H:i:s'));
+        $this->assertSame('09:00-24:00', $dayHours->nextOpenRange(Time::fromString('08:00'))->format());
+        $this->assertFalse($dayHours->nextOpenRange(Time::fromString('10:00')));
+        $this->assertSame('09:00-24:00', $dayHours->nextCloseRange(Time::fromString('08:00'))->format());
+        $this->assertSame('09:00-24:00', $dayHours->nextCloseRange(Time::fromString('10:00'))->format());
+        $this->assertSame('2019-02-06 03:00:00', $openingHours->nextClose($monday)->format('Y-m-d H:i:s'));
+        $this->assertSame('2019-02-06 09:00:00', $openingHours->nextOpen($monday)->format('Y-m-d H:i:s'));
 
         $monday = new DateTimeImmutable('2019-02-04 11:00:00');
         $this->assertTrue($openingHours->isOpenAt($monday));
         $this->assertFalse($openingHours->isClosedAt($monday));
-        $this->assertEquals('2019-02-06 03:00:00', $openingHours->nextClose($monday)->format('Y-m-d H:i:s'));
-        $this->assertEquals('2019-02-06 09:00:00', $openingHours->nextOpen($monday)->format('Y-m-d H:i:s'));
+        $this->assertSame('2019-02-06 03:00:00', $openingHours->nextClose($monday)->format('Y-m-d H:i:s'));
+        $this->assertSame('2019-02-06 09:00:00', $openingHours->nextOpen($monday)->format('Y-m-d H:i:s'));
 
         $wednesday = new DateTime('2019-02-06 09:00:00');
         $this->assertTrue($openingHours->isOpenAt($wednesday));
         $this->assertFalse($openingHours->isClosedAt($wednesday));
-        $this->assertEquals('2019-02-07 00:00:00', $openingHours->nextClose($wednesday)->format('Y-m-d H:i:s'));
-        $this->assertEquals('2019-02-08 00:00:00', $openingHours->nextOpen($wednesday)->format('Y-m-d H:i:s'));
+        $this->assertSame('2019-02-07 00:00:00', $openingHours->nextClose($wednesday)->format('Y-m-d H:i:s'));
+        $this->assertSame('2019-02-08 00:00:00', $openingHours->nextOpen($wednesday)->format('Y-m-d H:i:s'));
 
         $wednesday = new DateTimeImmutable('2019-02-06 09:00:00');
         $this->assertTrue($openingHours->isOpenAt($wednesday));
         $this->assertFalse($openingHours->isClosedAt($wednesday));
-        $this->assertEquals('2019-02-07 00:00:00', $openingHours->nextClose($wednesday)->format('Y-m-d H:i:s'));
-        $this->assertEquals('2019-02-08 00:00:00', $openingHours->nextOpen($wednesday)->format('Y-m-d H:i:s'));
+        $this->assertSame('2019-02-07 00:00:00', $openingHours->nextClose($wednesday)->format('Y-m-d H:i:s'));
+        $this->assertSame('2019-02-08 00:00:00', $openingHours->nextOpen($wednesday)->format('Y-m-d H:i:s'));
     }
 
     /** @test */
