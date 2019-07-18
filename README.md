@@ -44,7 +44,8 @@ if ($range) {
     echo "It's open since ".$range->start()."\n";
     echo "It will close at ".$range->end()."\n";
 } else {
-    echo "It's closed, it will open at ".$openingHours->nextOpen($now)->format('l H:i');
+    echo "It's closed since ".$openingHours->previousClose($now)->format('l H:i')."\n";
+    echo "It will re-open at ".$openingHours->nextOpen($now)->format('l H:i')."\n";
 }
 ```
 
@@ -356,6 +357,22 @@ $openingHours->nextOpen(new DateTime('2016-12-24 11:00:00'));
 #### `OpeningHours::nextClose(DateTimeInterface $dateTime) : DateTime`
 
 Returns next close DateTime from the given DateTime
+
+```php
+$openingHours->nextClose(new DateTime('2016-12-24 11:00:00'));
+```
+
+#### `OpeningHours::previousOpen(DateTimeInterface $dateTime) : DateTime`
+
+Returns previous open DateTime from the given DateTime
+
+```php
+$openingHours->previousOpen(new DateTime('2016-12-24 11:00:00'));
+```
+
+#### `OpeningHours::previousClose(DateTimeInterface $dateTime) : DateTime`
+
+Returns previous close DateTime from the given DateTime
 
 ```php
 $openingHours->nextClose(new DateTime('2016-12-24 11:00:00'));

@@ -9,12 +9,13 @@ use ArrayIterator;
 use IteratorAggregate;
 use Spatie\OpeningHours\Helpers\Arr;
 use Spatie\OpeningHours\Helpers\DataTrait;
+use Spatie\OpeningHours\Helpers\RangeFinder;
 use Spatie\OpeningHours\Exceptions\NonMutableOffsets;
 use Spatie\OpeningHours\Exceptions\OverlappingTimeRanges;
 
 class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
 {
-    use DataTrait;
+    use DataTrait, RangeFinder;
 
     /** @var \Spatie\OpeningHours\TimeRange[] */
     protected $openingHours = [];
@@ -71,12 +72,13 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
 
     /**
      * @param callable[] $filters
+     * @param bool       $reverse
      *
      * @return Time|bool
      */
-    public function openingHoursFilter(array $filters)
+    public function openingHoursFilter(array $filters, bool $reverse = false)
     {
-        foreach ($this->openingHours as $timeRange) {
+        foreach (($reverse ? array_reverse($this->openingHours) : $this->openingHours) as $timeRange) {
             foreach ($filters as $filter) {
                 if ($result = $filter($timeRange)) {
                     reset($timeRange);
@@ -98,7 +100,7 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
     {
         return $this->openingHoursFilter([
             function ($timeRange) use ($time) {
-                return $this->findNextOpenInFreeTime($time, $timeRange);
+                return $this->findOpenInFreeTime($time, $timeRange);
             },
         ]);
     }
@@ -112,7 +114,7 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
     {
         return $this->openingHoursFilter([
             function ($timeRange) use ($time) {
-                return $this->findNextOpenRangeInFreeTime($time, $timeRange);
+                return $this->findRangeInFreeTime($time, $timeRange);
             },
         ]);
     }
@@ -126,10 +128,10 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
     {
         return $this->openingHoursFilter([
             function ($timeRange) use ($time) {
-                return $this->findNextCloseInWorkingHours($time, $timeRange);
+                return $this->findCloseInWorkingHours($time, $timeRange);
             },
             function ($timeRange) use ($time) {
-                return $this->findNextCloseInFreeTime($time, $timeRange);
+                return $this->findCloseInFreeTime($time, $timeRange);
             },
         ]);
     }
@@ -143,58 +145,71 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
     {
         return $this->openingHoursFilter([
             function ($timeRange) use ($time) {
-                return $this->findNextCloseRangeInWorkingHours($time, $timeRange);
+                return $this->findCloseRangeInWorkingHours($time, $timeRange);
             },
             function ($timeRange) use ($time) {
-                return $this->findNextCloseRangeInFreeTime($time, $timeRange);
+                return $this->findRangeInFreeTime($time, $timeRange);
             },
         ]);
     }
 
-    protected function findNextOpenRangeInFreeTime(Time $time, TimeRange $timeRange)
+    /**
+     * @param Time $time
+     *
+     * @return bool|Time
+     */
+    public function previousOpen(Time $time)
     {
-        if (TimeRange::fromString('00:00-'.$timeRange->start())->containsTime($time)) {
-            return $timeRange;
-        }
+        return $this->openingHoursFilter([
+            function ($timeRange) use ($time) {
+                return $this->findPreviousOpenInFreeTime($time, $timeRange);
+            },
+            function ($timeRange) use ($time) {
+                return $this->findOpenInWorkingHours($time, $timeRange);
+            },
+        ], true);
     }
 
-    protected function findNextOpenInFreeTime(Time $time, TimeRange $timeRange)
+    /**
+     * @param Time $time
+     *
+     * @return bool|TimeRange
+     */
+    public function previousOpenRange(Time $time)
     {
-        $range = $this->findNextOpenRangeInFreeTime($time, $timeRange);
-
-        if ($range) {
-            return $range->start();
-        }
+        return $this->openingHoursFilter([
+            function ($timeRange) use ($time) {
+                return $this->findRangeInFreeTime($time, $timeRange);
+            },
+        ], true);
     }
 
-    protected function findNextCloseInWorkingHours(Time $time, TimeRange $timeRange)
+    /**
+     * @param Time $time
+     *
+     * @return bool|Time
+     */
+    public function previousClose(Time $time)
     {
-        if ($timeRange->containsTime($time)) {
-            return next($timeRange);
-        }
+        return $this->openingHoursFilter([
+            function ($timeRange) use ($time) {
+                return $this->findPreviousCloseInWorkingHours($time, $timeRange);
+            },
+        ], true);
     }
 
-    protected function findNextCloseRangeInWorkingHours(Time $time, TimeRange $timeRange)
+    /**
+     * @param Time $time
+     *
+     * @return bool|TimeRange
+     */
+    public function previousCloseRange(Time $time)
     {
-        if ($timeRange->containsTime($time)) {
-            return $timeRange;
-        }
-    }
-
-    protected function findNextCloseRangeInFreeTime(Time $time, TimeRange $timeRange)
-    {
-        if (TimeRange::fromString('00:00-'.$timeRange->start())->containsTime($time)) {
-            return $timeRange;
-        }
-    }
-
-    protected function findNextCloseInFreeTime(Time $time, TimeRange $timeRange)
-    {
-        $range = $this->findNextCloseRangeInFreeTime($time, $timeRange);
-
-        if ($range) {
-            return $range->end();
-        }
+        return $this->openingHoursFilter([
+            function ($timeRange) use ($time) {
+                return $this->findPreviousRangeInFreeTime($time, $timeRange);
+            },
+        ], true);
     }
 
     protected static function getHoursFromRange($range)

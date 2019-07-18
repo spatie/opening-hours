@@ -4,14 +4,14 @@ namespace Spatie\OpeningHours;
 
 use DateTime;
 use DateTimeZone;
-use DateTimeImmutable;
 use DateTimeInterface;
 use Spatie\OpeningHours\Helpers\DataTrait;
+use Spatie\OpeningHours\Helpers\DateTimeCopier;
 use Spatie\OpeningHours\Exceptions\InvalidTimeString;
 
 class Time
 {
-    use DataTrait;
+    use DataTrait, DateTimeCopier;
 
     /** @var int */
     protected $hours;
@@ -90,11 +90,7 @@ class Time
 
     public function toDateTime(DateTimeInterface $date = null): DateTimeInterface
     {
-        if (! $date) {
-            $date = new DateTime('1970-01-01 00:00:00');
-        } elseif (! ($date instanceof DateTimeImmutable)) {
-            $date = clone $date;
-        }
+        $date = $date ? $this->copyDateTime($date) : new DateTime('1970-01-01 00:00:00');
 
         return $date->setTime($this->hours, $this->minutes);
     }

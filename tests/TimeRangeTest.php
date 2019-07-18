@@ -14,7 +14,7 @@ class TimeRangeTest extends TestCase
     /** @test */
     public function it_can_be_created_from_a_string()
     {
-        $this->assertEquals('16:00-18:00', (string) TimeRange::fromString('16:00-18:00'));
+        $this->assertSame('16:00-18:00', (string) TimeRange::fromString('16:00-18:00'));
     }
 
     /** @test */
@@ -115,8 +115,8 @@ class TimeRangeTest extends TestCase
     /** @test */
     public function it_can_be_formatted()
     {
-        $this->assertEquals('16:00-18:00', TimeRange::fromString('16:00-18:00')->format());
-        $this->assertEquals('16:00 - 18:00', TimeRange::fromString('16:00-18:00')->format('H:i', '%s - %s'));
-        $this->assertEquals('from 4 PM to 6 PM', TimeRange::fromString('16:00-18:00')->format('g A', 'from %s to %s'));
+        $this->assertSame('16:00-18:00', TimeRange::fromString('16:00-18:00')->format());
+        $this->assertSame('16:00 - 18:00', TimeRange::fromString('16:00-18:00')->format('H:i', '%s - %s'));
+        $this->assertSame('from 4 PM to 6 PM', TimeRange::fromString('16:00-18:00')->format('g A', 'from %s to %s'));
     }
 }

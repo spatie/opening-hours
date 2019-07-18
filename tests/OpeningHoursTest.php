@@ -7,7 +7,9 @@ use DateTimeZone;
 use DateTimeImmutable;
 use Spatie\OpeningHours\Time;
 use PHPUnit\Framework\TestCase;
+use Spatie\OpeningHours\TimeRange;
 use Spatie\OpeningHours\OpeningHours;
+use Spatie\OpeningHours\OpeningHoursForDay;
 use Spatie\OpeningHours\Exceptions\MaximumLimitExceeded;
 
 class OpeningHoursTest extends TestCase
@@ -22,7 +24,7 @@ class OpeningHoursTest extends TestCase
         $openingHoursForWeek = $openingHours->forWeek();
 
         $this->assertCount(7, $openingHoursForWeek);
-        $this->assertEquals('09:00-18:00', (string) $openingHoursForWeek['monday'][0]);
+        $this->assertSame('09:00-18:00', (string) $openingHoursForWeek['monday'][0]);
         $this->assertCount(0, $openingHoursForWeek['tuesday']);
         $this->assertCount(0, $openingHoursForWeek['wednesday']);
         $this->assertCount(0, $openingHoursForWeek['thursday']);
@@ -45,8 +47,9 @@ class OpeningHoursTest extends TestCase
         $openingHoursForWeek = $openingHours->forWeekCombined();
 
         $this->assertCount(4, $openingHoursForWeek);
-        $this->assertEquals('11:00-15:00', $openingHoursForWeek['wednesday']['opening_hours']);
-        $this->assertEquals('thursday', array_values($openingHoursForWeek['wednesday']['days'])[1]);
+        $this->assertInstanceOf(OpeningHoursForDay::class, $openingHoursForWeek['wednesday']['opening_hours']);
+        $this->assertSame('11:00-15:00', (string) $openingHoursForWeek['wednesday']['opening_hours']);
+        $this->assertSame('thursday', array_values($openingHoursForWeek['wednesday']['days'])[1]);
     }
 
     /** @test */
@@ -89,7 +92,8 @@ class OpeningHoursTest extends TestCase
 
         $openingHoursForMonday = $openingHours->forDay('monday');
         $this->assertCount(1, $openingHoursForMonday);
-        $this->assertEquals('09:00-18:00', $openingHoursForMonday[0]);
+        $this->assertInstanceOf(TimeRange::class, $openingHoursForMonday[0]);
+        $this->assertSame('09:00-18:00', (string) $openingHoursForMonday[0]);
 
         $openingHoursForTuesday = $openingHours->forDay('tuesday');
         $this->assertCount(0, $openingHoursForTuesday);
@@ -131,7 +135,8 @@ class OpeningHoursTest extends TestCase
         $openingHoursForMonday2609 = $openingHours->forDate(new DateTime('2016-09-26 00:00:00'));
 
         $this->assertCount(1, $openingHoursForMonday1909);
-        $this->assertEquals('09:00-18:00', $openingHoursForMonday1909[0]);
+        $this->assertInstanceOf(TimeRange::class, $openingHoursForMonday1909[0]);
+        $this->assertSame('09:00-18:00', (string) $openingHoursForMonday1909[0]);
 
         $this->assertCount(0, $openingHoursForMonday2609);
 
@@ -139,7 +144,8 @@ class OpeningHoursTest extends TestCase
         $openingHoursForMonday2609 = $openingHours->forDate(new DateTimeImmutable('2016-09-26 00:00:00'));
 
         $this->assertCount(1, $openingHoursForMonday1909);
-        $this->assertEquals('09:00-18:00', $openingHoursForMonday1909[0]);
+        $this->assertInstanceOf(TimeRange::class, $openingHoursForMonday1909[0]);
+        $this->assertSame('09:00-18:00', (string) $openingHoursForMonday1909[0]);
 
         $this->assertCount(0, $openingHoursForMonday2609);
     }
@@ -280,11 +286,18 @@ class OpeningHoursTest extends TestCase
         $this->assertTrue($openingHours->isOpenAt($monday));
         $this->assertFalse($openingHours->isClosedAt($monday));
         $this->assertSame('09:00-24:00', $dayHours->nextOpenRange(Time::fromString('08:00'))->format());
+        //$this->assertFalse($dayHours->previousOpenRange(Time::fromString('08:00')));
         $this->assertFalse($dayHours->nextOpenRange(Time::fromString('10:00')));
+        $this->assertFalse($dayHours->previousOpenRange(Time::fromString('10:00')));
         $this->assertSame('09:00-24:00', $dayHours->nextCloseRange(Time::fromString('08:00'))->format());
+        $this->assertFalse($dayHours->previousCloseRange(Time::fromString('10:00')));
         $this->assertSame('09:00-24:00', $dayHours->nextCloseRange(Time::fromString('10:00'))->format());
         $this->assertSame('2019-02-06 03:00:00', $openingHours->nextClose($monday)->format('Y-m-d H:i:s'));
         $this->assertSame('2019-02-06 09:00:00', $openingHours->nextOpen($monday)->format('Y-m-d H:i:s'));
+
+        $this->assertSame('2019-02-01 03:00:00', $openingHours->previousClose($monday)->format('Y-m-d H:i:s'));
+        $this->assertSame('2019-02-04 09:00:00', $openingHours->previousOpen($monday)->format('Y-m-d H:i:s'));
+        $this->assertSame('2019-02-01 00:00:00', $openingHours->previousOpen(new DateTime('2019-02-04 08:50:00'))->format('Y-m-d H:i:s'));
 
         $monday = new DateTimeImmutable('2019-02-04 11:00:00');
         $this->assertTrue($openingHours->isOpenAt($monday));
@@ -293,16 +306,31 @@ class OpeningHoursTest extends TestCase
         $this->assertSame('2019-02-06 09:00:00', $openingHours->nextOpen($monday)->format('Y-m-d H:i:s'));
 
         $wednesday = new DateTime('2019-02-06 09:00:00');
+        $dayHours = $openingHours->forDay('wednesday');
         $this->assertTrue($openingHours->isOpenAt($wednesday));
         $this->assertFalse($openingHours->isClosedAt($wednesday));
+        $this->assertSame('00:00-03:00', $dayHours->previousCloseRange(Time::fromString('08:00'))->format());
+        $this->assertSame('00:00-03:00', $dayHours->previousCloseRange(Time::fromString('08:00'))->format());
+        $this->assertSame('00:00', $dayHours->previousOpen(Time::fromString('08:00'))->format());
+        $this->assertSame('03:00', $dayHours->previousClose(Time::fromString('08:00'))->format());
         $this->assertSame('2019-02-07 00:00:00', $openingHours->nextClose($wednesday)->format('Y-m-d H:i:s'));
         $this->assertSame('2019-02-08 00:00:00', $openingHours->nextOpen($wednesday)->format('Y-m-d H:i:s'));
+        $this->assertSame('2019-02-06 03:00:00', $openingHours->previousClose($wednesday)->format('Y-m-d H:i:s'));
+        $this->assertSame('2019-02-04 09:00:00', $openingHours->previousOpen($wednesday)->format('Y-m-d H:i:s'));
 
         $wednesday = new DateTimeImmutable('2019-02-06 09:00:00');
         $this->assertTrue($openingHours->isOpenAt($wednesday));
         $this->assertFalse($openingHours->isClosedAt($wednesday));
         $this->assertSame('2019-02-07 00:00:00', $openingHours->nextClose($wednesday)->format('Y-m-d H:i:s'));
         $this->assertSame('2019-02-08 00:00:00', $openingHours->nextOpen($wednesday)->format('Y-m-d H:i:s'));
+
+        $friday = new DateTimeImmutable('2019-02-08 09:00:00');
+        $this->assertSame('2019-02-08 03:00:00', $openingHours->previousClose($friday)->format('Y-m-d H:i:s'));
+        $this->assertSame('2019-02-08 00:00:00', $openingHours->previousOpen($friday)->format('Y-m-d H:i:s'));
+
+        $friday = new DateTimeImmutable('2019-02-08 02:00:00');
+        $this->assertSame('2019-02-07 00:00:00', $openingHours->previousClose($friday)->format('Y-m-d H:i:s'));
+        $this->assertSame('2019-02-08 00:00:00', $openingHours->previousOpen($friday)->format('Y-m-d H:i:s'));
     }
 
     /** @test */
@@ -315,51 +343,101 @@ class OpeningHoursTest extends TestCase
         $nextTimeOpen = $openingHours->nextOpen(new DateTime('2016-09-26 12:00:00'));
 
         $this->assertInstanceOf(DateTime::class, $nextTimeOpen);
-        $this->assertEquals('2016-09-26 13:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
+        $this->assertSame('2016-09-26 13:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
+
+        $previousTimeOpen = $openingHours->previousOpen(new DateTime('2016-09-26 12:00:00'));
+
+        $this->assertInstanceOf(DateTime::class, $previousTimeOpen);
+        $this->assertSame('2016-09-26 09:00:00', $previousTimeOpen->format('Y-m-d H:i:s'));
     }
 
     /** @test */
     public function it_can_determine_next_open_hours_from_edges_time()
     {
         $openingHours = OpeningHours::create([
-            'monday' => ['09:00-11:00', '13:00-19:00'],
-            'tuesday' => ['09:00-11:00', '13:00-19:00'],
+            'monday' => ['09:00-11:00', '13:00-19:00'], // 2016-09-26
+            'tuesday' => ['09:00-11:00', '13:00-19:00'], // 2016-09-27
         ]);
 
         $nextTimeOpen = $openingHours->nextOpen(new DateTime('2016-09-26 00:00:00'));
 
         $this->assertInstanceOf(DateTime::class, $nextTimeOpen);
-        $this->assertEquals('2016-09-26 09:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
+        $this->assertSame('2016-09-26 09:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
+
+        $previousTimeOpen = $openingHours->previousOpen(new DateTime('2016-09-26 00:00:00'));
+
+        $this->assertInstanceOf(DateTime::class, $previousTimeOpen);
+        $this->assertSame('2016-09-20 13:00:00', $previousTimeOpen->format('Y-m-d H:i:s'));
 
         $nextTimeOpen = $openingHours->nextOpen(new DateTime('2016-09-26 09:00:00'));
 
         $this->assertInstanceOf(DateTime::class, $nextTimeOpen);
-        $this->assertEquals('2016-09-26 13:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
+        $this->assertSame('2016-09-26 13:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
+
+        $previousTimeOpen = $openingHours->previousOpen(new DateTime('2016-09-26 09:00:00'));
+
+        $this->assertInstanceOf(DateTime::class, $previousTimeOpen);
+        $this->assertSame('2016-09-20 13:00:00', $previousTimeOpen->format('Y-m-d H:i:s'));
 
         $nextTimeOpen = $openingHours->nextOpen(new DateTime('2016-09-26 11:00:00'));
 
         $this->assertInstanceOf(DateTime::class, $nextTimeOpen);
-        $this->assertEquals('2016-09-26 13:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
+        $this->assertSame('2016-09-26 13:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
+
+        $previousTimeOpen = $openingHours->previousOpen(new DateTime('2016-09-26 11:00:00'));
+
+        $this->assertInstanceOf(DateTime::class, $previousTimeOpen);
+        $this->assertSame('2016-09-26 09:00:00', $previousTimeOpen->format('Y-m-d H:i:s'));
 
         $nextTimeOpen = $openingHours->nextOpen(new DateTime('2016-09-26 12:00:00'));
 
         $this->assertInstanceOf(DateTime::class, $nextTimeOpen);
-        $this->assertEquals('2016-09-26 13:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
+        $this->assertSame('2016-09-26 13:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
+
+        $previousTimeOpen = $openingHours->previousOpen(new DateTime('2016-09-26 12:00:00'));
+
+        $this->assertInstanceOf(DateTime::class, $previousTimeOpen);
+        $this->assertSame('2016-09-26 09:00:00', $previousTimeOpen->format('Y-m-d H:i:s'));
 
         $nextTimeOpen = $openingHours->nextOpen(new DateTime('2016-09-26 13:00:00'));
 
         $this->assertInstanceOf(DateTime::class, $nextTimeOpen);
-        $this->assertEquals('2016-09-27 09:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
+        $this->assertSame('2016-09-27 09:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
+
+        $previousTimeOpen = $openingHours->previousOpen(new DateTime('2016-09-26 13:00:00'));
+
+        $this->assertInstanceOf(DateTime::class, $previousTimeOpen);
+        $this->assertSame('2016-09-26 09:00:00', $previousTimeOpen->format('Y-m-d H:i:s'));
 
         $nextTimeOpen = $openingHours->nextOpen(new DateTime('2016-09-26 19:00:00'));
 
         $this->assertInstanceOf(DateTime::class, $nextTimeOpen);
-        $this->assertEquals('2016-09-27 09:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
+        $this->assertSame('2016-09-27 09:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
+
+        $previousTimeOpen = $openingHours->previousOpen(new DateTime('2016-09-26 19:00:00'));
+
+        $this->assertInstanceOf(DateTime::class, $previousTimeOpen);
+        $this->assertSame('2016-09-26 13:00:00', $previousTimeOpen->format('Y-m-d H:i:s'));
 
         $nextTimeOpen = $openingHours->nextOpen(new DateTime('2016-09-26 23:00:00'));
 
         $this->assertInstanceOf(DateTime::class, $nextTimeOpen);
-        $this->assertEquals('2016-09-27 09:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
+        $this->assertSame('2016-09-27 09:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
+
+        $previousTimeOpen = $openingHours->previousOpen(new DateTime('2016-09-26 23:00:00'));
+
+        $this->assertInstanceOf(DateTime::class, $previousTimeOpen);
+        $this->assertSame('2016-09-26 13:00:00', $previousTimeOpen->format('Y-m-d H:i:s'));
+
+        $previousTimeOpen = $openingHours->previousOpen(new DateTime('2016-09-27 23:00:00'));
+
+        $this->assertInstanceOf(DateTime::class, $previousTimeOpen);
+        $this->assertSame('2016-09-27 13:00:00', $previousTimeOpen->format('Y-m-d H:i:s'));
+
+        $previousTimeOpen = $openingHours->previousOpen(new DateTime('2016-09-27 08:00:00'));
+
+        $this->assertInstanceOf(DateTime::class, $previousTimeOpen);
+        $this->assertSame('2016-09-26 13:00:00', $previousTimeOpen->format('Y-m-d H:i:s'));
     }
 
     /** @test */
@@ -378,92 +456,92 @@ class OpeningHoursTest extends TestCase
         $nextTimeOpen = $openingHours->nextOpen(new DateTime('2019-02-11 00:00:00'));
 
         $this->assertInstanceOf(DateTime::class, $nextTimeOpen);
-        $this->assertEquals('2019-02-11 09:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
+        $this->assertSame('2019-02-11 09:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
 
         $nextTimeClose = $openingHours->nextClose(new DateTime('2019-02-11 00:00:00'));
 
         $this->assertInstanceOf(DateTime::class, $nextTimeClose);
-        $this->assertEquals('2019-02-11 11:00:00', $nextTimeClose->format('Y-m-d H:i:s'));
+        $this->assertSame('2019-02-11 11:00:00', $nextTimeClose->format('Y-m-d H:i:s'));
 
         $nextTimeOpen = $openingHours->nextOpen(new DateTime('2019-02-11 09:00:00'));
 
         $this->assertInstanceOf(DateTime::class, $nextTimeOpen);
-        $this->assertEquals('2019-02-11 13:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
+        $this->assertSame('2019-02-11 13:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
 
         $nextTimeClose = $openingHours->nextClose(new DateTime('2019-02-11 09:00:00'));
 
         $this->assertInstanceOf(DateTime::class, $nextTimeClose);
-        $this->assertEquals('2019-02-11 11:00:00', $nextTimeClose->format('Y-m-d H:i:s'));
+        $this->assertSame('2019-02-11 11:00:00', $nextTimeClose->format('Y-m-d H:i:s'));
 
         $nextTimeOpen = $openingHours->nextOpen(new DateTime('2019-02-11 10:00:00'));
 
         $this->assertInstanceOf(DateTime::class, $nextTimeOpen);
-        $this->assertEquals('2019-02-11 13:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
+        $this->assertSame('2019-02-11 13:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
 
         $nextTimeClose = $openingHours->nextClose(new DateTime('2019-02-11 10:00:00'));
 
         $this->assertInstanceOf(DateTime::class, $nextTimeClose);
-        $this->assertEquals('2019-02-11 11:00:00', $nextTimeClose->format('Y-m-d H:i:s'));
+        $this->assertSame('2019-02-11 11:00:00', $nextTimeClose->format('Y-m-d H:i:s'));
 
         $nextTimeOpen = $openingHours->nextOpen(new DateTime('2019-02-11 11:00:00'));
 
         $this->assertInstanceOf(DateTime::class, $nextTimeOpen);
-        $this->assertEquals('2019-02-11 13:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
+        $this->assertSame('2019-02-11 13:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
 
         $nextTimeClose = $openingHours->nextClose(new DateTime('2019-02-11 11:00:00'));
 
         $this->assertInstanceOf(DateTime::class, $nextTimeClose);
-        $this->assertEquals('2019-02-11 19:00:00', $nextTimeClose->format('Y-m-d H:i:s'));
+        $this->assertSame('2019-02-11 19:00:00', $nextTimeClose->format('Y-m-d H:i:s'));
 
         $nextTimeOpen = $openingHours->nextOpen(new DateTime('2019-02-11 12:00:00'));
 
         $this->assertInstanceOf(DateTime::class, $nextTimeOpen);
-        $this->assertEquals('2019-02-11 13:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
+        $this->assertSame('2019-02-11 13:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
 
         $nextTimeClose = $openingHours->nextClose(new DateTime('2019-02-11 12:00:00'));
 
         $this->assertInstanceOf(DateTime::class, $nextTimeClose);
-        $this->assertEquals('2019-02-11 19:00:00', $nextTimeClose->format('Y-m-d H:i:s'));
+        $this->assertSame('2019-02-11 19:00:00', $nextTimeClose->format('Y-m-d H:i:s'));
 
         $nextTimeOpen = $openingHours->nextOpen(new DateTime('2019-02-11 13:00:00'));
 
         $this->assertInstanceOf(DateTime::class, $nextTimeOpen);
-        $this->assertEquals('2019-02-18 09:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
+        $this->assertSame('2019-02-18 09:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
 
         $nextTimeClose = $openingHours->nextClose(new DateTime('2019-02-11 13:00:00'));
 
         $this->assertInstanceOf(DateTime::class, $nextTimeClose);
-        $this->assertEquals('2019-02-11 19:00:00', $nextTimeClose->format('Y-m-d H:i:s'));
+        $this->assertSame('2019-02-11 19:00:00', $nextTimeClose->format('Y-m-d H:i:s'));
 
         $nextTimeOpen = $openingHours->nextOpen(new DateTime('2019-02-11 15:00:00'));
 
         $this->assertInstanceOf(DateTime::class, $nextTimeOpen);
-        $this->assertEquals('2019-02-18 09:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
+        $this->assertSame('2019-02-18 09:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
 
         $nextTimeClose = $openingHours->nextClose(new DateTime('2019-02-11 15:00:00'));
 
         $this->assertInstanceOf(DateTime::class, $nextTimeClose);
-        $this->assertEquals('2019-02-11 19:00:00', $nextTimeClose->format('Y-m-d H:i:s'));
+        $this->assertSame('2019-02-11 19:00:00', $nextTimeClose->format('Y-m-d H:i:s'));
 
         $nextTimeOpen = $openingHours->nextOpen(new DateTime('2019-02-11 19:00:00'));
 
         $this->assertInstanceOf(DateTime::class, $nextTimeOpen);
-        $this->assertEquals('2019-02-18 09:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
+        $this->assertSame('2019-02-18 09:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
 
         $nextTimeClose = $openingHours->nextClose(new DateTime('2019-02-11 19:00:00'));
 
         $this->assertInstanceOf(DateTime::class, $nextTimeClose);
-        $this->assertEquals('2019-02-18 11:00:00', $nextTimeClose->format('Y-m-d H:i:s'));
+        $this->assertSame('2019-02-18 11:00:00', $nextTimeClose->format('Y-m-d H:i:s'));
 
         $nextTimeOpen = $openingHours->nextOpen(new DateTime('2019-02-11 21:00:00'));
 
         $this->assertInstanceOf(DateTime::class, $nextTimeOpen);
-        $this->assertEquals('2019-02-18 09:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
+        $this->assertSame('2019-02-18 09:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
 
         $nextTimeClose = $openingHours->nextClose(new DateTime('2019-02-11 21:00:00'));
 
         $this->assertInstanceOf(DateTime::class, $nextTimeClose);
-        $this->assertEquals('2019-02-18 11:00:00', $nextTimeClose->format('Y-m-d H:i:s'));
+        $this->assertSame('2019-02-18 11:00:00', $nextTimeClose->format('Y-m-d H:i:s'));
     }
 
     /** @test */
@@ -476,13 +554,13 @@ class OpeningHoursTest extends TestCase
         $nextTimeOpen = $openingHours->nextOpen(new DateTime('2016-09-26 12:00:00'));
 
         $this->assertInstanceOf(DateTime::class, $nextTimeOpen);
-        $this->assertEquals('2016-09-26 13:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
+        $this->assertSame('2016-09-26 13:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
 
         /** @var CustomDate $nextTimeOpen */
         $nextTimeOpen = $openingHours->nextOpen(new CustomDate('2016-09-26 12:00:00'));
 
         $this->assertInstanceOf(CustomDate::class, $nextTimeOpen);
-        $this->assertEquals('2016-09-26 13:00:00', $nextTimeOpen->foo());
+        $this->assertSame('2016-09-26 13:00:00', $nextTimeOpen->foo());
     }
 
     /** @test */
@@ -530,8 +608,8 @@ class OpeningHoursTest extends TestCase
 
         $openingHours = OpeningHours::createAndMergeOverlappingRanges($ranges);
 
-        $this->assertEquals('09:00-12:30,13:00-18:00', strval($openingHours->forDate(new DateTime('2016-11-07'))));
-        $this->assertEquals('09:00-18:00', strval($openingHours->forDate(new DateTime('2016-11-14'))));
+        $this->assertSame('09:00-12:30,13:00-18:00', strval($openingHours->forDate(new DateTime('2016-11-07'))));
+        $this->assertSame('09:00-18:00', strval($openingHours->forDate(new DateTime('2016-11-14'))));
     }
 
     /** @test */
@@ -544,7 +622,7 @@ class OpeningHoursTest extends TestCase
         $nextTimeOpen = $openingHours->nextClose(new DateTimeImmutable('2016-09-26 12:00:00'));
 
         $this->assertInstanceOf(DateTimeImmutable::class, $nextTimeOpen);
-        $this->assertEquals('2016-09-26 19:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
+        $this->assertSame('2016-09-26 19:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
     }
 
     /** @test */
@@ -558,7 +636,7 @@ class OpeningHoursTest extends TestCase
         $nextTimeOpen = $openingHours->nextOpen(new DateTime('2016-09-26 16:00:00'));
 
         $this->assertInstanceOf(DateTime::class, $nextTimeOpen);
-        $this->assertEquals('2016-09-27 10:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
+        $this->assertSame('2016-09-27 10:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
     }
 
     /** @test */
@@ -572,7 +650,7 @@ class OpeningHoursTest extends TestCase
         $nextTimeOpen = $openingHours->nextOpen(new DateTimeImmutable('2016-09-26 16:00:00'));
 
         $this->assertInstanceOf(DateTimeImmutable::class, $nextTimeOpen);
-        $this->assertEquals('2016-09-27 10:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
+        $this->assertSame('2016-09-27 10:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
     }
 
     /** @test */
@@ -586,7 +664,7 @@ class OpeningHoursTest extends TestCase
         $nextTimeClose = $openingHours->nextClose(new DateTime('2016-09-26 16:00:00'));
 
         $this->assertInstanceOf(DateTime::class, $nextTimeClose);
-        $this->assertEquals('2016-09-26 19:00:00', $nextTimeClose->format('Y-m-d H:i:s'));
+        $this->assertSame('2016-09-26 19:00:00', $nextTimeClose->format('Y-m-d H:i:s'));
     }
 
     /** @test */
@@ -600,7 +678,7 @@ class OpeningHoursTest extends TestCase
         $nextTimeClose = $openingHours->nextClose(new DateTimeImmutable('2016-09-26 16:00:00'));
 
         $this->assertInstanceOf(DateTimeImmutable::class, $nextTimeClose);
-        $this->assertEquals('2016-09-26 19:00:00', $nextTimeClose->format('Y-m-d H:i:s'));
+        $this->assertSame('2016-09-26 19:00:00', $nextTimeClose->format('Y-m-d H:i:s'));
     }
 
     /** @test */
@@ -617,7 +695,7 @@ class OpeningHoursTest extends TestCase
         $nextTimeOpen = $openingHours->nextOpen(new DateTime('2016-09-26 04:00:00'));
 
         $this->assertInstanceOf(DateTime::class, $nextTimeOpen);
-        $this->assertEquals('2016-09-27 10:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
+        $this->assertSame('2016-09-27 10:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
     }
 
     /** @test */
@@ -634,7 +712,7 @@ class OpeningHoursTest extends TestCase
         $nextTimeOpen = $openingHours->nextOpen(new DateTimeImmutable('2016-09-26 04:00:00'));
 
         $this->assertInstanceOf(DateTimeImmutable::class, $nextTimeOpen);
-        $this->assertEquals('2016-09-27 10:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
+        $this->assertSame('2016-09-27 10:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
     }
 
     /** @test */
@@ -651,7 +729,7 @@ class OpeningHoursTest extends TestCase
         $nextClosedTime = $openingHours->nextClose(new DateTime('2016-09-26 04:00:00'));
 
         $this->assertInstanceOf(DateTime::class, $nextClosedTime);
-        $this->assertEquals('2016-09-27 11:00:00', $nextClosedTime->format('Y-m-d H:i:s'));
+        $this->assertSame('2016-09-27 11:00:00', $nextClosedTime->format('Y-m-d H:i:s'));
     }
 
     /** @test */
@@ -668,7 +746,7 @@ class OpeningHoursTest extends TestCase
         $nextClosedTime = $openingHours->nextClose(new DateTimeImmutable('2016-09-26 04:00:00'));
 
         $this->assertInstanceOf(DateTimeImmutable::class, $nextClosedTime);
-        $this->assertEquals('2016-09-27 11:00:00', $nextClosedTime->format('Y-m-d H:i:s'));
+        $this->assertSame('2016-09-27 11:00:00', $nextClosedTime->format('Y-m-d H:i:s'));
     }
 
     /** @test */
@@ -757,7 +835,7 @@ class OpeningHoursTest extends TestCase
             'sunday' => [],
         ]);
 
-        $this->assertEquals(['saturday', 'sunday'], $openingHours->regularClosingDays());
+        $this->assertSame(['saturday', 'sunday'], $openingHours->regularClosingDays());
     }
 
     /** @test */
@@ -773,7 +851,7 @@ class OpeningHoursTest extends TestCase
             'sunday' => [],
         ]);
 
-        $this->assertEquals([6, 7], $openingHours->regularClosingDaysISO());
+        $this->assertSame([6, 7], $openingHours->regularClosingDaysISO());
     }
 
     /** @test */
@@ -789,8 +867,8 @@ class OpeningHoursTest extends TestCase
         $exceptionalClosingDates = $openingHours->exceptionalClosingDates();
 
         $this->assertCount(2, $exceptionalClosingDates);
-        $this->assertEquals('2017-06-01', $exceptionalClosingDates[0]->format('Y-m-d'));
-        $this->assertEquals('2017-06-02', $exceptionalClosingDates[1]->format('Y-m-d'));
+        $this->assertSame('2017-06-01', $exceptionalClosingDates[0]->format('Y-m-d'));
+        $this->assertSame('2017-06-02', $exceptionalClosingDates[1]->format('Y-m-d'));
     }
 
     /** @test */
@@ -825,7 +903,7 @@ class OpeningHoursTest extends TestCase
         $openingHoursForWeek = $openingHours->forWeek();
 
         $this->assertCount(7, $openingHoursForWeek);
-        $this->assertEquals('00:00-16:00', (string) $openingHoursForWeek['monday'][0]);
+        $this->assertSame('00:00-16:00', (string) $openingHoursForWeek['monday'][0]);
         $this->assertCount(0, $openingHoursForWeek['tuesday']);
         $this->assertCount(0, $openingHoursForWeek['wednesday']);
         $this->assertCount(0, $openingHoursForWeek['thursday']);
@@ -844,7 +922,7 @@ class OpeningHoursTest extends TestCase
         $openingHoursForWeek = $openingHours->forWeek();
 
         $this->assertCount(7, $openingHoursForWeek);
-        $this->assertEquals('00:00-16:00', (string) $openingHoursForWeek['monday'][0]);
+        $this->assertSame('00:00-16:00', (string) $openingHoursForWeek['monday'][0]);
         $this->assertCount(0, $openingHoursForWeek['tuesday']);
         $this->assertCount(0, $openingHoursForWeek['wednesday']);
         $this->assertCount(0, $openingHoursForWeek['thursday']);
@@ -863,7 +941,7 @@ class OpeningHoursTest extends TestCase
         $openingHoursForWeek = $openingHours->forWeek();
 
         $this->assertCount(7, $openingHoursForWeek);
-        $this->assertEquals('00:00-16:00', (string) $openingHoursForWeek['monday'][0]);
+        $this->assertSame('00:00-16:00', (string) $openingHoursForWeek['monday'][0]);
         $this->assertCount(0, $openingHoursForWeek['tuesday']);
         $this->assertCount(0, $openingHoursForWeek['wednesday']);
         $this->assertCount(0, $openingHoursForWeek['thursday']);
@@ -891,6 +969,15 @@ class OpeningHoursTest extends TestCase
     }
 
     /** @test */
+    public function it_throw_an_exception_on_limit_exceeded_void_array_previous_open()
+    {
+        $this->expectException(MaximumLimitExceeded::class);
+        $this->expectExceptionMessage('No open date/time found in the previous 8 days, use $openingHours->setDayLimit() to increase the limit.');
+
+        OpeningHours::create([])->previousOpen(new DateTime('2019-06-06 19:02:00'));
+    }
+
+    /** @test */
     public function it_throw_an_exception_on_limit_exceeded_full_array_next_open()
     {
         $this->expectException(MaximumLimitExceeded::class);
@@ -905,6 +992,23 @@ class OpeningHoursTest extends TestCase
             'saturday' => ['00:00-24:00'],
             'sunday' => ['00:00-24:00'],
         ])->nextOpen(new DateTime('2019-06-06 19:02:00'));
+    }
+
+    /** @test */
+    public function it_throw_an_exception_on_limit_exceeded_full_array_previous_open()
+    {
+        $this->expectException(MaximumLimitExceeded::class);
+        $this->expectExceptionMessage('No open date/time found in the previous 8 days, use $openingHours->setDayLimit() to increase the limit.');
+
+        OpeningHours::create([
+            'monday' => ['00:00-24:00'],
+            'tuesday' => ['00:00-24:00'],
+            'wednesday' => ['00:00-24:00'],
+            'thursday' => ['00:00-24:00'],
+            'friday' => ['00:00-24:00'],
+            'saturday' => ['00:00-24:00'],
+            'sunday' => ['00:00-24:00'],
+        ])->previousOpen(new DateTime('2019-06-06 19:02:00'));
     }
 
     /** @test */
@@ -937,6 +1041,15 @@ class OpeningHoursTest extends TestCase
     }
 
     /** @test */
+    public function it_throw_an_exception_on_limit_exceeded_void_array_previous_close()
+    {
+        $this->expectException(MaximumLimitExceeded::class);
+        $this->expectExceptionMessage('No close date/time found in the previous 8 days, use $openingHours->setDayLimit() to increase the limit.');
+
+        OpeningHours::create([])->previousClose(new DateTime('2019-06-06 19:02:00'));
+    }
+
+    /** @test */
     public function it_throw_an_exception_on_limit_exceeded_full_array_next_close()
     {
         $this->expectException(MaximumLimitExceeded::class);
@@ -954,9 +1067,26 @@ class OpeningHoursTest extends TestCase
     }
 
     /** @test */
+    public function it_throw_an_exception_on_limit_exceeded_full_array_previous_close()
+    {
+        $this->expectException(MaximumLimitExceeded::class);
+        $this->expectExceptionMessage('No close date/time found in the previous 8 days, use $openingHours->setDayLimit() to increase the limit.');
+
+        OpeningHours::create([
+            'monday' => ['00:00-24:00'],
+            'tuesday' => ['00:00-24:00'],
+            'wednesday' => ['00:00-24:00'],
+            'thursday' => ['00:00-24:00'],
+            'friday' => ['00:00-24:00'],
+            'saturday' => ['00:00-24:00'],
+            'sunday' => ['00:00-24:00'],
+        ])->previousClose(new DateTime('2019-06-06 19:02:00'));
+    }
+
+    /** @test */
     public function it_should_handle_far_exception()
     {
-        $this->assertEquals('2019-12-25 00:00:00', OpeningHours::create([
+        $this->assertSame('2019-12-25 00:00:00', OpeningHours::create([
             'monday' => ['00:00-24:00'],
             'tuesday' => ['00:00-24:00'],
             'wednesday' => ['00:00-24:00'],
@@ -971,7 +1101,7 @@ class OpeningHoursTest extends TestCase
     }
 
     /** @test */
-    public function it_should_handle_very_far_exception_by_changing_limit()
+    public function it_should_handle_very_far_future_exception_by_changing_limit()
     {
         $openingHours = OpeningHours::create([
             'monday' => ['00:00-24:00'],
@@ -987,7 +1117,27 @@ class OpeningHoursTest extends TestCase
         ]);
         $openingHours->setDayLimit(3000);
 
-        $this->assertEquals('2022-12-25 00:00:00', $openingHours->nextClose(new DateTime('2019-06-06 19:02:00'))->format('Y-m-d H:i:s'));
+        $this->assertSame('2022-12-25 00:00:00', $openingHours->nextClose(new DateTime('2019-06-06 19:02:00'))->format('Y-m-d H:i:s'));
+    }
+
+    /** @test */
+    public function it_should_handle_very_far_past_exception_by_changing_limit()
+    {
+        $openingHours = OpeningHours::create([
+            'monday' => ['00:00-24:00'],
+            'tuesday' => ['00:00-24:00'],
+            'wednesday' => ['00:00-24:00'],
+            'thursday' => ['00:00-24:00'],
+            'friday' => ['00:00-24:00'],
+            'saturday' => ['00:00-24:00'],
+            'sunday' => ['00:00-24:00'],
+            'exceptions' => [
+                '2013-12-25' => [],
+            ],
+        ]);
+        $openingHours->setDayLimit(3000);
+
+        $this->assertSame('2013-12-26 00:00:00', $openingHours->previousOpen(new DateTime('2019-06-06 19:02:00'))->format('Y-m-d H:i:s'));
     }
 
     /** @test */

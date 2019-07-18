@@ -13,9 +13,9 @@ class TimeTest extends TestCase
     /** @test */
     public function it_can_be_created_from_a_string()
     {
-        $this->assertEquals('00:00', (string) Time::fromString('00:00'));
-        $this->assertEquals('16:32', (string) Time::fromString('16:32'));
-        $this->assertEquals('24:00', (string) Time::fromString('24:00'));
+        $this->assertSame('00:00', (string) Time::fromString('00:00'));
+        $this->assertSame('16:32', (string) Time::fromString('16:32'));
+        $this->assertSame('24:00', (string) Time::fromString('24:00'));
     }
 
     /** @test */
@@ -55,11 +55,11 @@ class TimeTest extends TestCase
     {
         $dateTime = new DateTime('2016-09-27 16:00:00');
 
-        $this->assertEquals('16:00', (string) Time::fromDateTime($dateTime));
+        $this->assertSame('16:00', (string) Time::fromDateTime($dateTime));
 
         $dateTime = new DateTimeImmutable('2016-09-27 16:00:00');
 
-        $this->assertEquals('16:00', (string) Time::fromDateTime($dateTime));
+        $this->assertSame('16:00', (string) Time::fromDateTime($dateTime));
     }
 
     /** @test */
@@ -107,23 +107,23 @@ class TimeTest extends TestCase
     {
         $dateTime = date_create_immutable('2012-11-06 13:25:59.123456');
 
-        $this->assertEquals('13:25', (string) Time::fromDateTime($dateTime));
+        $this->assertSame('13:25', (string) Time::fromDateTime($dateTime));
     }
 
     /** @test */
     public function it_can_be_formatted()
     {
-        $this->assertEquals('09:00', Time::fromString('09:00')->format());
-        $this->assertEquals('09:00', Time::fromString('09:00')->format('H:i'));
-        $this->assertEquals('9 AM', Time::fromString('09:00')->format('g A'));
+        $this->assertSame('09:00', Time::fromString('09:00')->format());
+        $this->assertSame('09:00', Time::fromString('09:00')->format('H:i'));
+        $this->assertSame('9 AM', Time::fromString('09:00')->format('g A'));
     }
 
     /** @test */
     public function it_can_get_hours_and_minutes()
     {
         $time = Time::fromString('16:30');
-        $this->assertEquals(16, $time->hours());
-        $this->assertEquals(30, $time->minutes());
+        $this->assertSame(16, $time->hours());
+        $this->assertSame(30, $time->minutes());
     }
 
     /** @test */
@@ -131,8 +131,8 @@ class TimeTest extends TestCase
     {
         $time1 = Time::fromString('16:30');
         $time2 = Time::fromString('16:05');
-        $this->assertEquals(0, $time1->diff($time2)->h);
-        $this->assertEquals(25, $time1->diff($time2)->i);
+        $this->assertSame(0, $time1->diff($time2)->h);
+        $this->assertSame(25, $time1->diff($time2)->i);
     }
 
     /** @test */
@@ -140,8 +140,8 @@ class TimeTest extends TestCase
     {
         $dateTime = new DateTime('2016-09-27 12:00:00');
         $time = Time::fromString('15:00');
-        $this->assertEquals('2016-09-27 15:00:00', $time->toDateTime($dateTime)->format('Y-m-d H:i:s'));
-        $this->assertEquals('2016-09-27 12:00:00', $dateTime->format('Y-m-d H:i:s'));
+        $this->assertSame('2016-09-27 15:00:00', $time->toDateTime($dateTime)->format('Y-m-d H:i:s'));
+        $this->assertSame('2016-09-27 12:00:00', $dateTime->format('Y-m-d H:i:s'));
     }
 
     /** @test */
@@ -149,7 +149,7 @@ class TimeTest extends TestCase
     {
         $dateTime = new DateTimeImmutable('2016-09-27 12:00:00');
         $time = Time::fromString('15:00');
-        $this->assertEquals('2016-09-27 15:00:00', $time->toDateTime($dateTime)->format('Y-m-d H:i:s'));
-        $this->assertEquals('2016-09-27 12:00:00', $dateTime->format('Y-m-d H:i:s'));
+        $this->assertSame('2016-09-27 15:00:00', $time->toDateTime($dateTime)->format('Y-m-d H:i:s'));
+        $this->assertSame('2016-09-27 12:00:00', $dateTime->format('Y-m-d H:i:s'));
     }
 }
