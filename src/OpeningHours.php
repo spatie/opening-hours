@@ -240,10 +240,10 @@ class OpeningHours
      */
     public function forDateTime(DateTimeInterface $date): array
     {
-        $yesterday = $this->copyDateTime($date)->modify('-1 day');
-
         return array_merge(
-            iterator_to_array($this->forDate($yesterday)->forNightTime(Time::fromDateTime($date))),
+            iterator_to_array($this->forDate(
+                $this->yesterday($date)
+            )->forNightTime(Time::fromDateTime($date))),
             iterator_to_array($this->forDate($date)->forTime(Time::fromDateTime($date)))
         );
     }
@@ -268,7 +268,7 @@ class OpeningHours
         $dateTime = $this->applyTimezone($dateTime);
 
         if ($this->overflow) {
-            $dateTimeMinus1Day = $this->copyDateTime($dateTime)->modify('-1 day');
+            $dateTimeMinus1Day = $this->yesterday($dateTime);
             $openingHoursForDayBefore = $this->forDate($dateTimeMinus1Day);
             if ($openingHoursForDayBefore->isOpenAtNight(Time::fromDateTime($dateTimeMinus1Day))) {
                 return true;
@@ -384,8 +384,7 @@ class OpeningHours
         $dateTime = $this->copyDateTime($dateTime);
         $nextClose = null;
         if ($this->overflow) {
-            $yesterday = $this->copyDateTime($dateTime);
-            $dateTimeMinus1Day = $yesterday->sub(new \DateInterval('P1D'));
+            $dateTimeMinus1Day = $this->copyDateTime($dateTime)->modify('-1 day');
             $openingHoursForDayBefore = $this->forDate($dateTimeMinus1Day);
             if ($openingHoursForDayBefore->isOpenAtNight(Time::fromDateTime($dateTimeMinus1Day))) {
                 $nextClose = $openingHoursForDayBefore->nextClose(Time::fromDateTime($dateTime));
@@ -467,8 +466,7 @@ class OpeningHours
         $dateTime = $this->copyDateTime($dateTime);
         $previousClose = null;
         if ($this->overflow) {
-            $yesterday = $this->copyDateTime($dateTime);
-            $dateTimeMinus1Day = $yesterday->sub(new \DateInterval('P1D'));
+            $dateTimeMinus1Day = $this->copyDateTime($dateTime)->modify('-1 day');
             $openingHoursForDayBefore = $this->forDate($dateTimeMinus1Day);
             if ($openingHoursForDayBefore->isOpenAtNight(Time::fromDateTime($dateTimeMinus1Day))) {
                 $previousClose = $openingHoursForDayBefore->previousClose(Time::fromDateTime($dateTime));

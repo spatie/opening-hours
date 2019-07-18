@@ -9,12 +9,13 @@ use ArrayIterator;
 use IteratorAggregate;
 use Spatie\OpeningHours\Helpers\Arr;
 use Spatie\OpeningHours\Helpers\DataTrait;
+use Spatie\OpeningHours\Helpers\RangeFinder;
 use Spatie\OpeningHours\Exceptions\NonMutableOffsets;
 use Spatie\OpeningHours\Exceptions\OverlappingTimeRanges;
 
 class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
 {
-    use DataTrait;
+    use DataTrait, RangeFinder;
 
     /** @var \Spatie\OpeningHours\TimeRange[] */
     protected $openingHours = [];
@@ -209,86 +210,6 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
                 return $this->findPreviousRangeInFreeTime($time, $timeRange);
             },
         ], true);
-    }
-
-    protected function findRangeInFreeTime(Time $time, TimeRange $timeRange)
-    {
-        if ($timeRange->start()->isAfter($time)) {
-            return $timeRange;
-        }
-    }
-
-    protected function findOpenInFreeTime(Time $time, TimeRange $timeRange)
-    {
-        $range = $this->findRangeInFreeTime($time, $timeRange);
-
-        if ($range) {
-            return $range->start();
-        }
-    }
-
-    protected function findOpenRangeInWorkingHours(Time $time, TimeRange $timeRange)
-    {
-        if ($timeRange->start()->isBefore($time)) {
-            return $timeRange;
-        }
-    }
-
-    protected function findOpenInWorkingHours(Time $time, TimeRange $timeRange)
-    {
-        $range = $this->findOpenRangeInWorkingHours($time, $timeRange);
-
-        if ($range) {
-            return $range->start();
-        }
-    }
-
-    protected function findCloseInWorkingHours(Time $time, TimeRange $timeRange)
-    {
-        if ($timeRange->containsTime($time)) {
-            return $timeRange->end();
-        }
-    }
-
-    protected function findCloseRangeInWorkingHours(Time $time, TimeRange $timeRange)
-    {
-        if ($timeRange->containsTime($time)) {
-            return $timeRange;
-        }
-    }
-
-    protected function findCloseInFreeTime(Time $time, TimeRange $timeRange)
-    {
-        $range = $this->findRangeInFreeTime($time, $timeRange);
-
-        if ($range) {
-            return $range->end();
-        }
-    }
-
-    protected function findPreviousRangeInFreeTime(Time $time, TimeRange $timeRange)
-    {
-        if ($timeRange->end()->isBefore($time)) {
-            return $timeRange;
-        }
-    }
-
-    protected function findPreviousOpenInFreeTime(Time $time, TimeRange $timeRange)
-    {
-        $range = $this->findPreviousRangeInFreeTime($time, $timeRange);
-
-        if ($range) {
-            return $range->start();
-        }
-    }
-
-    protected function findPreviousCloseInWorkingHours(Time $time, TimeRange $timeRange)
-    {
-        $end = $timeRange->end();
-
-        if ($end->isBefore($time)) {
-            return $end;
-        }
     }
 
     protected static function getHoursFromRange($range)

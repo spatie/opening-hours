@@ -16,4 +16,9 @@ trait DateTimeCopier
     {
         return $date instanceof DateTimeImmutable ? $date : clone $date;
     }
+
+    protected function yesterday(DateTimeInterface $date): DateTimeInterface
+    {
+        return $this->copyDateTime($date)->modify('-1 day');
+    }
 }
