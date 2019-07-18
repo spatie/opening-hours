@@ -64,7 +64,7 @@ class OpeningHoursStructuredDataTest extends TestCase
             ],
         ];
 
-        $this->assertEquals($expected, $openingHours->asStructuredData());
+        $this->assertSame($expected, $openingHours->asStructuredData());
 
         $openingHours = OpeningHours::create([
             'monday' => [
@@ -74,12 +74,12 @@ class OpeningHoursStructuredDataTest extends TestCase
             ],
         ]);
 
-        $this->assertEquals('17:00:00+00:00', $openingHours->asStructuredData('H:i:sP')[0]['closes']);
+        $this->assertSame('17:00:00+00:00', $openingHours->asStructuredData('H:i:sP')[0]['closes']);
 
-        $this->assertEquals('17:00:00-05:00', $openingHours->asStructuredData('H:i:sP', '-05:00')[0]['closes']);
+        $this->assertSame('17:00:00-05:00', $openingHours->asStructuredData('H:i:sP', '-05:00')[0]['closes']);
 
-        $this->assertEquals('17:00:00+01:00', $openingHours->asStructuredData('H:i:sP', 'Europe/Paris')[0]['closes']);
+        $this->assertSame('17:00:00+01:00', $openingHours->asStructuredData('H:i:sP', 'Europe/Paris')[0]['closes']);
 
-        $this->assertEquals('17:00:00+12:45', $openingHours->asStructuredData('H:i:sP', new DateTimeZone('+12:45'))[0]['closes']);
+        $this->assertSame('17:00:00+12:45', $openingHours->asStructuredData('H:i:sP', new DateTimeZone('+12:45'))[0]['closes']);
     }
 }

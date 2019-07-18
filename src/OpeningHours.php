@@ -305,46 +305,6 @@ class OpeningHours
         return $this->isClosedAt(new DateTime());
     }
 
-    public function nextOpen(DateTimeInterface $dateTime): DateTimeInterface
-    {
-        if (! ($dateTime instanceof DateTimeImmutable)) {
-            $dateTime = clone $dateTime;
-        }
-
-        $openingHoursForDay = $this->forDate($dateTime);
-        $nextOpen = $openingHoursForDay->nextOpen(Time::fromDateTime($dateTime));
-        $tries = $this->getDayLimit();
-
-        while ($nextOpen === false || $nextOpen->hours() >= 24) {
-            if (--$tries < 0) {
-                throw MaximumLimitExceeded::forString(
-                    'No open date/time found in the next '.$this->getDayLimit().' days,'.
-                    ' use $openingHours->setDayLimit() to increase the limit.'
-                );
-            }
-
-            $dateTime = $dateTime
-                ->modify('+1 day')
-                ->setTime(0, 0, 0);
-
-            if ($this->isOpenAt($dateTime) && ! $openingHoursForDay->isOpenAt(Time::fromString('23:59'))) {
-                return $dateTime;
-            }
-
-            $openingHoursForDay = $this->forDate($dateTime);
-
-            $nextOpen = $openingHoursForDay->nextOpen(Time::fromDateTime($dateTime));
-        }
-
-        if ($dateTime->format('H:i') === '00:00' && $this->isOpenAt((clone $dateTime)->modify('-1 second'))) {
-            return $this->nextOpen($dateTime->modify('+1 minute'));
-        }
-
-        $nextDateTime = $nextOpen->toDateTime();
-
-        return $dateTime->setTime($nextDateTime->format('G'), $nextDateTime->format('i'), 0);
-    }
-
     public function currentOpenRange(DateTimeInterface $dateTime)
     {
         $list = $this->forDateTime($dateTime);
@@ -392,6 +352,46 @@ class OpeningHours
         if ($range->overflowsNextDay() && $nextDateTime->format('Hi') < $dateTime->format('Hi')) {
             $dateTime = $dateTime->modify('+1 day');
         }
+
+        return $dateTime->setTime($nextDateTime->format('G'), $nextDateTime->format('i'), 0);
+    }
+
+    public function nextOpen(DateTimeInterface $dateTime): DateTimeInterface
+    {
+        if (! ($dateTime instanceof DateTimeImmutable)) {
+            $dateTime = clone $dateTime;
+        }
+
+        $openingHoursForDay = $this->forDate($dateTime);
+        $nextOpen = $openingHoursForDay->nextOpen(Time::fromDateTime($dateTime));
+        $tries = $this->getDayLimit();
+
+        while ($nextOpen === false || $nextOpen->hours() >= 24) {
+            if (--$tries < 0) {
+                throw MaximumLimitExceeded::forString(
+                    'No open date/time found in the next '.$this->getDayLimit().' days,'.
+                    ' use $openingHours->setDayLimit() to increase the limit.'
+                );
+            }
+
+            $dateTime = $dateTime
+                ->modify('+1 day')
+                ->setTime(0, 0, 0);
+
+            if ($this->isOpenAt($dateTime) && ! $openingHoursForDay->isOpenAt(Time::fromString('23:59'))) {
+                return $dateTime;
+            }
+
+            $openingHoursForDay = $this->forDate($dateTime);
+
+            $nextOpen = $openingHoursForDay->nextOpen(Time::fromDateTime($dateTime));
+        }
+
+        if ($dateTime->format('H:i') === '00:00' && $this->isOpenAt((clone $dateTime)->modify('-1 second'))) {
+            return $this->nextOpen($dateTime->modify('+1 minute'));
+        }
+
+        $nextDateTime = $nextOpen->toDateTime();
 
         return $dateTime->setTime($nextDateTime->format('G'), $nextDateTime->format('i'), 0);
     }
@@ -446,6 +446,97 @@ class OpeningHours
         $nextDateTime = $nextClose->toDateTime();
 
         return $dateTime->setTime($nextDateTime->format('G'), $nextDateTime->format('i'), 0);
+    }
+
+    public function previousOpen(DateTimeInterface $dateTime): DateTimeInterface
+    {
+        if (! ($dateTime instanceof DateTimeImmutable)) {
+            $dateTime = clone $dateTime;
+        }
+
+        $openingHoursForDay = $this->forDate($dateTime);
+        $previousOpen = $openingHoursForDay->previousOpen(Time::fromDateTime($dateTime));
+        $tries = $this->getDayLimit();
+
+        while ($previousOpen === false || ($previousOpen->hours() === 0 && $previousOpen->minutes() === 0)) {
+            if (--$tries < 0) {
+                throw MaximumLimitExceeded::forString(
+                    'No open date/time found in the previous '.$this->getDayLimit().' days,'.
+                    ' use $openingHours->setDayLimit() to increase the limit.'
+                );
+            }
+
+            $midnight = $dateTime->setTime(0, 0, 0);
+            $dateTime = clone $midnight;
+            $dateTime = $dateTime->modify('-1 minute');
+
+            $openingHoursForDay = $this->forDate($dateTime);
+
+            if ($this->isOpenAt($midnight) && ! $openingHoursForDay->isOpenAt(Time::fromString('23:59'))) {
+                return $midnight;
+            }
+
+            $previousOpen = $openingHoursForDay->previousOpen(Time::fromDateTime($dateTime));
+        }
+
+        if ($dateTime->format('H:i') === '00:00' && $this->isOpenAt((clone $dateTime)->modify('-1 second'))) {
+            return $this->previousOpen($dateTime->modify('+1 minute'));
+        }
+
+        $nextDateTime = $previousOpen->toDateTime();
+
+        return $dateTime->setTime($nextDateTime->format('G'), $nextDateTime->format('i'), 0);
+    }
+
+    public function previousClose(DateTimeInterface $dateTime): DateTimeInterface
+    {
+        if (! ($dateTime instanceof DateTimeImmutable)) {
+            $dateTime = clone $dateTime;
+        }
+
+        $previousClose = null;
+        if ($this->overflow) {
+            $yesterday = $dateTime;
+            if (! ($dateTime instanceof DateTimeImmutable)) {
+                $yesterday = clone $dateTime;
+            }
+            $dateTimeMinus1Day = $yesterday->sub(new \DateInterval('P1D'));
+            $openingHoursForDayBefore = $this->forDate($dateTimeMinus1Day);
+            if ($openingHoursForDayBefore->isOpenAtNight(Time::fromDateTime($dateTimeMinus1Day))) {
+                $previousClose = $openingHoursForDayBefore->previousClose(Time::fromDateTime($dateTime));
+            }
+        }
+
+        $openingHoursForDay = $this->forDate($dateTime);
+        if (! $previousClose) {
+            $previousClose = $openingHoursForDay->previousClose(Time::fromDateTime($dateTime));
+        }
+
+        $tries = $this->getDayLimit();
+
+        while ($previousClose === false || ($previousClose->hours() === 0 && $previousClose->minutes() === 0)) {
+            if (--$tries < 0) {
+                throw MaximumLimitExceeded::forString(
+                    'No close date/time found in the previous '.$this->getDayLimit().' days,'.
+                    ' use $openingHours->setDayLimit() to increase the limit.'
+                );
+            }
+
+            $midnight = $dateTime->setTime(0, 0, 0);
+            $dateTime = clone $midnight;
+            $dateTime = $dateTime->modify('-1 minute');
+            $openingHoursForDay = $this->forDate($dateTime);
+
+            if ($this->isClosedAt($midnight) && $openingHoursForDay->isOpenAt(Time::fromString('23:59'))) {
+                return $midnight;
+            }
+
+            $previousClose = $openingHoursForDay->previousClose(Time::fromDateTime($dateTime));
+        }
+
+        $previousDateTime = $previousClose->toDateTime();
+
+        return $dateTime->setTime($previousDateTime->format('G'), $previousDateTime->format('i'), 0);
     }
 
     public function regularClosingDays(): array

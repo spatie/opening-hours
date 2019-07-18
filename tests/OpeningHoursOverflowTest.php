@@ -19,7 +19,7 @@ class OpeningHoursOverflowTest extends TestCase
         ], null);
 
         $this->assertInstanceOf(TimeRange::class, $openingHours->forDay('monday')[0]);
-        $this->assertEquals((string) $openingHours->forDay('monday')[0], '09:00-02:00');
+        $this->assertSame((string) $openingHours->forDay('monday')[0], '09:00-02:00');
     }
 
     /** @test */
@@ -81,7 +81,7 @@ class OpeningHoursOverflowTest extends TestCase
         ], null);
 
         $shouldBeOpen = new DateTime('2019-04-23 01:00:00');
-        $this->assertEquals('2019-04-23 02:00:00', $openingHours->nextClose($shouldBeOpen)->format('Y-m-d H:i:s'));
+        $this->assertSame('2019-04-23 02:00:00', $openingHours->nextClose($shouldBeOpen)->format('Y-m-d H:i:s'));
     }
 
     /** @test */
@@ -94,8 +94,8 @@ class OpeningHoursOverflowTest extends TestCase
 
         $shouldBeOpen = new DateTimeImmutable('2019-04-23 01:00:00');
         $nextTimeClosed = $openingHours->nextClose($shouldBeOpen)->format('Y-m-d H:i:s');
-        $this->assertEquals('2019-04-23 02:00:00', $nextTimeClosed);
-        $this->assertEquals('2019-04-23 01:00:00', $shouldBeOpen->format('Y-m-d H:i:s'));
+        $this->assertSame('2019-04-23 02:00:00', $nextTimeClosed);
+        $this->assertSame('2019-04-23 01:00:00', $shouldBeOpen->format('Y-m-d H:i:s'));
     }
 
     /** @test */

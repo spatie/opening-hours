@@ -19,10 +19,10 @@ class OpeningHoursForDayTest extends TestCase
         $this->assertCount(2, $openingHoursForDay);
 
         $this->assertInstanceOf(TimeRange::class, $openingHoursForDay[0]);
-        $this->assertEquals('09:00-12:00', (string) $openingHoursForDay[0]);
+        $this->assertSame('09:00-12:00', (string) $openingHoursForDay[0]);
 
         $this->assertInstanceOf(TimeRange::class, $openingHoursForDay[1]);
-        $this->assertEquals('13:00-18:00', (string) $openingHoursForDay[1]);
+        $this->assertSame('13:00-18:00', (string) $openingHoursForDay[1]);
     }
 
     /** @test */
@@ -48,7 +48,7 @@ class OpeningHoursForDayTest extends TestCase
     {
         $openingHoursForDay = OpeningHoursForDay::fromStrings(['09:00-12:00', '13:00-18:00']);
 
-        $this->assertEquals('09:00-12:00,13:00-18:00', (string) $openingHoursForDay);
+        $this->assertSame('09:00-12:00,13:00-18:00', (string) $openingHoursForDay);
     }
 
     /** @test */

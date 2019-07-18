@@ -71,12 +71,13 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
 
     /**
      * @param callable[] $filters
+     * @param bool       $reverse
      *
      * @return Time|bool
      */
-    public function openingHoursFilter(array $filters)
+    public function openingHoursFilter(array $filters, bool $reverse = false)
     {
-        foreach ($this->openingHours as $timeRange) {
+        foreach (($reverse ? array_reverse($this->openingHours) : $this->openingHours) as $timeRange) {
             foreach ($filters as $filter) {
                 if ($result = $filter($timeRange)) {
                     reset($timeRange);
@@ -98,7 +99,7 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
     {
         return $this->openingHoursFilter([
             function ($timeRange) use ($time) {
-                return $this->findNextOpenInFreeTime($time, $timeRange);
+                return $this->findOpenInFreeTime($time, $timeRange);
             },
         ]);
     }
@@ -112,7 +113,7 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
     {
         return $this->openingHoursFilter([
             function ($timeRange) use ($time) {
-                return $this->findNextOpenRangeInFreeTime($time, $timeRange);
+                return $this->findRangeInFreeTime($time, $timeRange);
             },
         ]);
     }
@@ -126,10 +127,10 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
     {
         return $this->openingHoursFilter([
             function ($timeRange) use ($time) {
-                return $this->findNextCloseInWorkingHours($time, $timeRange);
+                return $this->findCloseInWorkingHours($time, $timeRange);
             },
             function ($timeRange) use ($time) {
-                return $this->findNextCloseInFreeTime($time, $timeRange);
+                return $this->findCloseInFreeTime($time, $timeRange);
             },
         ]);
     }
@@ -143,54 +144,169 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
     {
         return $this->openingHoursFilter([
             function ($timeRange) use ($time) {
-                return $this->findNextCloseRangeInWorkingHours($time, $timeRange);
+                return $this->findCloseRangeInWorkingHours($time, $timeRange);
             },
             function ($timeRange) use ($time) {
-                return $this->findNextCloseRangeInFreeTime($time, $timeRange);
+                return $this->findRangeInFreeTime($time, $timeRange);
             },
         ]);
     }
 
-    protected function findNextOpenRangeInFreeTime(Time $time, TimeRange $timeRange)
+    /**
+     * @param Time $time
+     *
+     * @return bool|Time
+     */
+    public function previousOpen(Time $time)
     {
-        if (TimeRange::fromString('00:00-'.$timeRange->start())->containsTime($time)) {
+        return $this->openingHoursFilter([
+            function ($timeRange) use ($time) {
+                return $this->findOpenInWorkingHours($time, $timeRange);
+            },
+            function ($timeRange) use ($time) {
+                return $this->findPreviousOpenInFreeTime($time, $timeRange);
+            },
+        ], true);
+    }
+
+    /**
+     * @param Time $time
+     *
+     * @return bool|TimeRange
+     */
+    public function previousOpenRange(Time $time)
+    {
+        return $this->openingHoursFilter([
+            function ($timeRange) use ($time) {
+                return $this->findRangeInFreeTime($time, $timeRange);
+            },
+        ], true);
+    }
+
+    /**
+     * @param Time $time
+     *
+     * @return bool|Time
+     */
+    public function previousClose(Time $time)
+    {
+        return $this->openingHoursFilter([
+            function ($timeRange) use ($time) {
+                return $this->findPreviousCloseInWorkingHours($time, $timeRange);
+            },
+            function ($timeRange) use ($time) {
+                return $this->findPreviousCloseInFreeTime($time, $timeRange);
+            },
+        ], true);
+    }
+
+    /**
+     * @param Time $time
+     *
+     * @return bool|TimeRange
+     */
+    public function previousCloseRange(Time $time)
+    {
+        return $this->openingHoursFilter([
+            function ($timeRange) use ($time) {
+                return $this->findPreviousCloseRangeInWorkingHours($time, $timeRange);
+            },
+            function ($timeRange) use ($time) {
+                return $this->findPreviousRangeInFreeTime($time, $timeRange);
+            },
+        ], true);
+    }
+
+    protected function findRangeInFreeTime(Time $time, TimeRange $timeRange)
+    {
+        if ($timeRange->start()->isAfter($time)) {
             return $timeRange;
         }
     }
 
-    protected function findNextOpenInFreeTime(Time $time, TimeRange $timeRange)
+    protected function findOpenInFreeTime(Time $time, TimeRange $timeRange)
     {
-        $range = $this->findNextOpenRangeInFreeTime($time, $timeRange);
+        $range = $this->findRangeInFreeTime($time, $timeRange);
 
         if ($range) {
             return $range->start();
         }
     }
 
-    protected function findNextCloseInWorkingHours(Time $time, TimeRange $timeRange)
+    protected function findOpenRangeInWorkingHours(Time $time, TimeRange $timeRange)
     {
-        if ($timeRange->containsTime($time)) {
-            return next($timeRange);
+        if ($timeRange->start()->isBefore($time)) {
+            return $timeRange;
         }
     }
 
-    protected function findNextCloseRangeInWorkingHours(Time $time, TimeRange $timeRange)
+    protected function findOpenInWorkingHours(Time $time, TimeRange $timeRange)
+    {
+        $range = $this->findOpenRangeInWorkingHours($time, $timeRange);
+
+        if ($range) {
+            return $range->start();
+        }
+    }
+
+    protected function findCloseInWorkingHours(Time $time, TimeRange $timeRange)
+    {
+        if ($timeRange->containsTime($time)) {
+            return $timeRange->end();
+        }
+    }
+
+    protected function findCloseRangeInWorkingHours(Time $time, TimeRange $timeRange)
     {
         if ($timeRange->containsTime($time)) {
             return $timeRange;
         }
     }
 
-    protected function findNextCloseRangeInFreeTime(Time $time, TimeRange $timeRange)
+    protected function findCloseInFreeTime(Time $time, TimeRange $timeRange)
     {
-        if (TimeRange::fromString('00:00-'.$timeRange->start())->containsTime($time)) {
+        $range = $this->findRangeInFreeTime($time, $timeRange);
+
+        if ($range) {
+            return $range->end();
+        }
+    }
+
+    protected function findPreviousRangeInFreeTime(Time $time, TimeRange $timeRange)
+    {
+        if ($timeRange->end()->isBefore($time)) {
             return $timeRange;
         }
     }
 
-    protected function findNextCloseInFreeTime(Time $time, TimeRange $timeRange)
+    protected function findPreviousOpenInFreeTime(Time $time, TimeRange $timeRange)
     {
-        $range = $this->findNextCloseRangeInFreeTime($time, $timeRange);
+        $range = $this->findPreviousRangeInFreeTime($time, $timeRange);
+
+        if ($range) {
+            return $range->start();
+        }
+    }
+
+    protected function findPreviousCloseInWorkingHours(Time $time, TimeRange $timeRange)
+    {
+        $end = $timeRange->end();
+
+        if ($end->isBefore($time)) {
+            return $end;
+        }
+    }
+
+    protected function findPreviousCloseRangeInWorkingHours(Time $time, TimeRange $timeRange)
+    {
+        if ($timeRange->end()->isBefore($time)) {
+            return $timeRange;
+        }
+    }
+
+    protected function findPreviousCloseInFreeTime(Time $time, TimeRange $timeRange)
+    {
+        $range = $this->findPreviousRangeInFreeTime($time, $timeRange);
 
         if ($range) {
             return $range->end();
