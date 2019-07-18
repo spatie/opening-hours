@@ -161,10 +161,10 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
     {
         return $this->openingHoursFilter([
             function ($timeRange) use ($time) {
-                return $this->findOpenInWorkingHours($time, $timeRange);
+                return $this->findPreviousOpenInFreeTime($time, $timeRange);
             },
             function ($timeRange) use ($time) {
-                return $this->findPreviousOpenInFreeTime($time, $timeRange);
+                return $this->findOpenInWorkingHours($time, $timeRange);
             },
         ], true);
     }
@@ -194,9 +194,6 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
             function ($timeRange) use ($time) {
                 return $this->findPreviousCloseInWorkingHours($time, $timeRange);
             },
-            function ($timeRange) use ($time) {
-                return $this->findPreviousCloseInFreeTime($time, $timeRange);
-            },
         ], true);
     }
 
@@ -208,9 +205,6 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
     public function previousCloseRange(Time $time)
     {
         return $this->openingHoursFilter([
-            function ($timeRange) use ($time) {
-                return $this->findPreviousCloseRangeInWorkingHours($time, $timeRange);
-            },
             function ($timeRange) use ($time) {
                 return $this->findPreviousRangeInFreeTime($time, $timeRange);
             },
@@ -294,22 +288,6 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
 
         if ($end->isBefore($time)) {
             return $end;
-        }
-    }
-
-    protected function findPreviousCloseRangeInWorkingHours(Time $time, TimeRange $timeRange)
-    {
-        if ($timeRange->end()->isBefore($time)) {
-            return $timeRange;
-        }
-    }
-
-    protected function findPreviousCloseInFreeTime(Time $time, TimeRange $timeRange)
-    {
-        $range = $this->findPreviousRangeInFreeTime($time, $timeRange);
-
-        if ($range) {
-            return $range->end();
         }
     }
 

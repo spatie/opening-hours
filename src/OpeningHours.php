@@ -4,12 +4,12 @@ namespace Spatie\OpeningHours;
 
 use DateTime;
 use DateTimeZone;
-use DateTimeImmutable;
 use DateTimeInterface;
 use Spatie\OpeningHours\Helpers\Arr;
 use Spatie\OpeningHours\Helpers\DataTrait;
 use Spatie\OpeningHours\Exceptions\Exception;
 use Spatie\OpeningHours\Exceptions\InvalidDate;
+use Spatie\OpeningHours\Helpers\DateTimeCopier;
 use Spatie\OpeningHours\Exceptions\InvalidDayName;
 use Spatie\OpeningHours\Exceptions\MaximumLimitExceeded;
 
@@ -17,7 +17,7 @@ class OpeningHours
 {
     const DEFAULT_DAY_LIMIT = 8;
 
-    use DataTrait;
+    use DataTrait, DateTimeCopier;
 
     /** @var \Spatie\OpeningHours\Day[] */
     protected $openingHours = [];
@@ -240,13 +240,7 @@ class OpeningHours
      */
     public function forDateTime(DateTimeInterface $date): array
     {
-        $yesterday = $date;
-
-        if (! ($yesterday instanceof DateTimeImmutable)) {
-            $yesterday = clone $yesterday;
-        }
-
-        $yesterday = $yesterday->modify('-1 day');
+        $yesterday = $this->copyDateTime($date)->modify('-1 day');
 
         return array_merge(
             iterator_to_array($this->forDate($yesterday)->forNightTime(Time::fromDateTime($date))),
@@ -274,11 +268,7 @@ class OpeningHours
         $dateTime = $this->applyTimezone($dateTime);
 
         if ($this->overflow) {
-            $yesterdayDateTime = $dateTime;
-            if (! ($yesterdayDateTime instanceof DateTimeImmutable)) {
-                $yesterdayDateTime = clone $yesterdayDateTime;
-            }
-            $dateTimeMinus1Day = $yesterdayDateTime->sub(new \DateInterval('P1D'));
+            $dateTimeMinus1Day = $this->copyDateTime($dateTime)->modify('-1 day');
             $openingHoursForDayBefore = $this->forDate($dateTimeMinus1Day);
             if ($openingHoursForDayBefore->isOpenAtNight(Time::fromDateTime($dateTimeMinus1Day))) {
                 return true;
@@ -321,9 +311,7 @@ class OpeningHours
             return false;
         }
 
-        if (! ($dateTime instanceof DateTimeImmutable)) {
-            $dateTime = clone $dateTime;
-        }
+        $dateTime = $this->copyDateTime($dateTime);
 
         $nextDateTime = $range->start()->toDateTime();
 
@@ -343,9 +331,7 @@ class OpeningHours
             return false;
         }
 
-        if (! ($dateTime instanceof DateTimeImmutable)) {
-            $dateTime = clone $dateTime;
-        }
+        $dateTime = $this->copyDateTime($dateTime);
 
         $nextDateTime = $range->end()->toDateTime();
 
@@ -358,10 +344,7 @@ class OpeningHours
 
     public function nextOpen(DateTimeInterface $dateTime): DateTimeInterface
     {
-        if (! ($dateTime instanceof DateTimeImmutable)) {
-            $dateTime = clone $dateTime;
-        }
-
+        $dateTime = $this->copyDateTime($dateTime);
         $openingHoursForDay = $this->forDate($dateTime);
         $nextOpen = $openingHoursForDay->nextOpen(Time::fromDateTime($dateTime));
         $tries = $this->getDayLimit();
@@ -398,16 +381,10 @@ class OpeningHours
 
     public function nextClose(DateTimeInterface $dateTime): DateTimeInterface
     {
-        if (! ($dateTime instanceof DateTimeImmutable)) {
-            $dateTime = clone $dateTime;
-        }
-
+        $dateTime = $this->copyDateTime($dateTime);
         $nextClose = null;
         if ($this->overflow) {
-            $yesterday = $dateTime;
-            if (! ($dateTime instanceof DateTimeImmutable)) {
-                $yesterday = clone $dateTime;
-            }
+            $yesterday = $this->copyDateTime($dateTime);
             $dateTimeMinus1Day = $yesterday->sub(new \DateInterval('P1D'));
             $openingHoursForDayBefore = $this->forDate($dateTimeMinus1Day);
             if ($openingHoursForDayBefore->isOpenAtNight(Time::fromDateTime($dateTimeMinus1Day))) {
@@ -418,6 +395,10 @@ class OpeningHours
         $openingHoursForDay = $this->forDate($dateTime);
         if (! $nextClose) {
             $nextClose = $openingHoursForDay->nextClose(Time::fromDateTime($dateTime));
+
+            if ($nextClose && $nextClose->hours() < 24 && $nextClose->format('Gi') < $dateTime->format('Gi')) {
+                $dateTime = $dateTime->modify('+1 day');
+            }
         }
 
         $tries = $this->getDayLimit();
@@ -450,10 +431,7 @@ class OpeningHours
 
     public function previousOpen(DateTimeInterface $dateTime): DateTimeInterface
     {
-        if (! ($dateTime instanceof DateTimeImmutable)) {
-            $dateTime = clone $dateTime;
-        }
-
+        $dateTime = $this->copyDateTime($dateTime);
         $openingHoursForDay = $this->forDate($dateTime);
         $previousOpen = $openingHoursForDay->previousOpen(Time::fromDateTime($dateTime));
         $tries = $this->getDayLimit();
@@ -479,10 +457,6 @@ class OpeningHours
             $previousOpen = $openingHoursForDay->previousOpen(Time::fromDateTime($dateTime));
         }
 
-        if ($dateTime->format('H:i') === '00:00' && $this->isOpenAt((clone $dateTime)->modify('-1 second'))) {
-            return $this->previousOpen($dateTime->modify('+1 minute'));
-        }
-
         $nextDateTime = $previousOpen->toDateTime();
 
         return $dateTime->setTime($nextDateTime->format('G'), $nextDateTime->format('i'), 0);
@@ -490,16 +464,10 @@ class OpeningHours
 
     public function previousClose(DateTimeInterface $dateTime): DateTimeInterface
     {
-        if (! ($dateTime instanceof DateTimeImmutable)) {
-            $dateTime = clone $dateTime;
-        }
-
+        $dateTime = $this->copyDateTime($dateTime);
         $previousClose = null;
         if ($this->overflow) {
-            $yesterday = $dateTime;
-            if (! ($dateTime instanceof DateTimeImmutable)) {
-                $yesterday = clone $dateTime;
-            }
+            $yesterday = $this->copyDateTime($dateTime);
             $dateTimeMinus1Day = $yesterday->sub(new \DateInterval('P1D'));
             $openingHoursForDayBefore = $this->forDate($dateTimeMinus1Day);
             if ($openingHoursForDayBefore->isOpenAtNight(Time::fromDateTime($dateTimeMinus1Day))) {

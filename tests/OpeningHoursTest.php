@@ -5,12 +5,12 @@ namespace Spatie\OpeningHours\Test;
 use DateTime;
 use DateTimeZone;
 use DateTimeImmutable;
-use Spatie\OpeningHours\OpeningHoursForDay;
 use Spatie\OpeningHours\Time;
 use PHPUnit\Framework\TestCase;
-use Spatie\OpeningHours\OpeningHours;
-use Spatie\OpeningHours\Exceptions\MaximumLimitExceeded;
 use Spatie\OpeningHours\TimeRange;
+use Spatie\OpeningHours\OpeningHours;
+use Spatie\OpeningHours\OpeningHoursForDay;
+use Spatie\OpeningHours\Exceptions\MaximumLimitExceeded;
 
 class OpeningHoursTest extends TestCase
 {
@@ -311,6 +311,8 @@ class OpeningHoursTest extends TestCase
         $this->assertFalse($openingHours->isClosedAt($wednesday));
         $this->assertSame('00:00-03:00', $dayHours->previousCloseRange(Time::fromString('08:00'))->format());
         $this->assertSame('00:00-03:00', $dayHours->previousCloseRange(Time::fromString('08:00'))->format());
+        $this->assertSame('00:00', $dayHours->previousOpen(Time::fromString('08:00'))->format());
+        $this->assertSame('03:00', $dayHours->previousClose(Time::fromString('08:00'))->format());
         $this->assertSame('2019-02-07 00:00:00', $openingHours->nextClose($wednesday)->format('Y-m-d H:i:s'));
         $this->assertSame('2019-02-08 00:00:00', $openingHours->nextOpen($wednesday)->format('Y-m-d H:i:s'));
         $this->assertSame('2019-02-06 03:00:00', $openingHours->previousClose($wednesday)->format('Y-m-d H:i:s'));
