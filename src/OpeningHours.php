@@ -218,14 +218,15 @@ class OpeningHours
         foreach ($allOpeningHours as $day => $value) {
             $previousDay = end($concatnatedDays);
             if ($previousDay && (string) $previousDay['opening_hours'] === (string) $value) {
-                $key = array_key_last($concatnatedDays);
+                $key = key($concatnatedDays);
                 $concatnatedDays[$key]['days'][] = $day;
-            } else {
-                $concatnatedDays[$day] = [
-                    'opening_hours' => $value,
-                    'days' => [$day],
-                ];
+                continue;
             }
+
+            $concatnatedDays[$day] = [
+                'opening_hours' => $value,
+                'days' => [$day],
+            ];
         }
 
         return $concatnatedDays;

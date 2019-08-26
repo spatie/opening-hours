@@ -274,6 +274,14 @@ Returns an array of days. Array key is first day with same hours, array values a
 $openingHours->forWeekCombined();
 ```
 
+#### `OpeningHours::concatnatedDays(): array`
+
+Returns an array of concatnated days, adjacent days with the same hours get concatnated. Array key is first day with same hours, array values are days that have the same working hours and `OpeningHoursForDay` object.
+
+```php
+$openingHours->concatnatedDays();
+```
+
 #### `OpeningHours::forDay(string $day): Spatie\OpeningHours\OpeningHoursForDay`
 
 Returns an `OpeningHoursForDay` object for a regular day. A day is lowercase string of the english day name.
