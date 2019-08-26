@@ -210,6 +210,26 @@ class OpeningHours
 
         return $equalDays;
     }
+    
+    public function concatnatedDays(): array
+    {
+        $concatnatedDays = [];
+        $allOpeningHours = $this->openingHours;
+        foreach ($allOpeningHours as $day => $value) {
+            $previousDay = end($concatnatedDays);
+            if (!empty($previousDay) && (string) $previousDay['opening_hours'] === (string) $value) {
+                $key = array_key_last($concatnatedDays);
+                $concatnatedDays[$key]['days'][] = $day;
+            } else {
+                $concatnatedDays[$day] = [
+                    'opening_hours' => $value,
+                    'days' => [$day]
+                ];
+            }
+        }
+
+        return $concatnatedDays;
+    }
 
     public function forDay(string $day): OpeningHoursForDay
     {
