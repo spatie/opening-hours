@@ -210,7 +210,7 @@ class OpeningHours
 
         return $equalDays;
     }
-    
+
     public function concatnatedDays(): array
     {
         $concatnatedDays = [];
