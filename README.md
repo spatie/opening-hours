@@ -274,12 +274,14 @@ Returns an array of days. Array key is first day with same hours, array values a
 $openingHours->forWeekCombined();
 ```
 
-#### `OpeningHours::concatnatedDays(): array`
+#### `OpeningHours::forWeekConsecutiveDays(): array`
 
-Returns an array of concatnated days, adjacent days with the same hours get concatnated. Array key is first day with same hours, array values are days that have the same working hours and `OpeningHoursForDay` object.
+Returns an array of concatenated days, adjacent days with the same hours. Array key is first day with same hours, array values are days that have the same working hours and `OpeningHoursForDay` object.
+
+*Warning*: consecutive days are considered from Monday to Sunday without looping (Monday is not consecutive to Sunday) no matter the days order in initial data.
 
 ```php
-$openingHours->concatnatedDays();
+$openingHours->forWeekConsecutiveDays();
 ```
 
 #### `OpeningHours::forDay(string $day): Spatie\OpeningHours\OpeningHoursForDay`
