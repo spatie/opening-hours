@@ -34,6 +34,73 @@ class OpeningHoursTest extends TestCase
     }
 
     /** @test */
+    public function it_can_return_consecutive_opening_hours_for_a_regular_week()
+    {
+        $openingHours = OpeningHours::create([
+            'monday' => [],
+            'tuesday' => ['09:00-18:00'],
+            'wednesday' => ['09:00-18:00'],
+            'thursday' => ['09:00-18:00'],
+            'friday' => ['09:00-20:00'],
+            'saturday' => ['09:00-17:00'],
+            'sunday' => [],
+        ]);
+
+        $openingHoursForWeek = $openingHours->forWeekConsecutiveDays();
+
+        $this->assertCount(5, $openingHoursForWeek);
+        $this->assertInstanceOf(OpeningHoursForDay::class, $openingHoursForWeek['tuesday']['opening_hours']);
+        $this->assertSame('09:00-18:00', (string) $openingHoursForWeek['tuesday']['opening_hours']);
+        $this->assertSame('wednesday', array_values($openingHoursForWeek['tuesday']['days'])[1]);
+
+        $openingHours = OpeningHours::create([
+            'monday' => [],
+            'tuesday' => ['09:00-18:00'],
+            'wednesday' => ['09:00-15:00'],
+            'thursday' => ['09:00-18:00'],
+            'friday' => ['09:00-18:00'],
+            'saturday' => ['09:00-15:00'],
+            'sunday' => [],
+        ]);
+
+        $dump = array_map(function ($data) {
+            return implode(', ', $data['days']).': '.((string) $data['opening_hours']);
+        }, $openingHours->forWeekConsecutiveDays());
+
+        $this->assertSame([
+            'monday' => 'monday: ',
+            'tuesday' => 'tuesday: 09:00-18:00',
+            'wednesday' => 'wednesday: 09:00-15:00',
+            'thursday' => 'thursday, friday: 09:00-18:00',
+            'saturday' => 'saturday: 09:00-15:00',
+            'sunday' => 'sunday: ',
+        ], $dump);
+
+        $openingHours = OpeningHours::create([
+            'tuesday' => ['09:00-18:00'],
+            'wednesday' => ['09:00-15:00'],
+            'thursday' => ['09:00-18:00'],
+            'friday' => ['09:00-18:00'],
+            'saturday' => ['09:00-15:00'],
+            'sunday' => [],
+            'monday' => [],
+        ]);
+
+        $dump = array_map(function ($data) {
+            return implode(', ', $data['days']).': '.((string) $data['opening_hours']);
+        }, $openingHours->forWeekConsecutiveDays());
+
+        $this->assertSame([
+            'monday' => 'monday: ',
+            'tuesday' => 'tuesday: 09:00-18:00',
+            'wednesday' => 'wednesday: 09:00-15:00',
+            'thursday' => 'thursday, friday: 09:00-18:00',
+            'saturday' => 'saturday: 09:00-15:00',
+            'sunday' => 'sunday: ',
+        ], $dump);
+    }
+
+    /** @test */
     public function it_can_return_combined_opening_hours_for_a_regular_week()
     {
         $openingHours = OpeningHours::create([
@@ -50,6 +117,26 @@ class OpeningHoursTest extends TestCase
         $this->assertInstanceOf(OpeningHoursForDay::class, $openingHoursForWeek['wednesday']['opening_hours']);
         $this->assertSame('11:00-15:00', (string) $openingHoursForWeek['wednesday']['opening_hours']);
         $this->assertSame('thursday', array_values($openingHoursForWeek['wednesday']['days'])[1]);
+
+        $openingHours = OpeningHours::create([
+            'monday' => [],
+            'tuesday' => ['09:00-18:00'],
+            'wednesday' => ['09:00-15:00'],
+            'thursday' => ['09:00-18:00'],
+            'friday' => ['09:00-18:00'],
+            'saturday' => ['09:00-15:00'],
+            'sunday' => [],
+        ]);
+
+        $dump = array_map(function ($data) {
+            return implode(', ', $data['days']).': '.((string) $data['opening_hours']);
+        }, $openingHours->forWeekCombined());
+
+        $this->assertSame([
+            'monday' => 'monday, sunday: ',
+            'tuesday' => 'tuesday, thursday, friday: 09:00-18:00',
+            'wednesday' => 'wednesday, saturday: 09:00-15:00',
+        ], $dump);
     }
 
     /** @test */

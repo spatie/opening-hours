@@ -211,6 +211,27 @@ class OpeningHours
         return $equalDays;
     }
 
+    public function forWeekConsecutiveDays(): array
+    {
+        $concatenatedDays = [];
+        $allOpeningHours = $this->openingHours;
+        foreach ($allOpeningHours as $day => $value) {
+            $previousDay = end($concatenatedDays);
+            if ($previousDay && (string) $previousDay['opening_hours'] === (string) $value) {
+                $key = key($concatenatedDays);
+                $concatenatedDays[$key]['days'][] = $day;
+                continue;
+            }
+
+            $concatenatedDays[$day] = [
+                'opening_hours' => $value,
+                'days' => [$day],
+            ];
+        }
+
+        return $concatenatedDays;
+    }
+
     public function forDay(string $day): OpeningHoursForDay
     {
         $day = $this->normalizeDayName($day);
