@@ -63,6 +63,9 @@ class TimeRange
 
     public static function fromDefinition($value): self
     {
+        if (!$value) {
+            throw new Exception('Duplicate or overlapping date or hours');
+        }
         return is_array($value) ? static::fromArray($value) : static::fromString($value);
     }
 
