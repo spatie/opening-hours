@@ -5,6 +5,7 @@ namespace Spatie\OpeningHours;
 use DateTime;
 use DateTimeZone;
 use DateTimeInterface;
+use Spatie\OpeningHours\Exceptions\InvalidTimezone;
 use Spatie\OpeningHours\Helpers\Arr;
 use Spatie\OpeningHours\Helpers\DataTrait;
 use Spatie\OpeningHours\Exceptions\Exception;
@@ -44,7 +45,7 @@ class OpeningHours
         } elseif (is_string($timezone)) {
             $this->timezone = new DateTimeZone($timezone);
         } elseif ($timezone) {
-            throw new \InvalidArgumentException('Invalid Timezone');
+            throw InvalidTimezone::create();
         }
 
         $this->openingHours = Day::mapDays(function () {
