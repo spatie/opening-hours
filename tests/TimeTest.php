@@ -4,9 +4,9 @@ namespace Spatie\OpeningHours\Test;
 
 use DateTime;
 use DateTimeImmutable;
-use Spatie\OpeningHours\Time;
 use PHPUnit\Framework\TestCase;
 use Spatie\OpeningHours\Exceptions\InvalidTimeString;
+use Spatie\OpeningHours\Time;
 
 class TimeTest extends TestCase
 {

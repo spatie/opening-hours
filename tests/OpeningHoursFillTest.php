@@ -4,13 +4,13 @@ namespace Spatie\OpeningHours\Test;
 
 use DateTime;
 use DateTimeImmutable;
-use Spatie\OpeningHours\Day;
 use PHPUnit\Framework\TestCase;
-use Spatie\OpeningHours\TimeRange;
-use Spatie\OpeningHours\OpeningHours;
-use Spatie\OpeningHours\OpeningHoursForDay;
+use Spatie\OpeningHours\Day;
 use Spatie\OpeningHours\Exceptions\InvalidDate;
 use Spatie\OpeningHours\Exceptions\InvalidDayName;
+use Spatie\OpeningHours\OpeningHours;
+use Spatie\OpeningHours\OpeningHoursForDay;
+use Spatie\OpeningHours\TimeRange;
 
 class OpeningHoursFillTest extends TestCase
 {

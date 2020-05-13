@@ -2,16 +2,16 @@
 
 namespace Spatie\OpeningHours;
 
-use Countable;
-use Generator;
 use ArrayAccess;
 use ArrayIterator;
+use Countable;
+use Generator;
 use IteratorAggregate;
+use Spatie\OpeningHours\Exceptions\NonMutableOffsets;
+use Spatie\OpeningHours\Exceptions\OverlappingTimeRanges;
 use Spatie\OpeningHours\Helpers\Arr;
 use Spatie\OpeningHours\Helpers\DataTrait;
 use Spatie\OpeningHours\Helpers\RangeFinder;
-use Spatie\OpeningHours\Exceptions\NonMutableOffsets;
-use Spatie\OpeningHours\Exceptions\OverlappingTimeRanges;
 
 class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
 {
