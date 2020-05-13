@@ -5,8 +5,8 @@ namespace Spatie\OpeningHours\Test;
 use DateTime;
 use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
-use Spatie\OpeningHours\TimeRange;
 use Spatie\OpeningHours\OpeningHours;
+use Spatie\OpeningHours\TimeRange;
 
 class OpeningHoursOverflowTest extends TestCase
 {

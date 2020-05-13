@@ -3,11 +3,11 @@
 namespace Spatie\OpeningHours;
 
 use DateTime;
-use DateTimeZone;
 use DateTimeInterface;
+use DateTimeZone;
+use Spatie\OpeningHours\Exceptions\InvalidTimeString;
 use Spatie\OpeningHours\Helpers\DataTrait;
 use Spatie\OpeningHours\Helpers\DateTimeCopier;
-use Spatie\OpeningHours\Exceptions\InvalidTimeString;
 
 class Time
 {

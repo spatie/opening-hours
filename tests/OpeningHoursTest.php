@@ -3,14 +3,14 @@
 namespace Spatie\OpeningHours\Test;
 
 use DateTime;
-use DateTimeZone;
 use DateTimeImmutable;
-use Spatie\OpeningHours\Time;
+use DateTimeZone;
 use PHPUnit\Framework\TestCase;
-use Spatie\OpeningHours\TimeRange;
+use Spatie\OpeningHours\Exceptions\MaximumLimitExceeded;
 use Spatie\OpeningHours\OpeningHours;
 use Spatie\OpeningHours\OpeningHoursForDay;
-use Spatie\OpeningHours\Exceptions\MaximumLimitExceeded;
+use Spatie\OpeningHours\Time;
+use Spatie\OpeningHours\TimeRange;
 
 class OpeningHoursTest extends TestCase
 {
