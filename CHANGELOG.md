@@ -73,11 +73,17 @@ Overflow is now calculated at the day level (OpeningHoursForDay).
 - Fixed [#89](https://github.com/spatie/opening-hours/issues/89) Data support for next open hours
 - Implemented [#93](https://github.com/spatie/opening-hours/issues/93) Enable PHP 8
 
-## 2.0.0-beta.1 - 2018-12-13
+## 2.0.0 - 2018-12-13
 
 - Added support for immutable dates
-- Allowed to add meta-data to global/exceptions config, days config, ranges settings
+- Allowed to add meta-data to global/exceptions config, days config, ranges settings via `setData()` and `getData()`
 - Allowed dynamic opening hours settings
+- Added `TimeRange::fromArray()` and `TimeRange::fromDefinition()` (to support array of hours+data or string[] or string)
+- Added `setFilters()` and `getFilters()`
+
+⚠ Breaking changes:
+- `nextOpen()` and `nextClose()` return type changed for `DateTimeInterface` as it can now return `DateTimeImmutable` too
+- `toDateTime()` changed both input type and return type for `DateTimeInterface` as it can now take and return `DateTimeImmutable` too
 
 ## 1.9.0 - 2018-12-07
 
