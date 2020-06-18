@@ -65,21 +65,22 @@ class OpeningHours
     }
 
     /**
-     * @param array $data
+     * @param array $data         hours definition array or sub-array
+     * @param array $excludedKeys keys to ignore from parsing
      *
      * @return array
      */
-    public static function mergeOverlappingRanges(array $data)
+    public static function mergeOverlappingRanges(array $data, array $excludedKeys = ['data', 'filters', 'overflow'])
     {
         $result = [];
         $ranges = [];
         foreach ($data as $key => $value) {
-            if (in_array($key, ['data', 'exceptions', 'filters', 'overflow'], true)) {
+            if (in_array($key, $excludedKeys, true)) {
                 continue;
             }
 
             $value = is_array($value)
-                ? static::mergeOverlappingRanges($value)
+                ? static::mergeOverlappingRanges($value, ['data'])
                 : (is_string($value) ? TimeRange::fromString($value) : $value);
 
             if ($value instanceof TimeRange) {
