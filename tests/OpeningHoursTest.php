@@ -24,7 +24,7 @@ class OpeningHoursTest extends TestCase
         $openingHoursForWeek = $openingHours->forWeek();
 
         $this->assertCount(7, $openingHoursForWeek);
-        $this->assertSame('09:00-18:00', (string) $openingHoursForWeek['monday'][0]);
+        $this->assertSame('09:00-18:00', (string)$openingHoursForWeek['monday'][0]);
         $this->assertCount(0, $openingHoursForWeek['tuesday']);
         $this->assertCount(0, $openingHoursForWeek['wednesday']);
         $this->assertCount(0, $openingHoursForWeek['thursday']);
@@ -37,66 +37,66 @@ class OpeningHoursTest extends TestCase
     public function it_can_return_consecutive_opening_hours_for_a_regular_week()
     {
         $openingHours = OpeningHours::create([
-            'monday' => [],
-            'tuesday' => ['09:00-18:00'],
+            'monday'    => [],
+            'tuesday'   => ['09:00-18:00'],
             'wednesday' => ['09:00-18:00'],
-            'thursday' => ['09:00-18:00'],
-            'friday' => ['09:00-20:00'],
-            'saturday' => ['09:00-17:00'],
-            'sunday' => [],
+            'thursday'  => ['09:00-18:00'],
+            'friday'    => ['09:00-20:00'],
+            'saturday'  => ['09:00-17:00'],
+            'sunday'    => [],
         ]);
 
         $openingHoursForWeek = $openingHours->forWeekConsecutiveDays();
 
         $this->assertCount(5, $openingHoursForWeek);
         $this->assertInstanceOf(OpeningHoursForDay::class, $openingHoursForWeek['tuesday']['opening_hours']);
-        $this->assertSame('09:00-18:00', (string) $openingHoursForWeek['tuesday']['opening_hours']);
+        $this->assertSame('09:00-18:00', (string)$openingHoursForWeek['tuesday']['opening_hours']);
         $this->assertSame('wednesday', array_values($openingHoursForWeek['tuesday']['days'])[1]);
 
         $openingHours = OpeningHours::create([
-            'monday' => [],
-            'tuesday' => ['09:00-18:00'],
+            'monday'    => [],
+            'tuesday'   => ['09:00-18:00'],
             'wednesday' => ['09:00-15:00'],
-            'thursday' => ['09:00-18:00'],
-            'friday' => ['09:00-18:00'],
-            'saturday' => ['09:00-15:00'],
-            'sunday' => [],
+            'thursday'  => ['09:00-18:00'],
+            'friday'    => ['09:00-18:00'],
+            'saturday'  => ['09:00-15:00'],
+            'sunday'    => [],
         ]);
 
         $dump = array_map(function ($data) {
-            return implode(', ', $data['days']).': '.((string) $data['opening_hours']);
+            return implode(', ', $data['days']).': '.((string)$data['opening_hours']);
         }, $openingHours->forWeekConsecutiveDays());
 
         $this->assertSame([
-            'monday' => 'monday: ',
-            'tuesday' => 'tuesday: 09:00-18:00',
+            'monday'    => 'monday: ',
+            'tuesday'   => 'tuesday: 09:00-18:00',
             'wednesday' => 'wednesday: 09:00-15:00',
-            'thursday' => 'thursday, friday: 09:00-18:00',
-            'saturday' => 'saturday: 09:00-15:00',
-            'sunday' => 'sunday: ',
+            'thursday'  => 'thursday, friday: 09:00-18:00',
+            'saturday'  => 'saturday: 09:00-15:00',
+            'sunday'    => 'sunday: ',
         ], $dump);
 
         $openingHours = OpeningHours::create([
-            'tuesday' => ['09:00-18:00'],
+            'tuesday'   => ['09:00-18:00'],
             'wednesday' => ['09:00-15:00'],
-            'thursday' => ['09:00-18:00'],
-            'friday' => ['09:00-18:00'],
-            'saturday' => ['09:00-15:00'],
-            'sunday' => [],
-            'monday' => [],
+            'thursday'  => ['09:00-18:00'],
+            'friday'    => ['09:00-18:00'],
+            'saturday'  => ['09:00-15:00'],
+            'sunday'    => [],
+            'monday'    => [],
         ]);
 
         $dump = array_map(function ($data) {
-            return implode(', ', $data['days']).': '.((string) $data['opening_hours']);
+            return implode(', ', $data['days']).': '.((string)$data['opening_hours']);
         }, $openingHours->forWeekConsecutiveDays());
 
         $this->assertSame([
-            'monday' => 'monday: ',
-            'tuesday' => 'tuesday: 09:00-18:00',
+            'monday'    => 'monday: ',
+            'tuesday'   => 'tuesday: 09:00-18:00',
             'wednesday' => 'wednesday: 09:00-15:00',
-            'thursday' => 'thursday, friday: 09:00-18:00',
-            'saturday' => 'saturday: 09:00-15:00',
-            'sunday' => 'sunday: ',
+            'thursday'  => 'thursday, friday: 09:00-18:00',
+            'saturday'  => 'saturday: 09:00-15:00',
+            'sunday'    => 'sunday: ',
         ], $dump);
     }
 
@@ -104,37 +104,37 @@ class OpeningHoursTest extends TestCase
     public function it_can_return_combined_opening_hours_for_a_regular_week()
     {
         $openingHours = OpeningHours::create([
-            'monday' => ['09:00-18:00'],
-            'tuesday' => ['09:00-18:00'],
+            'monday'    => ['09:00-18:00'],
+            'tuesday'   => ['09:00-18:00'],
             'wednesday' => ['11:00-15:00'],
-            'thursday' => ['11:00-15:00'],
-            'friday' => ['12:00-14:00'],
+            'thursday'  => ['11:00-15:00'],
+            'friday'    => ['12:00-14:00'],
         ]);
 
         $openingHoursForWeek = $openingHours->forWeekCombined();
 
         $this->assertCount(4, $openingHoursForWeek);
         $this->assertInstanceOf(OpeningHoursForDay::class, $openingHoursForWeek['wednesday']['opening_hours']);
-        $this->assertSame('11:00-15:00', (string) $openingHoursForWeek['wednesday']['opening_hours']);
+        $this->assertSame('11:00-15:00', (string)$openingHoursForWeek['wednesday']['opening_hours']);
         $this->assertSame('thursday', array_values($openingHoursForWeek['wednesday']['days'])[1]);
 
         $openingHours = OpeningHours::create([
-            'monday' => [],
-            'tuesday' => ['09:00-18:00'],
+            'monday'    => [],
+            'tuesday'   => ['09:00-18:00'],
             'wednesday' => ['09:00-15:00'],
-            'thursday' => ['09:00-18:00'],
-            'friday' => ['09:00-18:00'],
-            'saturday' => ['09:00-15:00'],
-            'sunday' => [],
+            'thursday'  => ['09:00-18:00'],
+            'friday'    => ['09:00-18:00'],
+            'saturday'  => ['09:00-15:00'],
+            'sunday'    => [],
         ]);
 
         $dump = array_map(function ($data) {
-            return implode(', ', $data['days']).': '.((string) $data['opening_hours']);
+            return implode(', ', $data['days']).': '.((string)$data['opening_hours']);
         }, $openingHours->forWeekCombined());
 
         $this->assertSame([
-            'monday' => 'monday, sunday: ',
-            'tuesday' => 'tuesday, thursday, friday: 09:00-18:00',
+            'monday'    => 'monday, sunday: ',
+            'tuesday'   => 'tuesday, thursday, friday: 09:00-18:00',
             'wednesday' => 'wednesday, saturday: 09:00-15:00',
         ], $dump);
     }
@@ -158,7 +158,7 @@ class OpeningHoursTest extends TestCase
     public function it_can_return_the_exceptions()
     {
         $openingHours = OpeningHours::create([
-            'monday' => ['09:00-18:00'],
+            'monday'     => ['09:00-18:00'],
             'exceptions' => [
                 '2016-09-26' => [],
             ],
@@ -180,7 +180,7 @@ class OpeningHoursTest extends TestCase
         $openingHoursForMonday = $openingHours->forDay('monday');
         $this->assertCount(1, $openingHoursForMonday);
         $this->assertInstanceOf(TimeRange::class, $openingHoursForMonday[0]);
-        $this->assertSame('09:00-18:00', (string) $openingHoursForMonday[0]);
+        $this->assertSame('09:00-18:00', (string)$openingHoursForMonday[0]);
 
         $openingHoursForTuesday = $openingHours->forDay('tuesday');
         $this->assertCount(0, $openingHoursForTuesday);
@@ -212,7 +212,7 @@ class OpeningHoursTest extends TestCase
     public function it_can_return_the_opening_hours_for_a_specific_date()
     {
         $openingHours = OpeningHours::create([
-            'monday' => ['09:00-18:00'],
+            'monday'     => ['09:00-18:00'],
             'exceptions' => [
                 '2016-09-26' => [],
             ],
@@ -223,7 +223,7 @@ class OpeningHoursTest extends TestCase
 
         $this->assertCount(1, $openingHoursForMonday1909);
         $this->assertInstanceOf(TimeRange::class, $openingHoursForMonday1909[0]);
-        $this->assertSame('09:00-18:00', (string) $openingHoursForMonday1909[0]);
+        $this->assertSame('09:00-18:00', (string)$openingHoursForMonday1909[0]);
 
         $this->assertCount(0, $openingHoursForMonday2609);
 
@@ -232,7 +232,7 @@ class OpeningHoursTest extends TestCase
 
         $this->assertCount(1, $openingHoursForMonday1909);
         $this->assertInstanceOf(TimeRange::class, $openingHoursForMonday1909[0]);
-        $this->assertSame('09:00-18:00', (string) $openingHoursForMonday1909[0]);
+        $this->assertSame('09:00-18:00', (string)$openingHoursForMonday1909[0]);
 
         $this->assertCount(0, $openingHoursForMonday2609);
     }
@@ -277,7 +277,7 @@ class OpeningHoursTest extends TestCase
     public function it_can_determine_that_its_open_at_a_certain_date_and_time_on_an_exceptional_day()
     {
         $openingHours = OpeningHours::create([
-            'monday' => ['09:00-18:00'],
+            'monday'     => ['09:00-18:00'],
             'exceptions' => [
                 '2016-09-26' => [],
             ],
@@ -296,7 +296,7 @@ class OpeningHoursTest extends TestCase
     public function it_can_determine_that_its_open_at_a_certain_date_and_time_on_an_recurring_exceptional_day()
     {
         $openingHours = OpeningHours::create([
-            'monday' => ['09:00-18:00'],
+            'monday'     => ['09:00-18:00'],
             'exceptions' => [
                 '01-01' => [],
                 '12-25' => ['09:00-12:00'],
@@ -335,9 +335,9 @@ class OpeningHoursTest extends TestCase
         $openingHours = OpeningHours::create([
             'exceptions' => [
                 '2018-01-01' => ['09:00-18:00'],
-                '01-01' => [],
-                '12-25' => ['09:00-12:00'],
-                '12-26' => [],
+                '01-01'      => [],
+                '12-25'      => ['09:00-12:00'],
+                '12-26'      => [],
             ],
         ]);
 
@@ -362,10 +362,10 @@ class OpeningHoursTest extends TestCase
     public function it_can_handle_consecutive_open_hours()
     {
         $openingHours = OpeningHours::create([
-            'monday'     => ['09:00-24:00'],
-            'tuesday'    => ['00:00-24:00'],
-            'wednesday'  => ['00:00-03:00', '09:00-24:00'],
-            'friday'     => ['00:00-03:00'],
+            'monday'    => ['09:00-24:00'],
+            'tuesday'   => ['00:00-24:00'],
+            'wednesday' => ['00:00-03:00', '09:00-24:00'],
+            'friday'    => ['00:00-03:00'],
         ]);
 
         $monday = new DateTime('2019-02-04 11:00:00');
@@ -442,7 +442,7 @@ class OpeningHoursTest extends TestCase
     public function it_can_determine_next_open_hours_from_edges_time()
     {
         $openingHours = OpeningHours::create([
-            'monday' => ['09:00-11:00', '13:00-19:00'], // 2016-09-26
+            'monday'  => ['09:00-11:00', '13:00-19:00'], // 2016-09-26
             'tuesday' => ['09:00-11:00', '13:00-19:00'], // 2016-09-27
         ]);
 
@@ -534,7 +534,7 @@ class OpeningHoursTest extends TestCase
             'monday' => [
                 [
                     'hours' => '09:00-11:00',
-                    'data' => ['foobar'],
+                    'data'  => ['foobar'],
                 ],
                 '13:00-19:00',
             ],
@@ -654,7 +654,7 @@ class OpeningHoursTest extends TestCase
     public function it_can_determine_next_close_hours_from_non_working_date_time()
     {
         $ranges = [
-            'monday' => ['09:00-18:00'],
+            'monday'     => ['09:00-18:00'],
             /* all the default week settings */
             'exceptions' => [
                 // add non-dynamic exceptions, else let empty
@@ -716,7 +716,7 @@ class OpeningHoursTest extends TestCase
     public function it_can_determine_next_open_hours_from_working_date_time()
     {
         $openingHours = OpeningHours::create([
-            'monday' => ['09:00-11:00', '13:00-19:00'],
+            'monday'  => ['09:00-11:00', '13:00-19:00'],
             'tuesday' => ['10:00-11:00', '14:00-19:00'],
         ]);
 
@@ -730,7 +730,7 @@ class OpeningHoursTest extends TestCase
     public function it_can_determine_next_open_hours_from_working_date_time_immutable()
     {
         $openingHours = OpeningHours::create([
-            'monday' => ['09:00-11:00', '13:00-19:00'],
+            'monday'  => ['09:00-11:00', '13:00-19:00'],
             'tuesday' => ['10:00-11:00', '14:00-19:00'],
         ]);
 
@@ -744,7 +744,7 @@ class OpeningHoursTest extends TestCase
     public function it_can_determine_next_close_hours_from_working_date_time()
     {
         $openingHours = OpeningHours::create([
-            'monday' => ['09:00-11:00', '13:00-19:00'],
+            'monday'  => ['09:00-11:00', '13:00-19:00'],
             'tuesday' => ['10:00-11:00', '14:00-19:00'],
         ]);
 
@@ -758,7 +758,7 @@ class OpeningHoursTest extends TestCase
     public function it_can_determine_next_close_hours_from_working_date_time_immutable()
     {
         $openingHours = OpeningHours::create([
-            'monday' => ['09:00-11:00', '13:00-19:00'],
+            'monday'  => ['09:00-11:00', '13:00-19:00'],
             'tuesday' => ['10:00-11:00', '14:00-19:00'],
         ]);
 
@@ -772,8 +772,8 @@ class OpeningHoursTest extends TestCase
     public function it_can_determine_next_open_hours_from_early_morning()
     {
         $openingHours = OpeningHours::create([
-            'monday' => ['09:00-11:00', '13:00-19:00'],
-            'tuesday' => ['10:00-11:00', '14:00-19:00'],
+            'monday'     => ['09:00-11:00', '13:00-19:00'],
+            'tuesday'    => ['10:00-11:00', '14:00-19:00'],
             'exceptions' => [
                 '2016-09-26' => [],
             ],
@@ -789,8 +789,8 @@ class OpeningHoursTest extends TestCase
     public function it_can_determine_next_open_hours_from_early_morning_immutable()
     {
         $openingHours = OpeningHours::create([
-            'monday' => ['09:00-11:00', '13:00-19:00'],
-            'tuesday' => ['10:00-11:00', '14:00-19:00'],
+            'monday'     => ['09:00-11:00', '13:00-19:00'],
+            'tuesday'    => ['10:00-11:00', '14:00-19:00'],
             'exceptions' => [
                 '2016-09-26' => [],
             ],
@@ -806,8 +806,8 @@ class OpeningHoursTest extends TestCase
     public function it_can_determine_next_close_hours_from_early_morning()
     {
         $openingHours = OpeningHours::create([
-            'monday' => ['09:00-11:00', '13:00-19:00'],
-            'tuesday' => ['10:00-11:00', '14:00-19:00'],
+            'monday'     => ['09:00-11:00', '13:00-19:00'],
+            'tuesday'    => ['10:00-11:00', '14:00-19:00'],
             'exceptions' => [
                 '2016-09-26' => [],
             ],
@@ -823,8 +823,8 @@ class OpeningHoursTest extends TestCase
     public function it_can_determine_next_close_hours_from_early_morning_immutable()
     {
         $openingHours = OpeningHours::create([
-            'monday' => ['09:00-11:00', '13:00-19:00'],
-            'tuesday' => ['10:00-11:00', '14:00-19:00'],
+            'monday'     => ['09:00-11:00', '13:00-19:00'],
+            'tuesday'    => ['10:00-11:00', '14:00-19:00'],
             'exceptions' => [
                 '2016-09-26' => [],
             ],
@@ -841,7 +841,7 @@ class OpeningHoursTest extends TestCase
     {
         $openingHours = new OpeningHours('Europe/Amsterdam');
         $openingHours->fill([
-            'monday' => ['09:00-18:00'],
+            'monday'     => ['09:00-18:00'],
             'exceptions' => [
                 '2016-11-14' => ['09:00-13:00'],
             ],
@@ -889,13 +889,13 @@ class OpeningHoursTest extends TestCase
     public function it_can_determine_that_its_open_now()
     {
         $openingHours = OpeningHours::create([
-            'monday' => ['00:00-23:59'],
-            'tuesday' => ['00:00-23:59'],
+            'monday'    => ['00:00-23:59'],
+            'tuesday'   => ['00:00-23:59'],
             'wednesday' => ['00:00-23:59'],
-            'thursday' => ['00:00-23:59'],
-            'friday' => ['00:00-23:59'],
-            'saturday' => ['00:00-23:59'],
-            'sunday' => ['00:00-23:59'],
+            'thursday'  => ['00:00-23:59'],
+            'friday'    => ['00:00-23:59'],
+            'saturday'  => ['00:00-23:59'],
+            'sunday'    => ['00:00-23:59'],
         ]);
 
         $this->assertTrue($openingHours->isOpen());
@@ -913,13 +913,13 @@ class OpeningHoursTest extends TestCase
     public function it_can_retrieve_regular_closing_days_as_strings()
     {
         $openingHours = OpeningHours::create([
-            'monday' => ['09:00-18:00'],
-            'tuesday' => ['09:00-18:00'],
+            'monday'    => ['09:00-18:00'],
+            'tuesday'   => ['09:00-18:00'],
             'wednesday' => ['09:00-18:00'],
-            'thursday' => ['09:00-18:00'],
-            'friday' => ['09:00-18:00'],
-            'saturday' => [],
-            'sunday' => [],
+            'thursday'  => ['09:00-18:00'],
+            'friday'    => ['09:00-18:00'],
+            'saturday'  => [],
+            'sunday'    => [],
         ]);
 
         $this->assertSame(['saturday', 'sunday'], $openingHours->regularClosingDays());
@@ -929,13 +929,13 @@ class OpeningHoursTest extends TestCase
     public function it_can_retrieve_regular_closing_days_as_iso_numbers()
     {
         $openingHours = OpeningHours::create([
-            'monday' => ['09:00-18:00'],
-            'tuesday' => ['09:00-18:00'],
+            'monday'    => ['09:00-18:00'],
+            'tuesday'   => ['09:00-18:00'],
             'wednesday' => ['09:00-18:00'],
-            'thursday' => ['09:00-18:00'],
-            'friday' => ['09:00-18:00'],
-            'saturday' => [],
-            'sunday' => [],
+            'thursday'  => ['09:00-18:00'],
+            'friday'    => ['09:00-18:00'],
+            'saturday'  => [],
+            'sunday'    => [],
         ]);
 
         $this->assertSame([6, 7], $openingHours->regularClosingDaysISO());
@@ -990,7 +990,7 @@ class OpeningHoursTest extends TestCase
         $openingHoursForWeek = $openingHours->forWeek();
 
         $this->assertCount(7, $openingHoursForWeek);
-        $this->assertSame('00:00-16:00', (string) $openingHoursForWeek['monday'][0]);
+        $this->assertSame('00:00-16:00', (string)$openingHoursForWeek['monday'][0]);
         $this->assertCount(0, $openingHoursForWeek['tuesday']);
         $this->assertCount(0, $openingHoursForWeek['wednesday']);
         $this->assertCount(0, $openingHoursForWeek['thursday']);
@@ -1009,7 +1009,7 @@ class OpeningHoursTest extends TestCase
         $openingHoursForWeek = $openingHours->forWeek();
 
         $this->assertCount(7, $openingHoursForWeek);
-        $this->assertSame('00:00-16:00', (string) $openingHoursForWeek['monday'][0]);
+        $this->assertSame('00:00-16:00', (string)$openingHoursForWeek['monday'][0]);
         $this->assertCount(0, $openingHoursForWeek['tuesday']);
         $this->assertCount(0, $openingHoursForWeek['wednesday']);
         $this->assertCount(0, $openingHoursForWeek['thursday']);
@@ -1028,7 +1028,7 @@ class OpeningHoursTest extends TestCase
         $openingHoursForWeek = $openingHours->forWeek();
 
         $this->assertCount(7, $openingHoursForWeek);
-        $this->assertSame('00:00-16:00', (string) $openingHoursForWeek['monday'][0]);
+        $this->assertSame('00:00-16:00', (string)$openingHoursForWeek['monday'][0]);
         $this->assertCount(0, $openingHoursForWeek['tuesday']);
         $this->assertCount(0, $openingHoursForWeek['wednesday']);
         $this->assertCount(0, $openingHoursForWeek['thursday']);
@@ -1071,13 +1071,13 @@ class OpeningHoursTest extends TestCase
         $this->expectExceptionMessage('No open date/time found in the next 8 days, use $openingHours->setDayLimit() to increase the limit.');
 
         OpeningHours::create([
-            'monday' => ['00:00-24:00'],
-            'tuesday' => ['00:00-24:00'],
+            'monday'    => ['00:00-24:00'],
+            'tuesday'   => ['00:00-24:00'],
             'wednesday' => ['00:00-24:00'],
-            'thursday' => ['00:00-24:00'],
-            'friday' => ['00:00-24:00'],
-            'saturday' => ['00:00-24:00'],
-            'sunday' => ['00:00-24:00'],
+            'thursday'  => ['00:00-24:00'],
+            'friday'    => ['00:00-24:00'],
+            'saturday'  => ['00:00-24:00'],
+            'sunday'    => ['00:00-24:00'],
         ])->nextOpen(new DateTime('2019-06-06 19:02:00'));
     }
 
@@ -1088,13 +1088,13 @@ class OpeningHoursTest extends TestCase
         $this->expectExceptionMessage('No open date/time found in the previous 8 days, use $openingHours->setDayLimit() to increase the limit.');
 
         OpeningHours::create([
-            'monday' => ['00:00-24:00'],
-            'tuesday' => ['00:00-24:00'],
+            'monday'    => ['00:00-24:00'],
+            'tuesday'   => ['00:00-24:00'],
             'wednesday' => ['00:00-24:00'],
-            'thursday' => ['00:00-24:00'],
-            'friday' => ['00:00-24:00'],
-            'saturday' => ['00:00-24:00'],
-            'sunday' => ['00:00-24:00'],
+            'thursday'  => ['00:00-24:00'],
+            'friday'    => ['00:00-24:00'],
+            'saturday'  => ['00:00-24:00'],
+            'sunday'    => ['00:00-24:00'],
         ])->previousOpen(new DateTime('2019-06-06 19:02:00'));
     }
 
@@ -1105,13 +1105,13 @@ class OpeningHoursTest extends TestCase
         $this->expectExceptionMessage('No open date/time found in the next 366 days, use $openingHours->setDayLimit() to increase the limit.');
 
         OpeningHours::create([
-            'monday' => ['00:00-24:00'],
-            'tuesday' => ['00:00-24:00'],
-            'wednesday' => ['00:00-24:00'],
-            'thursday' => ['00:00-24:00'],
-            'friday' => ['00:00-24:00'],
-            'saturday' => ['00:00-24:00'],
-            'sunday' => ['00:00-24:00'],
+            'monday'     => ['00:00-24:00'],
+            'tuesday'    => ['00:00-24:00'],
+            'wednesday'  => ['00:00-24:00'],
+            'thursday'   => ['00:00-24:00'],
+            'friday'     => ['00:00-24:00'],
+            'saturday'   => ['00:00-24:00'],
+            'sunday'     => ['00:00-24:00'],
             'exceptions' => [
                 '2022-09-05' => [],
             ],
@@ -1143,13 +1143,13 @@ class OpeningHoursTest extends TestCase
         $this->expectExceptionMessage('No close date/time found in the next 8 days, use $openingHours->setDayLimit() to increase the limit.');
 
         OpeningHours::create([
-            'monday' => ['00:00-24:00'],
-            'tuesday' => ['00:00-24:00'],
+            'monday'    => ['00:00-24:00'],
+            'tuesday'   => ['00:00-24:00'],
             'wednesday' => ['00:00-24:00'],
-            'thursday' => ['00:00-24:00'],
-            'friday' => ['00:00-24:00'],
-            'saturday' => ['00:00-24:00'],
-            'sunday' => ['00:00-24:00'],
+            'thursday'  => ['00:00-24:00'],
+            'friday'    => ['00:00-24:00'],
+            'saturday'  => ['00:00-24:00'],
+            'sunday'    => ['00:00-24:00'],
         ])->nextClose(new DateTime('2019-06-06 19:02:00'));
     }
 
@@ -1160,13 +1160,13 @@ class OpeningHoursTest extends TestCase
         $this->expectExceptionMessage('No close date/time found in the previous 8 days, use $openingHours->setDayLimit() to increase the limit.');
 
         OpeningHours::create([
-            'monday' => ['00:00-24:00'],
-            'tuesday' => ['00:00-24:00'],
+            'monday'    => ['00:00-24:00'],
+            'tuesday'   => ['00:00-24:00'],
             'wednesday' => ['00:00-24:00'],
-            'thursday' => ['00:00-24:00'],
-            'friday' => ['00:00-24:00'],
-            'saturday' => ['00:00-24:00'],
-            'sunday' => ['00:00-24:00'],
+            'thursday'  => ['00:00-24:00'],
+            'friday'    => ['00:00-24:00'],
+            'saturday'  => ['00:00-24:00'],
+            'sunday'    => ['00:00-24:00'],
         ])->previousClose(new DateTime('2019-06-06 19:02:00'));
     }
 
@@ -1174,13 +1174,13 @@ class OpeningHoursTest extends TestCase
     public function it_should_handle_far_exception()
     {
         $this->assertSame('2019-12-25 00:00:00', OpeningHours::create([
-            'monday' => ['00:00-24:00'],
-            'tuesday' => ['00:00-24:00'],
-            'wednesday' => ['00:00-24:00'],
-            'thursday' => ['00:00-24:00'],
-            'friday' => ['00:00-24:00'],
-            'saturday' => ['00:00-24:00'],
-            'sunday' => ['00:00-24:00'],
+            'monday'     => ['00:00-24:00'],
+            'tuesday'    => ['00:00-24:00'],
+            'wednesday'  => ['00:00-24:00'],
+            'thursday'   => ['00:00-24:00'],
+            'friday'     => ['00:00-24:00'],
+            'saturday'   => ['00:00-24:00'],
+            'sunday'     => ['00:00-24:00'],
             'exceptions' => [
                 '12-25' => [],
             ],
@@ -1191,13 +1191,13 @@ class OpeningHoursTest extends TestCase
     public function it_should_handle_very_far_future_exception_by_changing_limit()
     {
         $openingHours = OpeningHours::create([
-            'monday' => ['00:00-24:00'],
-            'tuesday' => ['00:00-24:00'],
-            'wednesday' => ['00:00-24:00'],
-            'thursday' => ['00:00-24:00'],
-            'friday' => ['00:00-24:00'],
-            'saturday' => ['00:00-24:00'],
-            'sunday' => ['00:00-24:00'],
+            'monday'     => ['00:00-24:00'],
+            'tuesday'    => ['00:00-24:00'],
+            'wednesday'  => ['00:00-24:00'],
+            'thursday'   => ['00:00-24:00'],
+            'friday'     => ['00:00-24:00'],
+            'saturday'   => ['00:00-24:00'],
+            'sunday'     => ['00:00-24:00'],
             'exceptions' => [
                 '2022-12-25' => [],
             ],
@@ -1211,13 +1211,13 @@ class OpeningHoursTest extends TestCase
     public function it_should_handle_very_far_past_exception_by_changing_limit()
     {
         $openingHours = OpeningHours::create([
-            'monday' => ['00:00-24:00'],
-            'tuesday' => ['00:00-24:00'],
-            'wednesday' => ['00:00-24:00'],
-            'thursday' => ['00:00-24:00'],
-            'friday' => ['00:00-24:00'],
-            'saturday' => ['00:00-24:00'],
-            'sunday' => ['00:00-24:00'],
+            'monday'     => ['00:00-24:00'],
+            'tuesday'    => ['00:00-24:00'],
+            'wednesday'  => ['00:00-24:00'],
+            'thursday'   => ['00:00-24:00'],
+            'friday'     => ['00:00-24:00'],
+            'saturday'   => ['00:00-24:00'],
+            'sunday'     => ['00:00-24:00'],
             'exceptions' => [
                 '2013-12-25' => [],
             ],
@@ -1231,13 +1231,13 @@ class OpeningHoursTest extends TestCase
     public function it_should_handle_open_range()
     {
         $openingHours = OpeningHours::create([
-            'monday' => ['10:00-16:00', '19:30-20:30'],
-            'tuesday' => ['22:30-04:00'],
+            'monday'    => ['10:00-16:00', '19:30-20:30'],
+            'tuesday'   => ['22:30-04:00'],
             'wednesday' => ['07:00-10:00'],
-            'thursday' => ['09:00-12:00'],
-            'friday' => ['09:00-12:00'],
-            'saturday' => [],
-            'sunday' => [],
+            'thursday'  => ['09:00-12:00'],
+            'friday'    => ['09:00-12:00'],
+            'saturday'  => [],
+            'sunday'    => [],
         ]);
 
         $this->assertFalse($openingHours->currentOpenRange(new DateTime('2019-07-15 08:00:00')));
@@ -1256,13 +1256,13 @@ class OpeningHoursTest extends TestCase
     public function it_should_handle_open_start_date_time()
     {
         $openingHours = OpeningHours::create([
-            'monday' => ['10:00-16:00', '19:30-20:30'],
-            'tuesday' => ['22:30-04:00'],
+            'monday'    => ['10:00-16:00', '19:30-20:30'],
+            'tuesday'   => ['22:30-04:00'],
             'wednesday' => ['07:00-10:00'],
-            'thursday' => ['09:00-12:00'],
-            'friday' => ['09:00-12:00'],
-            'saturday' => [],
-            'sunday' => [],
+            'thursday'  => ['09:00-12:00'],
+            'friday'    => ['09:00-12:00'],
+            'saturday'  => [],
+            'sunday'    => [],
         ]);
 
         $this->assertFalse($openingHours->currentOpenRangeStart(new DateTime('2019-07-15 08:00:00')));
@@ -1281,13 +1281,13 @@ class OpeningHoursTest extends TestCase
     public function it_should_handle_open_end_date_time()
     {
         $openingHours = OpeningHours::create([
-            'monday' => ['10:00-16:00', '19:30-20:30'],
-            'tuesday' => ['22:30-04:00'],
+            'monday'    => ['10:00-16:00', '19:30-20:30'],
+            'tuesday'   => ['22:30-04:00'],
             'wednesday' => ['07:00-10:00'],
-            'thursday' => ['09:00-12:00'],
-            'friday' => ['09:00-12:00'],
-            'saturday' => [],
-            'sunday' => [],
+            'thursday'  => ['09:00-12:00'],
+            'friday'    => ['09:00-12:00'],
+            'saturday'  => [],
+            'sunday'    => [],
         ]);
 
         $this->assertFalse($openingHours->currentOpenRangeEnd(new DateTime('2019-07-15 08:00:00')));
@@ -1300,5 +1300,30 @@ class OpeningHoursTest extends TestCase
         $this->assertSame('2019-07-17 04:00:00', $openingHours->currentOpenRangeEnd(new DateTime('2019-07-16 22:40:00'))->format('Y-m-d H:i:s'));
         $this->assertSame('2019-07-17 04:00:00', $openingHours->currentOpenRangeEnd(new DateTime('2019-07-17 03:59:59'))->format('Y-m-d H:i:s'));
         $this->assertSame('2019-07-17 10:00:00', $openingHours->currentOpenRangeEnd(new DateTime('2019-07-17 07:59:59'))->format('Y-m-d H:i:s'));
+    }
+
+    /** @test */
+    public function it_should_support_empty_arrays_with_merge()
+    {
+        $hours = OpeningHours::createAndMergeOverlappingRanges(
+            array(
+                'exceptions' => array(
+                    '01-01' => array(
+                        'hours' => array(),
+                        'data'  => array(
+                            'id' => 'my_id',
+                        ),
+                    ),
+                    '02-02' => array(
+                        'hours' => array(),
+                        'data'  => array(
+                            'id' => 'my_id',
+                        ),
+                    ),
+                ),
+            )
+        );
+
+        $this->assertTrue($hours->isClosedAt(new DateTimeImmutable('2020-01-01')));
     }
 }

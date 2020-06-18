@@ -74,6 +74,10 @@ class OpeningHours
         $result = [];
         $ranges = [];
         foreach ($data as $key => $value) {
+            if (in_array($key, ['data', 'exceptions', 'filters', 'overflow'], true)) {
+                continue;
+            }
+
             $value = is_array($value)
                 ? static::mergeOverlappingRanges($value)
                 : (is_string($value) ? TimeRange::fromString($value) : $value);
