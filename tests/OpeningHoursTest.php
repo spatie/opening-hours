@@ -24,7 +24,7 @@ class OpeningHoursTest extends TestCase
         $openingHoursForWeek = $openingHours->forWeek();
 
         $this->assertCount(7, $openingHoursForWeek);
-        $this->assertSame('09:00-18:00', (string)$openingHoursForWeek['monday'][0]);
+        $this->assertSame('09:00-18:00', (string) $openingHoursForWeek['monday'][0]);
         $this->assertCount(0, $openingHoursForWeek['tuesday']);
         $this->assertCount(0, $openingHoursForWeek['wednesday']);
         $this->assertCount(0, $openingHoursForWeek['thursday']);
@@ -50,7 +50,7 @@ class OpeningHoursTest extends TestCase
 
         $this->assertCount(5, $openingHoursForWeek);
         $this->assertInstanceOf(OpeningHoursForDay::class, $openingHoursForWeek['tuesday']['opening_hours']);
-        $this->assertSame('09:00-18:00', (string)$openingHoursForWeek['tuesday']['opening_hours']);
+        $this->assertSame('09:00-18:00', (string) $openingHoursForWeek['tuesday']['opening_hours']);
         $this->assertSame('wednesday', array_values($openingHoursForWeek['tuesday']['days'])[1]);
 
         $openingHours = OpeningHours::create([
@@ -64,7 +64,7 @@ class OpeningHoursTest extends TestCase
         ]);
 
         $dump = array_map(function ($data) {
-            return implode(', ', $data['days']).': '.((string)$data['opening_hours']);
+            return implode(', ', $data['days']).': '.((string) $data['opening_hours']);
         }, $openingHours->forWeekConsecutiveDays());
 
         $this->assertSame([
@@ -87,7 +87,7 @@ class OpeningHoursTest extends TestCase
         ]);
 
         $dump = array_map(function ($data) {
-            return implode(', ', $data['days']).': '.((string)$data['opening_hours']);
+            return implode(', ', $data['days']).': '.((string) $data['opening_hours']);
         }, $openingHours->forWeekConsecutiveDays());
 
         $this->assertSame([
@@ -115,7 +115,7 @@ class OpeningHoursTest extends TestCase
 
         $this->assertCount(4, $openingHoursForWeek);
         $this->assertInstanceOf(OpeningHoursForDay::class, $openingHoursForWeek['wednesday']['opening_hours']);
-        $this->assertSame('11:00-15:00', (string)$openingHoursForWeek['wednesday']['opening_hours']);
+        $this->assertSame('11:00-15:00', (string) $openingHoursForWeek['wednesday']['opening_hours']);
         $this->assertSame('thursday', array_values($openingHoursForWeek['wednesday']['days'])[1]);
 
         $openingHours = OpeningHours::create([
@@ -129,7 +129,7 @@ class OpeningHoursTest extends TestCase
         ]);
 
         $dump = array_map(function ($data) {
-            return implode(', ', $data['days']).': '.((string)$data['opening_hours']);
+            return implode(', ', $data['days']).': '.((string) $data['opening_hours']);
         }, $openingHours->forWeekCombined());
 
         $this->assertSame([
@@ -180,7 +180,7 @@ class OpeningHoursTest extends TestCase
         $openingHoursForMonday = $openingHours->forDay('monday');
         $this->assertCount(1, $openingHoursForMonday);
         $this->assertInstanceOf(TimeRange::class, $openingHoursForMonday[0]);
-        $this->assertSame('09:00-18:00', (string)$openingHoursForMonday[0]);
+        $this->assertSame('09:00-18:00', (string) $openingHoursForMonday[0]);
 
         $openingHoursForTuesday = $openingHours->forDay('tuesday');
         $this->assertCount(0, $openingHoursForTuesday);
@@ -223,7 +223,7 @@ class OpeningHoursTest extends TestCase
 
         $this->assertCount(1, $openingHoursForMonday1909);
         $this->assertInstanceOf(TimeRange::class, $openingHoursForMonday1909[0]);
-        $this->assertSame('09:00-18:00', (string)$openingHoursForMonday1909[0]);
+        $this->assertSame('09:00-18:00', (string) $openingHoursForMonday1909[0]);
 
         $this->assertCount(0, $openingHoursForMonday2609);
 
@@ -232,7 +232,7 @@ class OpeningHoursTest extends TestCase
 
         $this->assertCount(1, $openingHoursForMonday1909);
         $this->assertInstanceOf(TimeRange::class, $openingHoursForMonday1909[0]);
-        $this->assertSame('09:00-18:00', (string)$openingHoursForMonday1909[0]);
+        $this->assertSame('09:00-18:00', (string) $openingHoursForMonday1909[0]);
 
         $this->assertCount(0, $openingHoursForMonday2609);
     }
@@ -990,7 +990,7 @@ class OpeningHoursTest extends TestCase
         $openingHoursForWeek = $openingHours->forWeek();
 
         $this->assertCount(7, $openingHoursForWeek);
-        $this->assertSame('00:00-16:00', (string)$openingHoursForWeek['monday'][0]);
+        $this->assertSame('00:00-16:00', (string) $openingHoursForWeek['monday'][0]);
         $this->assertCount(0, $openingHoursForWeek['tuesday']);
         $this->assertCount(0, $openingHoursForWeek['wednesday']);
         $this->assertCount(0, $openingHoursForWeek['thursday']);
@@ -1009,7 +1009,7 @@ class OpeningHoursTest extends TestCase
         $openingHoursForWeek = $openingHours->forWeek();
 
         $this->assertCount(7, $openingHoursForWeek);
-        $this->assertSame('00:00-16:00', (string)$openingHoursForWeek['monday'][0]);
+        $this->assertSame('00:00-16:00', (string) $openingHoursForWeek['monday'][0]);
         $this->assertCount(0, $openingHoursForWeek['tuesday']);
         $this->assertCount(0, $openingHoursForWeek['wednesday']);
         $this->assertCount(0, $openingHoursForWeek['thursday']);
@@ -1028,7 +1028,7 @@ class OpeningHoursTest extends TestCase
         $openingHoursForWeek = $openingHours->forWeek();
 
         $this->assertCount(7, $openingHoursForWeek);
-        $this->assertSame('00:00-16:00', (string)$openingHoursForWeek['monday'][0]);
+        $this->assertSame('00:00-16:00', (string) $openingHoursForWeek['monday'][0]);
         $this->assertCount(0, $openingHoursForWeek['tuesday']);
         $this->assertCount(0, $openingHoursForWeek['wednesday']);
         $this->assertCount(0, $openingHoursForWeek['thursday']);
@@ -1306,22 +1306,22 @@ class OpeningHoursTest extends TestCase
     public function it_should_support_empty_arrays_with_merge()
     {
         $hours = OpeningHours::createAndMergeOverlappingRanges(
-            array(
-                'exceptions' => array(
-                    '01-01' => array(
-                        'hours' => array(),
-                        'data'  => array(
+            [
+                'exceptions' => [
+                    '01-01' => [
+                        'hours' => [],
+                        'data'  => [
                             'id' => 'my_id',
-                        ),
-                    ),
-                    '02-02' => array(
-                        'hours' => array(),
-                        'data'  => array(
+                        ],
+                    ],
+                    '02-02' => [
+                        'hours' => [],
+                        'data'  => [
                             'id' => 'my_id',
-                        ),
-                    ),
-                ),
-            )
+                        ],
+                    ],
+                ],
+            ]
         );
 
         $this->assertTrue($hours->isClosedAt(new DateTimeImmutable('2020-01-01')));
