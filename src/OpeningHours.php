@@ -13,12 +13,13 @@ use Spatie\OpeningHours\Exceptions\MaximumLimitExceeded;
 use Spatie\OpeningHours\Helpers\Arr;
 use Spatie\OpeningHours\Helpers\DataTrait;
 use Spatie\OpeningHours\Helpers\DateTimeCopier;
+use Spatie\OpeningHours\Helpers\DiffTrait;
 
 class OpeningHours
 {
     const DEFAULT_DAY_LIMIT = 8;
 
-    use DataTrait, DateTimeCopier;
+    use DataTrait, DateTimeCopier, DiffTrait;
 
     /** @var \Spatie\OpeningHours\Day[] */
     protected $openingHours = [];
@@ -54,7 +55,7 @@ class OpeningHours
     }
 
     /**
-     * @param string[][]               $data
+     * @param string[][] $data
      * @param string|DateTimeZone|null $timezone
      *
      * @return static
@@ -65,7 +66,7 @@ class OpeningHours
     }
 
     /**
-     * @param array $data         hours definition array or sub-array
+     * @param array $data hours definition array or sub-array
      * @param array $excludedKeys keys to ignore from parsing
      *
      * @return array
@@ -116,7 +117,7 @@ class OpeningHours
     }
 
     /**
-     * @param string[][]               $data
+     * @param string[][] $data
      * @param string|DateTimeZone|null $timezone
      *
      * @return static
@@ -208,7 +209,7 @@ class OpeningHours
 
         foreach ($uniqueOpeningHours as $uniqueDay => $uniqueValue) {
             foreach ($nonUniqueOpeningHours as $nonUniqueDay => $nonUniqueValue) {
-                if ((string) $uniqueValue === (string) $nonUniqueValue) {
+                if ((string)$uniqueValue === (string)$nonUniqueValue) {
                     $equalDays[$uniqueDay]['days'][] = $nonUniqueDay;
                 }
             }
@@ -223,7 +224,7 @@ class OpeningHours
         $allOpeningHours = $this->openingHours;
         foreach ($allOpeningHours as $day => $value) {
             $previousDay = end($concatenatedDays);
-            if ($previousDay && (string) $previousDay['opening_hours'] === (string) $value) {
+            if ($previousDay && (string)$previousDay['opening_hours'] === (string)$value) {
                 $key = key($concatenatedDays);
                 $concatenatedDays[$key]['days'][] = $day;
                 continue;
@@ -231,7 +232,7 @@ class OpeningHours
 
             $concatenatedDays[$day] = [
                 'opening_hours' => $value,
-                'days' => [$day],
+                'days'          => [$day],
             ];
         }
 
@@ -287,7 +288,7 @@ class OpeningHours
 
     public function isClosedOn(string $day): bool
     {
-        return ! $this->isOpenOn($day);
+        return !$this->isOpenOn($day);
     }
 
     public function isOpenAt(DateTimeInterface $dateTime): bool
@@ -309,7 +310,7 @@ class OpeningHours
 
     public function isClosedAt(DateTimeInterface $dateTime): bool
     {
-        return ! $this->isOpenAt($dateTime);
+        return !$this->isOpenAt($dateTime);
     }
 
     public function isOpen(): bool
@@ -334,7 +335,7 @@ class OpeningHours
         /** @var TimeRange $range */
         $range = $this->currentOpenRange($dateTime);
 
-        if (! $range) {
+        if (!$range) {
             return false;
         }
 
@@ -354,7 +355,7 @@ class OpeningHours
         /** @var TimeRange $range */
         $range = $this->currentOpenRange($dateTime);
 
-        if (! $range) {
+        if (!$range) {
             return false;
         }
 
@@ -388,7 +389,7 @@ class OpeningHours
                 ->modify('+1 day')
                 ->setTime(0, 0, 0);
 
-            if ($this->isOpenAt($dateTime) && ! $openingHoursForDay->isOpenAt(Time::fromString('23:59'))) {
+            if ($this->isOpenAt($dateTime) && !$openingHoursForDay->isOpenAt(Time::fromString('23:59'))) {
                 return $dateTime;
             }
 
@@ -419,7 +420,7 @@ class OpeningHours
         }
 
         $openingHoursForDay = $this->forDate($dateTime);
-        if (! $nextClose) {
+        if (!$nextClose) {
             $nextClose = $openingHoursForDay->nextClose(Time::fromDateTime($dateTime));
 
             if ($nextClose && $nextClose->hours() < 24 && $nextClose->format('Gi') < $dateTime->format('Gi')) {
@@ -476,7 +477,7 @@ class OpeningHours
 
             $openingHoursForDay = $this->forDate($dateTime);
 
-            if ($this->isOpenAt($midnight) && ! $openingHoursForDay->isOpenAt(Time::fromString('23:59'))) {
+            if ($this->isOpenAt($midnight) && !$openingHoursForDay->isOpenAt(Time::fromString('23:59'))) {
                 return $midnight;
             }
 
@@ -501,7 +502,7 @@ class OpeningHours
         }
 
         $openingHoursForDay = $this->forDate($dateTime);
-        if (! $previousClose) {
+        if (!$previousClose) {
             $previousClose = $openingHoursForDay->previousClose(Time::fromDateTime($dateTime));
         }
 
@@ -565,7 +566,7 @@ class OpeningHours
         $metaData = Arr::pull($data, 'data', null);
         $exceptions = [];
         $filters = Arr::pull($data, 'filters', []);
-        $overflow = (bool) Arr::pull($data, 'overflow', false);
+        $overflow = (bool)Arr::pull($data, 'overflow', false);
 
         foreach (Arr::pull($data, 'exceptions', []) as $key => $exception) {
             if (is_callable($exception)) {
@@ -606,7 +607,7 @@ class OpeningHours
             return;
         }
 
-        if (! $this->dayLimit) {
+        if (!$this->dayLimit) {
             $this->dayLimit = 366;
         }
 
@@ -629,7 +630,7 @@ class OpeningHours
     {
         $day = strtolower($day);
 
-        if (! Day::isValid($day)) {
+        if (!Day::isValid($day)) {
             throw InvalidDayName::invalidDayName($day);
         }
 
@@ -680,10 +681,10 @@ class OpeningHours
         $regularHours = $this->flatMap(function (OpeningHoursForDay $openingHoursForDay, string $day) use ($format, $timezone) {
             return $openingHoursForDay->map(function (TimeRange $timeRange) use ($format, $timezone, $day) {
                 return [
-                    '@type' => 'OpeningHoursSpecification',
+                    '@type'     => 'OpeningHoursSpecification',
                     'dayOfWeek' => ucfirst($day),
-                    'opens' => $timeRange->start()->format($format, $timezone),
-                    'closes' => $timeRange->end()->format($format, $timezone),
+                    'opens'     => $timeRange->start()->format($format, $timezone),
+                    'closes'    => $timeRange->end()->format($format, $timezone),
                 ];
             });
         });
@@ -693,20 +694,20 @@ class OpeningHours
                 $zero = Time::fromString('00:00')->format($format, $timezone);
 
                 return [[
-                    '@type' => 'OpeningHoursSpecification',
-                    'opens' => $zero,
-                    'closes' => $zero,
-                    'validFrom' => $date,
+                    '@type'        => 'OpeningHoursSpecification',
+                    'opens'        => $zero,
+                    'closes'       => $zero,
+                    'validFrom'    => $date,
                     'validThrough' => $date,
                 ]];
             }
 
             return $openingHoursForDay->map(function (TimeRange $timeRange) use ($format, $date, $timezone) {
                 return [
-                    '@type' => 'OpeningHoursSpecification',
-                    'opens' => $timeRange->start()->format($format, $timezone),
-                    'closes' => $timeRange->end()->format($format, $timezone),
-                    'validFrom' => $date,
+                    '@type'        => 'OpeningHoursSpecification',
+                    'opens'        => $timeRange->start()->format($format, $timezone),
+                    'closes'       => $timeRange->end()->format($format, $timezone),
+                    'validFrom'    => $date,
                     'validThrough' => $date,
                 ];
             });
