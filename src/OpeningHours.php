@@ -13,12 +13,13 @@ use Spatie\OpeningHours\Exceptions\MaximumLimitExceeded;
 use Spatie\OpeningHours\Helpers\Arr;
 use Spatie\OpeningHours\Helpers\DataTrait;
 use Spatie\OpeningHours\Helpers\DateTimeCopier;
+use Spatie\OpeningHours\Helpers\DiffTrait;
 
 class OpeningHours
 {
     const DEFAULT_DAY_LIMIT = 8;
 
-    use DataTrait, DateTimeCopier;
+    use DataTrait, DateTimeCopier, DiffTrait;
 
     /** @var \Spatie\OpeningHours\Day[] */
     protected $openingHours = [];
