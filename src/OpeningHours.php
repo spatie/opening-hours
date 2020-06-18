@@ -209,7 +209,7 @@ class OpeningHours
 
         foreach ($uniqueOpeningHours as $uniqueDay => $uniqueValue) {
             foreach ($nonUniqueOpeningHours as $nonUniqueDay => $nonUniqueValue) {
-                if ((string)$uniqueValue === (string)$nonUniqueValue) {
+                if ((string) $uniqueValue === (string) $nonUniqueValue) {
                     $equalDays[$uniqueDay]['days'][] = $nonUniqueDay;
                 }
             }
@@ -224,7 +224,7 @@ class OpeningHours
         $allOpeningHours = $this->openingHours;
         foreach ($allOpeningHours as $day => $value) {
             $previousDay = end($concatenatedDays);
-            if ($previousDay && (string)$previousDay['opening_hours'] === (string)$value) {
+            if ($previousDay && (string) $previousDay['opening_hours'] === (string) $value) {
                 $key = key($concatenatedDays);
                 $concatenatedDays[$key]['days'][] = $day;
                 continue;
@@ -288,7 +288,7 @@ class OpeningHours
 
     public function isClosedOn(string $day): bool
     {
-        return !$this->isOpenOn($day);
+        return ! $this->isOpenOn($day);
     }
 
     public function isOpenAt(DateTimeInterface $dateTime): bool
@@ -310,7 +310,7 @@ class OpeningHours
 
     public function isClosedAt(DateTimeInterface $dateTime): bool
     {
-        return !$this->isOpenAt($dateTime);
+        return ! $this->isOpenAt($dateTime);
     }
 
     public function isOpen(): bool
@@ -335,7 +335,7 @@ class OpeningHours
         /** @var TimeRange $range */
         $range = $this->currentOpenRange($dateTime);
 
-        if (!$range) {
+        if (! $range) {
             return false;
         }
 
@@ -355,7 +355,7 @@ class OpeningHours
         /** @var TimeRange $range */
         $range = $this->currentOpenRange($dateTime);
 
-        if (!$range) {
+        if (! $range) {
             return false;
         }
 
@@ -389,7 +389,7 @@ class OpeningHours
                 ->modify('+1 day')
                 ->setTime(0, 0, 0);
 
-            if ($this->isOpenAt($dateTime) && !$openingHoursForDay->isOpenAt(Time::fromString('23:59'))) {
+            if ($this->isOpenAt($dateTime) && ! $openingHoursForDay->isOpenAt(Time::fromString('23:59'))) {
                 return $dateTime;
             }
 
@@ -420,7 +420,7 @@ class OpeningHours
         }
 
         $openingHoursForDay = $this->forDate($dateTime);
-        if (!$nextClose) {
+        if (! $nextClose) {
             $nextClose = $openingHoursForDay->nextClose(Time::fromDateTime($dateTime));
 
             if ($nextClose && $nextClose->hours() < 24 && $nextClose->format('Gi') < $dateTime->format('Gi')) {
@@ -477,7 +477,7 @@ class OpeningHours
 
             $openingHoursForDay = $this->forDate($dateTime);
 
-            if ($this->isOpenAt($midnight) && !$openingHoursForDay->isOpenAt(Time::fromString('23:59'))) {
+            if ($this->isOpenAt($midnight) && ! $openingHoursForDay->isOpenAt(Time::fromString('23:59'))) {
                 return $midnight;
             }
 
@@ -502,7 +502,7 @@ class OpeningHours
         }
 
         $openingHoursForDay = $this->forDate($dateTime);
-        if (!$previousClose) {
+        if (! $previousClose) {
             $previousClose = $openingHoursForDay->previousClose(Time::fromDateTime($dateTime));
         }
 
@@ -566,7 +566,7 @@ class OpeningHours
         $metaData = Arr::pull($data, 'data', null);
         $exceptions = [];
         $filters = Arr::pull($data, 'filters', []);
-        $overflow = (bool)Arr::pull($data, 'overflow', false);
+        $overflow = (bool) Arr::pull($data, 'overflow', false);
 
         foreach (Arr::pull($data, 'exceptions', []) as $key => $exception) {
             if (is_callable($exception)) {
@@ -607,7 +607,7 @@ class OpeningHours
             return;
         }
 
-        if (!$this->dayLimit) {
+        if (! $this->dayLimit) {
             $this->dayLimit = 366;
         }
 
@@ -630,7 +630,7 @@ class OpeningHours
     {
         $day = strtolower($day);
 
-        if (!Day::isValid($day)) {
+        if (! Day::isValid($day)) {
             throw InvalidDayName::invalidDayName($day);
         }
 
