@@ -1340,8 +1340,14 @@ class OpeningHoursTest extends TestCase
             'sunday'    => [],
         ]);
 
-        $this->assertSame(1.5, $openingHours->diffInClosedSeconds(new DateTimeImmutable('Monday 09:59:58.5'), new DateTimeImmutable('Monday 10:59:58.5')));
-        $this->assertSame(3600 - 1.5, $openingHours->diffInOpenSeconds(new DateTimeImmutable('Monday 09:59:58.5'), new DateTimeImmutable('Monday 10:59:58.5')));
+        $this->assertSame(2.0, $openingHours->diffInClosedSeconds(new DateTimeImmutable('Monday 09:59:58'), new DateTimeImmutable('Monday 10:59:58')));
+        $this->assertSame(3600.0 - 2.0, $openingHours->diffInOpenSeconds(new DateTimeImmutable('Monday 09:59:58'), new DateTimeImmutable('Monday 10:59:58')));
+
+        if (version_compare(PHP_VERSION, '7.1.0-dev', '>=')) {
+            $this->assertSame(1.5, $openingHours->diffInClosedSeconds(new DateTimeImmutable('Monday 09:59:58.5'), new DateTimeImmutable('Monday 10:59:58.5')));
+            $this->assertSame(3600.0 - 1.5, $openingHours->diffInOpenSeconds(new DateTimeImmutable('Monday 09:59:58.5'), new DateTimeImmutable('Monday 10:59:58.5')));
+        }
+
         $this->assertSame(1.5 * 60, $openingHours->diffInOpenMinutes(new DateTimeImmutable('Monday 3pm'), new DateTimeImmutable('Monday 8pm')));
         $this->assertSame(3.5 * 60, $openingHours->diffInClosedMinutes(new DateTimeImmutable('Monday 3pm'), new DateTimeImmutable('Monday 8pm')));
         $this->assertSame(18.5, $openingHours->diffInOpenHours(new DateTimeImmutable('2020-06-21 3pm'), new DateTimeImmutable('2020-06-25 2pm')));
