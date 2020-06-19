@@ -398,6 +398,38 @@ Returns previous close DateTime from the given DateTime
 $openingHours->nextClose(new DateTime('2016-12-24 11:00:00'));
 ```
 
+#### `OpeningHours::diffInOpenHours(DateTimeInterface $startDate, DateTimeInterface $endDate) : float`
+
+Return the amount of open time (number of hours as a floating number) between 2 dates/times.
+
+```php
+$openingHours->diffInOpenHours(new DateTime('2016-12-24 11:00:00'), new DateTime('2016-12-24 16:34:25'));
+```
+
+#### `OpeningHours::diffInOpenMinutes(DateTimeInterface $startDate, DateTimeInterface $endDate) : float`
+
+Return the amount of open time (number of minutes as a floating number) between 2 dates/times.
+
+#### `OpeningHours::diffInOpenSeconds(DateTimeInterface $startDate, DateTimeInterface $endDate) : float`
+
+Return the amount of open time (number of seconds as a floating number) between 2 dates/times.
+
+#### `OpeningHours::diffInClosedHours(DateTimeInterface $startDate, DateTimeInterface $endDate) : float`
+
+Return the amount of closed time (number of hours as a floating number) between 2 dates/times.
+
+```php
+$openingHours->diffInClosedHours(new DateTime('2016-12-24 11:00:00'), new DateTime('2016-12-24 16:34:25'));
+```
+
+#### `OpeningHours::diffInClosedMinutes(DateTimeInterface $startDate, DateTimeInterface $endDate) : float`
+
+Return the amount of closed time (number of minutes as a floating number) between 2 dates/times.
+
+#### `OpeningHours::diffInClosedSeconds(DateTimeInterface $startDate, DateTimeInterface $endDate) : float`
+
+Return the amount of closed time (number of seconds as a floating number) between 2 dates/times.
+
 #### `OpeningHours::currentOpenRange(DateTimeInterface $dateTime) : false | TimeRange`
 
 Returns a `Spatie\OpeningHours\TimeRange` instance of the current open range if the
