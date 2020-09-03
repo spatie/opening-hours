@@ -66,7 +66,7 @@ It can also be queried for a specific date and time:
 $openingHours->isOpenAt(new DateTime('2016-09-26 19:00:00')); // false
 
 // Closed because Christmas was set as an exception
-$openingHours->isOpenAt(new DateTime('2016-12-25')); // false
+$openingHours->isOpenOn('2016-12-25'); // false
 ```
 
 It can also return arrays of opening hours for a week or a day:
@@ -320,10 +320,18 @@ $openingHours->exceptions();
 
 #### `OpeningHours::isOpenOn(string $day): bool`
 
-Checks if the business is open on a day in the regular schedule.
+Checks if the business is open (contains at least 1 range of open hours) on a day in the regular schedule.
 
 ```php
 $openingHours->isOpenOn('saturday');
+```
+
+If the given string is a date, it will check if it's open (contains at least 1 range of open hours) considering
+both regular day schedule and possible exceptions.
+
+```php
+$openingHours->isOpenOn('2020-09-03');
+$openingHours->isOpenOn('09-03'); // If year is omitted, current year is used instead
 ```
 
 #### `OpeningHours::isClosedOn(string $day): bool`

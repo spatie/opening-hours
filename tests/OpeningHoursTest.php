@@ -195,6 +195,12 @@ class OpeningHoursTest extends TestCase
 
         $this->assertTrue($openingHours->isOpenOn('monday'));
         $this->assertFalse($openingHours->isOpenOn('tuesday'));
+        $this->assertFalse($openingHours->isOpenOn('2019-08-31'));
+        $this->assertFalse($openingHours->isOpenOn('2019-09-01'));
+        $this->assertTrue($openingHours->isOpenOn('2020-08-31'));
+        $this->assertFalse($openingHours->isOpenOn('2020-09-01'));
+        $this->assertTrue($openingHours->isOpenOn((new DateTime('First Monday of January'))->format('m-d')));
+        $this->assertFalse($openingHours->isOpenOn((new DateTime('First Tuesday of January'))->format('m-d')));
     }
 
     /** @test */
@@ -206,6 +212,12 @@ class OpeningHoursTest extends TestCase
 
         $this->assertFalse($openingHours->isClosedOn('monday'));
         $this->assertTrue($openingHours->isClosedOn('tuesday'));
+        $this->assertTrue($openingHours->isClosedOn('2019-08-31'));
+        $this->assertTrue($openingHours->isClosedOn('2019-09-01'));
+        $this->assertFalse($openingHours->isClosedOn('2020-08-31'));
+        $this->assertTrue($openingHours->isClosedOn('2020-09-01'));
+        $this->assertFalse($openingHours->isClosedOn((new DateTime('First Monday of January'))->format('m-d')));
+        $this->assertTrue($openingHours->isClosedOn((new DateTime('First Tuesday of January'))->format('m-d')));
     }
 
     /** @test */
