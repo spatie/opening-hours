@@ -283,6 +283,13 @@ class OpeningHours
 
     public function isOpenOn(string $day): bool
     {
+        if (preg_match('/^(?:(\d+)-)?(\d{1,2})-(\d{1,2})$/', $day, $match)) {
+            list(, $year, $month, $day) = $match;
+            $year = $year ?: date('Y');
+
+            return count($this->forDate(new DateTime("$year-$month-$day"))) > 0;
+        }
+
         return count($this->forDay($day)) > 0;
     }
 
