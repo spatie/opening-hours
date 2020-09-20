@@ -2,6 +2,30 @@
 
 All notable changes to `opening-hours` will be documented in this file
 
+## 3.0.0 - upcoming
+
+- Add `currentOpenRangePeriod()` method
+- Add `TimeRange::startOn()` method
+- Add `TimeRange::endOn()` method
+- Add `TimeRange::startAfter()` method
+- Add `TimeRange::endAfter()` method
+- Add `TimeRange::startBefore()` method
+- Add `TimeRange::endBefore()` method
+
+## 2.9.0 - 2020-09-03
+
+- Allow `isOpenOn()` to take date string as parameter
+
+## 2.8.0 - 2020-06-19
+
+- Add `Time::diff()` methods
+
+## 2.7.2 - 2020-06-19
+
+- Fix support of data/filters/overflow with
+`OpeningHours::createAndMergeOverlappingRanges()` and
+`OpeningHours::mergeOverlappingRanges()`
+
 ## 2.7.1 - 2020-05-30
 
 - Added `InvalidTimezone` exception
