@@ -1,7 +1,1 @@
 preset: laravel
-
-disabled:
-  - short_list_syntax
-
-enabled:
-  - long_list_syntax
