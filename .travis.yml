@@ -7,7 +7,7 @@ matrix:
     - php: 7.4
       env: COMPOSER_FLAGS=""
     - php: nightly
-      env: COMPOSER_FLAGS=""
+      env: COMPOSER_FLAGS="--ignore-platform-reqs"
     - php: 7.4
       env: MULTITEST='on'
 
