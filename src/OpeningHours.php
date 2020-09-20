@@ -384,7 +384,7 @@ class OpeningHours
         $nextOpen = $openingHoursForDay->nextOpen(Time::fromDateTime($dateTime));
         $tries = $this->getDayLimit();
 
-        while (!$nextOpen || $nextOpen->hours() >= 24) {
+        while (! $nextOpen || $nextOpen->hours() >= 24) {
             if (--$tries < 0) {
                 throw MaximumLimitExceeded::forString(
                     'No open date/time found in the next '.$this->getDayLimit().' days,'.
@@ -437,7 +437,7 @@ class OpeningHours
 
         $tries = $this->getDayLimit();
 
-        while (!$nextClose || $nextClose->hours() >= 24) {
+        while (! $nextClose || $nextClose->hours() >= 24) {
             if (--$tries < 0) {
                 throw MaximumLimitExceeded::forString(
                     'No close date/time found in the next '.$this->getDayLimit().' days,'.
@@ -470,7 +470,7 @@ class OpeningHours
         $previousOpen = $openingHoursForDay->previousOpen(Time::fromDateTime($dateTime));
         $tries = $this->getDayLimit();
 
-        while (!$previousOpen || ($previousOpen->hours() === 0 && $previousOpen->minutes() === 0)) {
+        while (! $previousOpen || ($previousOpen->hours() === 0 && $previousOpen->minutes() === 0)) {
             if (--$tries < 0) {
                 throw MaximumLimitExceeded::forString(
                     'No open date/time found in the previous '.$this->getDayLimit().' days,'.
@@ -515,7 +515,7 @@ class OpeningHours
 
         $tries = $this->getDayLimit();
 
-        while (!$previousClose || ($previousClose->hours() === 0 && $previousClose->minutes() === 0)) {
+        while (! $previousClose || ($previousClose->hours() === 0 && $previousClose->minutes() === 0)) {
             if (--$tries < 0) {
                 throw MaximumLimitExceeded::forString(
                     'No close date/time found in the previous '.$this->getDayLimit().' days,'.
