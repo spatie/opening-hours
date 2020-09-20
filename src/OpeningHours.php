@@ -181,7 +181,7 @@ class OpeningHours
 
     public function fill(array $data): self
     {
-        [$openingHours, $exceptions, $metaData, $filters, $overflow] = $this->parseOpeningHoursAndExceptions($data);
+        list($openingHours, $exceptions, $metaData, $filters, $overflow) = $this->parseOpeningHoursAndExceptions($data);
 
         $this->overflow = $overflow;
 
@@ -291,7 +291,7 @@ class OpeningHours
     public function isOpenOn(string $day): bool
     {
         if (preg_match('/^(?:(\d+)-)?(\d{1,2})-(\d{1,2})$/', $day, $match)) {
-            [, $year, $month, $day] = $match;
+            list(, $year, $month, $day) = $match;
             $year = $year ?: date('Y');
 
             return count($this->forDate(new DateTime("$year-$month-$day"))) > 0;
