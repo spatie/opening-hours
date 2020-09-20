@@ -2,6 +2,7 @@
 
 namespace Spatie\OpeningHours;
 
+use DateInterval;
 use DateTime;
 use DateTimeInterface;
 use DateTimeZone;
@@ -9,15 +10,13 @@ use Spatie\OpeningHours\Exceptions\InvalidTimeString;
 use Spatie\OpeningHours\Helpers\DataTrait;
 use Spatie\OpeningHours\Helpers\DateTimeCopier;
 
-class Time
+class Time implements TimeDataContainer
 {
     use DataTrait, DateTimeCopier;
 
-    /** @var int */
-    protected $hours;
+    protected int $hours;
 
-    /** @var int */
-    protected $minutes;
+    protected int $minutes;
 
     protected function __construct(int $hours, int $minutes)
     {
@@ -48,7 +47,7 @@ class Time
 
     public static function fromDateTime(DateTimeInterface $dateTime): self
     {
-        return static::fromString($dateTime->format('H:i'));
+        return static::fromString($dateTime->format(self::TIME_FORMAT));
     }
 
     public function isSame(self $time): bool
@@ -58,24 +57,12 @@ class Time
 
     public function isAfter(self $time): bool
     {
-        if ($this->isSame($time)) {
-            return false;
-        }
-
-        if ($this->hours > $time->hours) {
-            return true;
-        }
-
-        return $this->hours === $time->hours && $this->minutes >= $time->minutes;
+        return $this > $time;
     }
 
     public function isBefore(self $time): bool
     {
-        if ($this->isSame($time)) {
-            return false;
-        }
-
-        return ! $this->isAfter($time);
+        return $this < $time;
     }
 
     public function isSameOrAfter(self $time): bool
@@ -83,7 +70,7 @@ class Time
         return $this->isSame($time) || $this->isAfter($time);
     }
 
-    public function diff(self $time): \DateInterval
+    public function diff(self $time): DateInterval
     {
         return $this->toDateTime()->diff($time->toDateTime());
     }
@@ -95,7 +82,7 @@ class Time
         return $date->setTime($this->hours, $this->minutes);
     }
 
-    public function format(string $format = 'H:i', $timezone = null): string
+    public function format(string $format = self::TIME_FORMAT, $timezone = null): string
     {
         $date = $timezone
             ? new DateTime('1970-01-01 00:00:00', $timezone instanceof DateTimeZone
@@ -104,7 +91,7 @@ class Time
             )
             : null;
 
-        if ($format === 'H:i' && $this->hours === 24 && $this->minutes === 0) {
+        if ($format === self::TIME_FORMAT && $this->hours === 24 && $this->minutes === 0) {
             return '24:00';
         }
 

@@ -7,18 +7,18 @@ use DateTimeInterface;
 
 trait DateTimeCopier
 {
-    /**
-     * @param DateTimeInterface $date
-     *
-     * @return \DateTime|\DateTimeImmutable
-     */
     protected function copyDateTime(DateTimeInterface $date): DateTimeInterface
     {
         return $date instanceof DateTimeImmutable ? $date : clone $date;
     }
 
+    protected function copyAndModify(DateTimeInterface $date, string $modifier): DateTimeInterface
+    {
+        return $this->copyDateTime($date)->modify($modifier);
+    }
+
     protected function yesterday(DateTimeInterface $date): DateTimeInterface
     {
-        return $this->copyDateTime($date)->modify('-1 day');
+        return $this->copyAndModify($date, '-1 day');
     }
 }

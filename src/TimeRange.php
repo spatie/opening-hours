@@ -7,15 +7,13 @@ use Spatie\OpeningHours\Exceptions\InvalidTimeRangeList;
 use Spatie\OpeningHours\Exceptions\InvalidTimeRangeString;
 use Spatie\OpeningHours\Helpers\DataTrait;
 
-class TimeRange
+class TimeRange implements TimeDataContainer
 {
     use DataTrait;
 
-    /** @var \Spatie\OpeningHours\Time */
-    protected $start;
+    protected Time $start;
 
-    /** @var \Spatie\OpeningHours\Time */
-    protected $end;
+    protected Time $end;
 
     protected function __construct(Time $start, Time $end)
     {
@@ -78,24 +76,23 @@ class TimeRange
             }
         }
 
-        $start = $ranges[0]->start();
-        $end = $ranges[0]->end();
+        $start = $ranges[0]->start;
+        $end = $ranges[0]->end;
 
         foreach (array_slice($ranges, 1) as $range) {
-            $rangeStart = $range->start();
-            if ($rangeStart->isBefore($start)) {
-                $start = $rangeStart;
+            if ($range->start->isBefore($start)) {
+                $start = $range->start;
             }
-            $rangeEnd = $range->end();
-            if ($rangeEnd->isAfter($end)) {
-                $end = $rangeEnd;
+
+            if ($range->end->isAfter($end)) {
+                $end = $range->end;
             }
         }
 
         return new self($start, $end);
     }
 
-    public static function fromMidnight(Time $end)
+    public static function fromMidnight(Time $end): self
     {
         return new self(Time::fromString('00:00'), $end);
     }
@@ -112,7 +109,7 @@ class TimeRange
 
     public function isReversed(): bool
     {
-        return $this->start()->isAfter($this->end());
+        return $this->start->isAfter($this->end);
     }
 
     public function overflowsNextDay(): bool
@@ -132,7 +129,7 @@ class TimeRange
 
     public function containsNightTime(Time $time): bool
     {
-        return $this->overflowsNextDay() && self::fromMidnight($this->end())->containsTime($time);
+        return $this->overflowsNextDay() && self::fromMidnight($this->end)->containsTime($time);
     }
 
     public function overlaps(self $timeRange): bool
@@ -140,7 +137,7 @@ class TimeRange
         return $this->containsTime($timeRange->start) || $this->containsTime($timeRange->end);
     }
 
-    public function format(string $timeFormat = 'H:i', string $rangeFormat = '%s-%s', $timezone = null): string
+    public function format(string $timeFormat = self::TIME_FORMAT, string $rangeFormat = '%s-%s', $timezone = null): string
     {
         return sprintf($rangeFormat, $this->start->format($timeFormat, $timezone), $this->end->format($timeFormat, $timezone));
     }

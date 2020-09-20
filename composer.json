@@ -19,7 +19,7 @@
         }
     ],
     "require": {
-        "php": "^7.0 || ^8.0"
+        "php": "^7.4 || ^8.0"
     },
     "require-dev": {
         "kylekatarnls/multi-tester": "^1.1",
@@ -40,5 +40,11 @@
     },
     "config": {
         "sort-packages": true
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.x-dev",
+            "dev-3.x": "3.x-dev"
+        }
     }
 }

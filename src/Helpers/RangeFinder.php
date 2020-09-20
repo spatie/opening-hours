@@ -7,83 +7,63 @@ use Spatie\OpeningHours\TimeRange;
 
 trait RangeFinder
 {
-    protected function findRangeInFreeTime(Time $time, TimeRange $timeRange)
+    protected function findRangeInFreeTime(Time $time, TimeRange $timeRange): ?TimeRange
     {
-        if ($timeRange->start()->isAfter($time)) {
-            return $timeRange;
-        }
+        return $timeRange->start()->isAfter($time) ? $timeRange : null;
     }
 
-    protected function findOpenInFreeTime(Time $time, TimeRange $timeRange)
+    protected function findOpenInFreeTime(Time $time, TimeRange $timeRange): ?Time
     {
         $range = $this->findRangeInFreeTime($time, $timeRange);
 
-        if ($range) {
-            return $range->start();
-        }
+        return $range ? $range->start() : null;
     }
 
-    protected function findOpenRangeInWorkingHours(Time $time, TimeRange $timeRange)
+    protected function findOpenRangeInWorkingHours(Time $time, TimeRange $timeRange): ?TimeRange
     {
-        if ($timeRange->start()->isBefore($time)) {
-            return $timeRange;
-        }
+        return $timeRange->start()->isBefore($time) ? $timeRange : null;
     }
 
-    protected function findOpenInWorkingHours(Time $time, TimeRange $timeRange)
+    protected function findOpenInWorkingHours(Time $time, TimeRange $timeRange): ?Time
     {
         $range = $this->findOpenRangeInWorkingHours($time, $timeRange);
 
-        if ($range) {
-            return $range->start();
-        }
+        return $range ? $range->start() : null;
     }
 
-    protected function findCloseInWorkingHours(Time $time, TimeRange $timeRange)
+    protected function findCloseInWorkingHours(Time $time, TimeRange $timeRange): ?Time
     {
-        if ($timeRange->containsTime($time)) {
-            return $timeRange->end();
-        }
+        return $timeRange->containsTime($time) ? $timeRange->end() : null;
     }
 
-    protected function findCloseRangeInWorkingHours(Time $time, TimeRange $timeRange)
+    protected function findCloseRangeInWorkingHours(Time $time, TimeRange $timeRange): ?TimeRange
     {
-        if ($timeRange->containsTime($time)) {
-            return $timeRange;
-        }
+        return $timeRange->containsTime($time) ? $timeRange : null;
     }
 
-    protected function findCloseInFreeTime(Time $time, TimeRange $timeRange)
+    protected function findCloseInFreeTime(Time $time, TimeRange $timeRange): ?Time
     {
         $range = $this->findRangeInFreeTime($time, $timeRange);
 
-        if ($range) {
-            return $range->end();
-        }
+        return $range ? $range->end() : null;
     }
 
-    protected function findPreviousRangeInFreeTime(Time $time, TimeRange $timeRange)
+    protected function findPreviousRangeInFreeTime(Time $time, TimeRange $timeRange): ?TimeRange
     {
-        if ($timeRange->end()->isBefore($time)) {
-            return $timeRange;
-        }
+        return $timeRange->end()->isBefore($time) ? $timeRange : null;
     }
 
-    protected function findPreviousOpenInFreeTime(Time $time, TimeRange $timeRange)
+    protected function findPreviousOpenInFreeTime(Time $time, TimeRange $timeRange): ?Time
     {
         $range = $this->findPreviousRangeInFreeTime($time, $timeRange);
 
-        if ($range) {
-            return $range->start();
-        }
+        return $range ? $range->start() : null;
     }
 
-    protected function findPreviousCloseInWorkingHours(Time $time, TimeRange $timeRange)
+    protected function findPreviousCloseInWorkingHours(Time $time, TimeRange $timeRange): ?Time
     {
         $end = $timeRange->end();
 
-        if ($end->isBefore($time)) {
-            return $end;
-        }
+        return $end->isBefore($time) ? $end : null;
     }
 }

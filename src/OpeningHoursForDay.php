@@ -18,9 +18,9 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
     use DataTrait, RangeFinder;
 
     /** @var \Spatie\OpeningHours\TimeRange[] */
-    protected $openingHours = [];
+    protected array $openingHours = [];
 
-    public static function fromStrings(array $strings)
+    public static function fromStrings(array $strings): self
     {
         if (isset($strings['hours'])) {
             return static::fromStrings($strings['hours'])->setData($strings['data'] ?? null);
@@ -48,7 +48,7 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
         return $openingHoursForDay;
     }
 
-    public function isOpenAt(Time $time)
+    public function isOpenAt(Time $time): bool
     {
         foreach ($this->openingHours as $timeRange) {
             if ($timeRange->containsTime($time)) {
@@ -59,7 +59,7 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
         return false;
     }
 
-    public function isOpenAtNight(Time $time)
+    public function isOpenAtNight(Time $time): bool
     {
         foreach ($this->openingHours as $timeRange) {
             if ($timeRange->containsNightTime($time)) {
@@ -74,9 +74,9 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
      * @param callable[] $filters
      * @param bool       $reverse
      *
-     * @return Time|bool
+     * @return Time|TimeRange|null
      */
-    public function openingHoursFilter(array $filters, bool $reverse = false)
+    public function openingHoursFilter(array $filters, bool $reverse = false): ?TimeDataContainer
     {
         foreach (($reverse ? array_reverse($this->openingHours) : $this->openingHours) as $timeRange) {
             foreach ($filters as $filter) {
@@ -88,15 +88,15 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
             }
         }
 
-        return false;
+        return null;
     }
 
     /**
      * @param Time $time
      *
-     * @return bool|Time
+     * @return Time|null
      */
-    public function nextOpen(Time $time)
+    public function nextOpen(Time $time): ?Time
     {
         return $this->openingHoursFilter([
             function ($timeRange) use ($time) {
@@ -108,9 +108,9 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
     /**
      * @param Time $time
      *
-     * @return bool|TimeRange
+     * @return TimeRange|null
      */
-    public function nextOpenRange(Time $time)
+    public function nextOpenRange(Time $time): ?TimeRange
     {
         return $this->openingHoursFilter([
             function ($timeRange) use ($time) {
@@ -122,9 +122,9 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
     /**
      * @param Time $time
      *
-     * @return bool|Time
+     * @return Time|null
      */
-    public function nextClose(Time $time)
+    public function nextClose(Time $time): ?Time
     {
         return $this->openingHoursFilter([
             function ($timeRange) use ($time) {
@@ -139,9 +139,9 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
     /**
      * @param Time $time
      *
-     * @return bool|TimeRange
+     * @return TimeRange|null
      */
-    public function nextCloseRange(Time $time)
+    public function nextCloseRange(Time $time): ?TimeRange
     {
         return $this->openingHoursFilter([
             function ($timeRange) use ($time) {
@@ -156,9 +156,9 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
     /**
      * @param Time $time
      *
-     * @return bool|Time
+     * @return Time|null
      */
-    public function previousOpen(Time $time)
+    public function previousOpen(Time $time): ?Time
     {
         return $this->openingHoursFilter([
             function ($timeRange) use ($time) {
@@ -173,9 +173,9 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
     /**
      * @param Time $time
      *
-     * @return bool|TimeRange
+     * @return TimeRange|null
      */
-    public function previousOpenRange(Time $time)
+    public function previousOpenRange(Time $time): ?TimeRange
     {
         return $this->openingHoursFilter([
             function ($timeRange) use ($time) {
@@ -187,9 +187,9 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
     /**
      * @param Time $time
      *
-     * @return bool|Time
+     * @return Time|null
      */
-    public function previousClose(Time $time)
+    public function previousClose(Time $time): ?Time
     {
         return $this->openingHoursFilter([
             function ($timeRange) use ($time) {
@@ -201,9 +201,9 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
     /**
      * @param Time $time
      *
-     * @return bool|TimeRange
+     * @return TimeRange|null
      */
-    public function previousCloseRange(Time $time)
+    public function previousCloseRange(Time $time): ?TimeRange
     {
         return $this->openingHoursFilter([
             function ($timeRange) use ($time) {
@@ -212,7 +212,7 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
         ], true);
     }
 
-    protected static function getHoursFromRange($range)
+    protected static function getHoursFromRange($range): string
     {
         return strval((is_array($range)
             ? ($range['hours'] ?? array_values($range)[0] ?? null)
@@ -225,17 +225,17 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
         return isset($this->openingHours[$offset]);
     }
 
-    public function offsetGet($offset)
+    public function offsetGet($offset): TimeRange
     {
         return $this->openingHours[$offset];
     }
 
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         throw NonMutableOffsets::forClass(static::class);
     }
 
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         unset($this->openingHours[$offset]);
     }
@@ -245,7 +245,7 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
         return count($this->openingHours);
     }
 
-    public function getIterator()
+    public function getIterator(): ArrayIterator
     {
         return new ArrayIterator($this->openingHours);
     }
@@ -292,7 +292,7 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
         return Arr::map($this->openingHours, $callback);
     }
 
-    protected function guardAgainstTimeRangeOverlaps(array $openingHours)
+    protected function guardAgainstTimeRangeOverlaps(array $openingHours): void
     {
         foreach (Arr::createUniquePairs($openingHours) as $timeRanges) {
             if ($timeRanges[0]->overlaps($timeRanges[1])) {
@@ -301,9 +301,10 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
         }
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         $values = [];
+
         foreach ($this->openingHours as $openingHour) {
             $values[] = (string) $openingHour;
         }
