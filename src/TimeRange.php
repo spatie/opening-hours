@@ -2,13 +2,16 @@
 
 namespace Spatie\OpeningHours;
 
+use DateTimeInterface;
 use Spatie\OpeningHours\Exceptions\InvalidTimeRangeArray;
 use Spatie\OpeningHours\Exceptions\InvalidTimeRangeList;
 use Spatie\OpeningHours\Exceptions\InvalidTimeRangeString;
 use Spatie\OpeningHours\Helpers\DataTrait;
+use Spatie\OpeningHours\Helpers\DateTimeCopier;
 
 class TimeRange implements TimeDataContainer
 {
+    use DateTimeCopier;
     use DataTrait;
 
     protected Time $start;
@@ -105,6 +108,52 @@ class TimeRange implements TimeDataContainer
     public function end(): Time
     {
         return $this->end;
+    }
+
+    public function startOn(DateTimeInterface $moment): DateTimeInterface
+    {
+        return $this->copyAndModify($moment, $this->start);
+    }
+
+    public function endOn(DateTimeInterface $moment): DateTimeInterface
+    {
+        return $this->copyAndModify($moment, $this->end);
+    }
+
+    public function startAfter(DateTimeInterface $moment): DateTimeInterface
+    {
+        return $this->copyAndModify($moment, $this->start.(
+            $this->start < $moment->format(self::TIME_FORMAT)
+                ? ' + 1 day'
+                : ''
+            ));
+    }
+
+    public function endAfter(DateTimeInterface $moment): DateTimeInterface
+    {
+        return $this->copyAndModify($moment, $this->end.(
+            $this->end < $moment->format(self::TIME_FORMAT)
+                ? ' + 1 day'
+                : ''
+            ));
+    }
+
+    public function startBefore(DateTimeInterface $moment): DateTimeInterface
+    {
+        return $this->copyAndModify($moment, $this->start.(
+            $this->start > $moment->format(self::TIME_FORMAT)
+                ? ' - 1 day'
+                : ''
+            ));
+    }
+
+    public function endBefore(DateTimeInterface $moment): DateTimeInterface
+    {
+        return $this->copyAndModify($moment, $this->end.(
+            $this->end > $moment->format(self::TIME_FORMAT)
+                ? ' - 1 day'
+                : ''
+            ));
     }
 
     public function isReversed(): bool

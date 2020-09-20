@@ -2,6 +2,7 @@
 
 namespace Spatie\OpeningHours\Test;
 
+use DateTime;
 use PHPUnit\Framework\TestCase;
 use Spatie\OpeningHours\Exceptions\InvalidTimeRangeArray;
 use Spatie\OpeningHours\Exceptions\InvalidTimeRangeList;
@@ -118,5 +119,69 @@ class TimeRangeTest extends TestCase
         $this->assertSame('16:00-18:00', TimeRange::fromString('16:00-18:00')->format());
         $this->assertSame('16:00 - 18:00', TimeRange::fromString('16:00-18:00')->format('H:i', '%s - %s'));
         $this->assertSame('from 4 PM to 6 PM', TimeRange::fromString('16:00-18:00')->format('g A', 'from %s to %s'));
+    }
+
+    /** @test */
+    public function it_can_return_dates_relative_to_a_given_one()
+    {
+        $date = new DateTime('2020-09-20 17:23:45');
+        $start = TimeRange::fromString('16:00-18:00')->startOn($date);
+        $this->assertInstanceOf(DateTime::class, $start);
+        $this->assertSame('2020-09-20 16:00:00', $start->format('Y-m-d H:i:s'));
+        $end = TimeRange::fromString('16:00-18:00')->endOn($date);
+        $this->assertInstanceOf(DateTime::class, $end);
+        $this->assertSame('2020-09-20 18:00:00', $end->format('Y-m-d H:i:s'));
+        $start = TimeRange::fromString('16:00-18:00')->startBefore($date);
+        $this->assertInstanceOf(DateTime::class, $start);
+        $this->assertSame('2020-09-20 16:00:00', $start->format('Y-m-d H:i:s'));
+        $end = TimeRange::fromString('16:00-18:00')->endBefore($date);
+        $this->assertInstanceOf(DateTime::class, $end);
+        $this->assertSame('2020-09-19 18:00:00', $end->format('Y-m-d H:i:s'));
+        $start = TimeRange::fromString('16:00-18:00')->startAfter($date);
+        $this->assertInstanceOf(DateTime::class, $start);
+        $this->assertSame('2020-09-21 16:00:00', $start->format('Y-m-d H:i:s'));
+        $end = TimeRange::fromString('16:00-18:00')->endAfter($date);
+        $this->assertInstanceOf(DateTime::class, $end);
+        $this->assertSame('2020-09-20 18:00:00', $end->format('Y-m-d H:i:s'));
+
+        $date = new DateTime('2020-09-20 15:23:45');
+        $start = TimeRange::fromString('16:00-18:00')->startOn($date);
+        $this->assertInstanceOf(DateTime::class, $start);
+        $this->assertSame('2020-09-20 16:00:00', $start->format('Y-m-d H:i:s'));
+        $end = TimeRange::fromString('16:00-18:00')->endOn($date);
+        $this->assertInstanceOf(DateTime::class, $end);
+        $this->assertSame('2020-09-20 18:00:00', $end->format('Y-m-d H:i:s'));
+        $start = TimeRange::fromString('16:00-18:00')->startBefore($date);
+        $this->assertInstanceOf(DateTime::class, $start);
+        $this->assertSame('2020-09-19 16:00:00', $start->format('Y-m-d H:i:s'));
+        $end = TimeRange::fromString('16:00-18:00')->endBefore($date);
+        $this->assertInstanceOf(DateTime::class, $end);
+        $this->assertSame('2020-09-19 18:00:00', $end->format('Y-m-d H:i:s'));
+        $start = TimeRange::fromString('16:00-18:00')->startAfter($date);
+        $this->assertInstanceOf(DateTime::class, $start);
+        $this->assertSame('2020-09-20 16:00:00', $start->format('Y-m-d H:i:s'));
+        $end = TimeRange::fromString('16:00-18:00')->endAfter($date);
+        $this->assertInstanceOf(DateTime::class, $end);
+        $this->assertSame('2020-09-20 18:00:00', $end->format('Y-m-d H:i:s'));
+
+        $date = new DateTime('2020-09-20 21:23:45');
+        $start = TimeRange::fromString('16:00-18:00')->startOn($date);
+        $this->assertInstanceOf(DateTime::class, $start);
+        $this->assertSame('2020-09-20 16:00:00', $start->format('Y-m-d H:i:s'));
+        $end = TimeRange::fromString('16:00-18:00')->endOn($date);
+        $this->assertInstanceOf(DateTime::class, $end);
+        $this->assertSame('2020-09-20 18:00:00', $end->format('Y-m-d H:i:s'));
+        $start = TimeRange::fromString('16:00-18:00')->startBefore($date);
+        $this->assertInstanceOf(DateTime::class, $start);
+        $this->assertSame('2020-09-20 16:00:00', $start->format('Y-m-d H:i:s'));
+        $end = TimeRange::fromString('16:00-18:00')->endBefore($date);
+        $this->assertInstanceOf(DateTime::class, $end);
+        $this->assertSame('2020-09-20 18:00:00', $end->format('Y-m-d H:i:s'));
+        $start = TimeRange::fromString('16:00-18:00')->startAfter($date);
+        $this->assertInstanceOf(DateTime::class, $start);
+        $this->assertSame('2020-09-21 16:00:00', $start->format('Y-m-d H:i:s'));
+        $end = TimeRange::fromString('16:00-18:00')->endAfter($date);
+        $this->assertInstanceOf(DateTime::class, $end);
+        $this->assertSame('2020-09-21 18:00:00', $end->format('Y-m-d H:i:s'));
     }
 }
