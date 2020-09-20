@@ -2,6 +2,7 @@
 
 namespace Spatie\OpeningHours\Test;
 
+use DateInterval;
 use DateTime;
 use DateTimeImmutable;
 use DateTimeZone;
@@ -1256,12 +1257,46 @@ class OpeningHoursTest extends TestCase
         $this->assertNull($openingHours->currentOpenRange(new DateTime('2019-07-15 17:00:00')));
         $this->assertNull($openingHours->currentOpenRange(new DateTime('2019-07-16 22:00:00')));
         $this->assertNull($openingHours->currentOpenRange(new DateTime('2019-07-17 04:00:00')));
-        $this->assertSame('10:00-16:00', $openingHours->currentOpenRange(new DateTime('2019-07-15 11:00:00'))->format());
+        $range = $openingHours->currentOpenRange(new DateTime('2019-07-15 11:00:00'));
+        $this->assertInstanceOf(TimeRange::class, $range);
+        $this->assertSame('10:00-16:00', $range->format());
         $this->assertSame('19:30-20:30', $openingHours->currentOpenRange(new DateTime('2019-07-15 20:00:00'))->format());
         $this->assertSame('22:30-04:00', $openingHours->currentOpenRange(new DateTime('2019-07-16 22:30:00'))->format());
         $this->assertSame('22:30-04:00', $openingHours->currentOpenRange(new DateTime('2019-07-16 22:40:00'))->format());
         $this->assertSame('22:30-04:00', $openingHours->currentOpenRange(new DateTime('2019-07-17 03:59:59'))->format());
         $this->assertSame('07:00-10:00', $openingHours->currentOpenRange(new DateTime('2019-07-17 07:59:59'))->format());
+
+        $this->assertNull($openingHours->currentOpenRangePeriod(new DateTime('2019-07-15 08:00:00')));
+        $period = $openingHours->currentOpenRangePeriod(new DateTime('2019-07-15 11:00:00'));
+        $this->assertSame('2019-07-15 10:00:00', $period->start->format('Y-m-d H:i:s'));
+        $this->assertSame('2019-07-15 16:00:00', $period->end->format('Y-m-d H:i:s'));
+
+        $openingHours = OpeningHours::create([
+            'overflow' => true,
+            'monday'   => ['10:00-16:00', '19:30-02:30'],
+        ]);
+
+        $this->assertNull($openingHours->currentOpenRangePeriod(new DateTime('2020-09-21 18:00')));
+        $period = $openingHours->currentOpenRangePeriod(new DateTime('2020-09-21 22:00'));
+        $this->assertSame('2020-09-21 19:30', $period->start->format('Y-m-d H:i'));
+        $this->assertSame('2020-09-22 02:30', $period->end->format('Y-m-d H:i'));
+        $period = $openingHours->currentOpenRangePeriod(new DateTime('2020-09-22 01:00'), new DateInterval('PT1H'));
+        $this->assertSame('2020-09-21 19:30', $period->start->format('Y-m-d H:i'));
+        $this->assertSame('2020-09-22 02:30', $period->end->format('Y-m-d H:i'));
+
+        $dates = array_map(function (DateTime $date) {
+            return $date->format('Y-m-d H:i');
+        }, iterator_to_array($period));
+
+        $this->assertSame([
+            '2020-09-21 19:30',
+            '2020-09-21 20:30',
+            '2020-09-21 21:30',
+            '2020-09-21 22:30',
+            '2020-09-21 23:30',
+            '2020-09-22 00:30',
+            '2020-09-22 01:30',
+        ], $dates);
     }
 
     /** @test */

@@ -2,6 +2,8 @@
 
 namespace Spatie\OpeningHours;
 
+use DateInterval;
+use DatePeriod;
 use DateTime;
 use DateTimeInterface;
 use DateTimeZone;
@@ -35,7 +37,7 @@ class OpeningHours
     /** @var bool Allow for overflowing time ranges which overflow into the next day */
     protected bool $overflow = false;
 
-    /** @var int Number of days to try before abandoning the search of the next close/open time */
+    /** @var int|null Number of days to try before abandoning the search of the next close/open time */
     protected ?int $dayLimit = null;
 
     public function __construct($timezone = null)
@@ -74,6 +76,7 @@ class OpeningHours
     {
         $result = [];
         $ranges = [];
+
         foreach ($data as $key => $value) {
             if (in_array($key, $excludedKeys, true)) {
                 continue;
@@ -178,7 +181,7 @@ class OpeningHours
 
     public function fill(array $data): self
     {
-        list($openingHours, $exceptions, $metaData, $filters, $overflow) = $this->parseOpeningHoursAndExceptions($data);
+        [$openingHours, $exceptions, $metaData, $filters, $overflow] = $this->parseOpeningHoursAndExceptions($data);
 
         $this->overflow = $overflow;
 
@@ -223,11 +226,14 @@ class OpeningHours
     {
         $concatenatedDays = [];
         $allOpeningHours = $this->openingHours;
+
         foreach ($allOpeningHours as $day => $value) {
             $previousDay = end($concatenatedDays);
+
             if ($previousDay && (string) $previousDay['opening_hours'] === (string) $value) {
                 $key = key($concatenatedDays);
                 $concatenatedDays[$key]['days'][] = $day;
+
                 continue;
             }
 
@@ -242,9 +248,7 @@ class OpeningHours
 
     public function forDay(string $day): OpeningHoursForDay
     {
-        $day = $this->normalizeDayName($day);
-
-        return $this->openingHours[$day];
+        return $this->openingHours[$this->normalizeDayName($day)];
     }
 
     public function forDate(DateTimeInterface $date): OpeningHoursForDay
@@ -259,7 +263,9 @@ class OpeningHours
             }
         }
 
-        return $this->exceptions[$date->format('Y-m-d')] ?? ($this->exceptions[$date->format('m-d')] ?? $this->forDay(Day::onDateTime($date)));
+        return $this->exceptions[$date->format('Y-m-d')]
+            ?? $this->exceptions[$date->format('m-d')]
+            ?? $this->forDay(Day::onDateTime($date));
     }
 
     /**
@@ -271,9 +277,9 @@ class OpeningHours
     {
         return array_merge(
             iterator_to_array($this->forDate(
-                $this->yesterday($date)
+                $this->yesterday($date),
             )->forNightTime(Time::fromDateTime($date))),
-            iterator_to_array($this->forDate($date)->forTime(Time::fromDateTime($date)))
+            iterator_to_array($this->forDate($date)->forTime(Time::fromDateTime($date))),
         );
     }
 
@@ -285,7 +291,7 @@ class OpeningHours
     public function isOpenOn(string $day): bool
     {
         if (preg_match('/^(?:(\d+)-)?(\d{1,2})-(\d{1,2})$/', $day, $match)) {
-            list(, $year, $month, $day) = $match;
+            [, $year, $month, $day] = $match;
             $year = $year ?: date('Y');
 
             return count($this->forDate(new DateTime("$year-$month-$day"))) > 0;
@@ -337,6 +343,19 @@ class OpeningHours
         $list = $this->forDateTime($dateTime);
 
         return end($list) ?: null;
+    }
+
+    public function currentOpenRangePeriod(DateTimeInterface $dateTime, DateInterval $interval = null): ?DatePeriod
+    {
+        $range = $this->currentOpenRange($dateTime);
+
+        return $range
+            ? new DatePeriod(
+                $range->startBefore($dateTime),
+                $interval ?? new DateInterval('PT1M'),
+                $range->endAfter($dateTime),
+            )
+            : null;
     }
 
     public function currentOpenRangeStart(DateTimeInterface $dateTime): ?DateTimeInterface

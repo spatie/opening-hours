@@ -30,7 +30,7 @@ class Time implements TimeDataContainer
             throw InvalidTimeString::forString($string);
         }
 
-        list($hours, $minutes) = explode(':', $string);
+        [$hours, $minutes] = explode(':', $string);
 
         return new self($hours, $minutes);
     }
