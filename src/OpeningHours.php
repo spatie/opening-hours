@@ -366,15 +366,10 @@ class OpeningHours
             return null;
         }
 
-        $dateTime = $this->copyDateTime($dateTime);
+        $time = $dateTime->format(TimeDataContainer::TIME_FORMAT);
+        $start = $range->start();
 
-        $nextDateTime = $range->start()->toDateTime();
-
-        if ($range->overflowsNextDay() && $nextDateTime->format('Hi') > $dateTime->format('Hi')) {
-            $dateTime = $dateTime->modify('-1 day');
-        }
-
-        return $dateTime->setTime($nextDateTime->format('G'), $nextDateTime->format('i'), 0);
+        return $this->copyAndModify($dateTime, $start.($start > $time ? ' - 1 day' : ''));
     }
 
     public function currentOpenRangeEnd(DateTimeInterface $dateTime): ?DateTimeInterface
@@ -385,15 +380,10 @@ class OpeningHours
             return null;
         }
 
-        $dateTime = $this->copyDateTime($dateTime);
+        $time = $dateTime->format(TimeDataContainer::TIME_FORMAT);
+        $end = $range->end();
 
-        $nextDateTime = $range->end()->toDateTime();
-
-        if ($range->overflowsNextDay() && $nextDateTime->format('Hi') < $dateTime->format('Hi')) {
-            $dateTime = $dateTime->modify('+1 day');
-        }
-
-        return $dateTime->setTime($nextDateTime->format('G'), $nextDateTime->format('i'), 0);
+        return $this->copyAndModify($dateTime, $end.($end < $time ? ' + 1 day' : ''));
     }
 
     public function nextOpen(DateTimeInterface $dateTime): DateTimeInterface
