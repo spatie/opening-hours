@@ -338,7 +338,7 @@ class OpeningHours
         $list = $this->forDateTime($dateTime);
         $range = end($list);
 
-        return $range ? DateTimeRange::fromTimeRange($dateTime, $range): null;
+        return $range ? DateTimeRange::fromTimeRange($dateTime, $range) : null;
     }
 
     public function currentOpenRangePeriod(DateTimeInterface $dateTime, DateInterval $interval = null): ?DatePeriod

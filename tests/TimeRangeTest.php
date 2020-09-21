@@ -2,7 +2,6 @@
 
 namespace Spatie\OpeningHours\Test;
 
-use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 use Spatie\OpeningHours\Exceptions\InvalidTimeRangeArray;
 use Spatie\OpeningHours\Exceptions\InvalidTimeRangeList;
