@@ -18,13 +18,14 @@ class TimeRange implements TimeDataContainer
 
     protected Time $end;
 
-    protected function __construct(Time $start, Time $end)
+    protected function __construct(Time $start, Time $end, $data = null)
     {
         $this->start = $start;
         $this->end = $end;
+        $this->data = $data;
     }
 
-    public static function fromString(string $string): self
+    public static function fromString(string $string, $data = null): self
     {
         $times = explode('-', $string);
 
@@ -32,7 +33,7 @@ class TimeRange implements TimeDataContainer
             throw InvalidTimeRangeString::forString($string);
         }
 
-        return new self(Time::fromString($times[0]), Time::fromString($times[1]));
+        return new self(Time::fromString($times[0]), Time::fromString($times[1]), $data);
     }
 
     public static function fromArray(array $array): self
@@ -59,7 +60,7 @@ class TimeRange implements TimeDataContainer
             throw InvalidTimeRangeArray::create();
         }
 
-        return static::fromString($values['hours'])->setData($values['data']);
+        return static::fromString($values['hours'], $values['data']);
     }
 
     public static function fromDefinition($value): self
@@ -95,9 +96,9 @@ class TimeRange implements TimeDataContainer
         return new self($start, $end);
     }
 
-    public static function fromMidnight(Time $end): self
+    public static function fromMidnight(Time $end, $data = null): self
     {
-        return new self(Time::fromString(self::MIDNIGHT), $end);
+        return new self(Time::fromString(self::MIDNIGHT), $end, $data);
     }
 
     public function start(): Time
@@ -108,52 +109,6 @@ class TimeRange implements TimeDataContainer
     public function end(): Time
     {
         return $this->end;
-    }
-
-    public function startOn(DateTimeInterface $moment): DateTimeInterface
-    {
-        return $this->copyAndModify($moment, $this->start);
-    }
-
-    public function endOn(DateTimeInterface $moment): DateTimeInterface
-    {
-        return $this->copyAndModify($moment, $this->end);
-    }
-
-    public function startAfter(DateTimeInterface $moment): DateTimeInterface
-    {
-        return $this->copyAndModify($moment, $this->start.(
-            $this->start < $moment->format(self::TIME_FORMAT)
-                ? ' + 1 day'
-                : ''
-            ));
-    }
-
-    public function endAfter(DateTimeInterface $moment): DateTimeInterface
-    {
-        return $this->copyAndModify($moment, $this->end.(
-            $this->end < $moment->format(self::TIME_FORMAT)
-                ? ' + 1 day'
-                : ''
-            ));
-    }
-
-    public function startBefore(DateTimeInterface $moment): DateTimeInterface
-    {
-        return $this->copyAndModify($moment, $this->start.(
-            $this->start > $moment->format(self::TIME_FORMAT)
-                ? ' - 1 day'
-                : ''
-            ));
-    }
-
-    public function endBefore(DateTimeInterface $moment): DateTimeInterface
-    {
-        return $this->copyAndModify($moment, $this->end.(
-            $this->end > $moment->format(self::TIME_FORMAT)
-                ? ' - 1 day'
-                : ''
-            ));
     }
 
     public function isReversed(): bool

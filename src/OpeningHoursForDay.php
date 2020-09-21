@@ -20,18 +20,20 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
     /** @var \Spatie\OpeningHours\TimeRange[] */
     protected array $openingHours = [];
 
-    public static function fromStrings(array $strings): self
+    public static function fromStrings(array $strings, $data = null): self
     {
         if (isset($strings['hours'])) {
-            return static::fromStrings($strings['hours'])->setData($strings['data'] ?? null);
+            return static::fromStrings($strings['hours'], $strings['data'] ?? $data);
         }
 
         $openingHoursForDay = new static();
 
         if (isset($strings['data'])) {
-            $openingHoursForDay->setData($strings['data'] ?? null);
+            $data = $strings['data'] ?? null;
             unset($strings['data']);
         }
+
+        $openingHoursForDay->data = $data;
 
         uasort($strings, function ($a, $b) {
             return strcmp(static::getHoursFromRange($a), static::getHoursFromRange($b));

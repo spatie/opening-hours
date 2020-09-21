@@ -167,13 +167,6 @@ class OpeningHours
         return $this->dayLimit ?: static::DEFAULT_DAY_LIMIT;
     }
 
-    public function setFilters(array $filters): self
-    {
-        $this->filters = $filters;
-
-        return $this;
-    }
-
     public function getFilters(): array
     {
         return $this->filters;
@@ -190,8 +183,10 @@ class OpeningHours
         }
 
         $this->setExceptionsFromStrings($exceptions);
+        $this->data = $metaData;
+        $this->filters = $filters;
 
-        return $this->setFilters($filters)->setData($metaData);
+        return $this;
     }
 
     public function forWeek(): array
@@ -338,11 +333,12 @@ class OpeningHours
         return $this->isClosedAt(new DateTime());
     }
 
-    public function currentOpenRange(DateTimeInterface $dateTime): ?TimeRange
+    public function currentOpenRange(DateTimeInterface $dateTime): ?DateTimeRange
     {
         $list = $this->forDateTime($dateTime);
+        $range = end($list);
 
-        return end($list) ?: null;
+        return $range ? DateTimeRange::fromTimeRange($dateTime, $range): null;
     }
 
     public function currentOpenRangePeriod(DateTimeInterface $dateTime, DateInterval $interval = null): ?DatePeriod
@@ -351,9 +347,9 @@ class OpeningHours
 
         return $range
             ? new DatePeriod(
-                $range->startBefore($dateTime),
+                $range->startDate(),
                 $interval ?? new DateInterval('PT1M'),
-                $range->endAfter($dateTime),
+                $range->endDate(),
             )
             : null;
     }
@@ -572,11 +568,6 @@ class OpeningHours
         });
     }
 
-    public function setTimezone($timezone): void
-    {
-        $this->timezone = new DateTimeZone($timezone);
-    }
-
     protected function parseOpeningHoursAndExceptions(array $data): array
     {
         $metaData = Arr::pull($data, 'data', null);
@@ -614,7 +605,7 @@ class OpeningHours
             unset($openingHours['data']);
         }
 
-        $this->openingHours[$day] = OpeningHoursForDay::fromStrings($openingHours)->setData($data);
+        $this->openingHours[$day] = OpeningHoursForDay::fromStrings($openingHours, $data);
     }
 
     protected function setExceptionsFromStrings(array $exceptions): void
