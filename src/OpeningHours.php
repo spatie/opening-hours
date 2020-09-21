@@ -405,7 +405,7 @@ class OpeningHours
                 ->modify('+1 day')
                 ->setTime(0, 0, 0);
 
-            if ($this->isOpenAt($dateTime) && ! $openingHoursForDay->isOpenAt(Time::fromString('23:59'))) {
+            if ($this->isOpenAt($dateTime) && ! $openingHoursForDay->isOpenAtTheEndOfTheDay()) {
                 return $dateTime;
             }
 
@@ -414,7 +414,9 @@ class OpeningHours
             $nextOpen = $openingHoursForDay->nextOpen(Time::fromDateTime($dateTime));
         }
 
-        if ($dateTime->format(TimeDataContainer::TIME_FORMAT) === '00:00' && $this->isOpenAt((clone $dateTime)->modify('-1 second'))) {
+        if ($dateTime->format(TimeDataContainer::TIME_FORMAT) === TimeDataContainer::MIDNIGHT &&
+            $this->isOpenAt($this->copyAndModify($dateTime, '-1 second'))
+        ) {
             return $this->nextOpen($dateTime->modify('+1 minute'));
         }
 
@@ -428,7 +430,7 @@ class OpeningHours
         $dateTime = $this->copyDateTime($dateTime);
         $nextClose = null;
         if ($this->overflow) {
-            $dateTimeMinus1Day = $this->copyDateTime($dateTime)->modify('-1 day');
+            $dateTimeMinus1Day = $this->yesterday($dateTime);
             $openingHoursForDayBefore = $this->forDate($dateTimeMinus1Day);
             if ($openingHoursForDayBefore->isOpenAtNight(Time::fromDateTime($dateTimeMinus1Day))) {
                 $nextClose = $openingHoursForDayBefore->nextClose(Time::fromDateTime($dateTime));
@@ -458,7 +460,7 @@ class OpeningHours
                 ->modify('+1 day')
                 ->setTime(0, 0, 0);
 
-            if ($this->isClosedAt($dateTime) && $openingHoursForDay->isOpenAt(Time::fromString('23:59'))) {
+            if ($this->isClosedAt($dateTime) && $openingHoursForDay->isOpenAtTheEndOfTheDay()) {
                 return $dateTime;
             }
 
@@ -488,12 +490,11 @@ class OpeningHours
             }
 
             $midnight = $dateTime->setTime(0, 0, 0);
-            $dateTime = clone $midnight;
-            $dateTime = $dateTime->modify('-1 minute');
+            $dateTime = $this->copyAndModify($midnight, '-1 minute');
 
             $openingHoursForDay = $this->forDate($dateTime);
 
-            if ($this->isOpenAt($midnight) && ! $openingHoursForDay->isOpenAt(Time::fromString('23:59'))) {
+            if ($this->isOpenAt($midnight) && ! $openingHoursForDay->isOpenAtTheEndOfTheDay()) {
                 return $midnight;
             }
 
@@ -510,7 +511,7 @@ class OpeningHours
         $dateTime = $this->copyDateTime($dateTime);
         $previousClose = null;
         if ($this->overflow) {
-            $dateTimeMinus1Day = $this->copyDateTime($dateTime)->modify('-1 day');
+            $dateTimeMinus1Day = $this->yesterday($dateTime);
             $openingHoursForDayBefore = $this->forDate($dateTimeMinus1Day);
             if ($openingHoursForDayBefore->isOpenAtNight(Time::fromDateTime($dateTimeMinus1Day))) {
                 $previousClose = $openingHoursForDayBefore->previousClose(Time::fromDateTime($dateTime));
@@ -533,11 +534,10 @@ class OpeningHours
             }
 
             $midnight = $dateTime->setTime(0, 0, 0);
-            $dateTime = clone $midnight;
-            $dateTime = $dateTime->modify('-1 minute');
+            $dateTime = $this->copyAndModify($midnight, '-1 minute');
             $openingHoursForDay = $this->forDate($dateTime);
 
-            if ($this->isClosedAt($midnight) && $openingHoursForDay->isOpenAt(Time::fromString('23:59'))) {
+            if ($this->isClosedAt($midnight) && $openingHoursForDay->isOpenAtTheEndOfTheDay()) {
                 return $midnight;
             }
 
@@ -707,7 +707,7 @@ class OpeningHours
 
         $exceptions = $this->flatMapExceptions(function (OpeningHoursForDay $openingHoursForDay, string $date) use ($format, $timezone) {
             if ($openingHoursForDay->isEmpty()) {
-                $zero = Time::fromString('00:00')->format($format, $timezone);
+                $zero = Time::fromString(TimeDataContainer::MIDNIGHT)->format($format, $timezone);
 
                 return [[
                     '@type' => 'OpeningHoursSpecification',

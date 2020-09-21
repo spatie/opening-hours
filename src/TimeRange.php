@@ -97,7 +97,7 @@ class TimeRange implements TimeDataContainer
 
     public static function fromMidnight(Time $end): self
     {
-        return new self(Time::fromString('00:00'), $end);
+        return new self(Time::fromString(self::MIDNIGHT), $end);
     }
 
     public function start(): Time

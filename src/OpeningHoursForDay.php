@@ -59,6 +59,11 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
         return false;
     }
 
+    public function isOpenAtTheEndOfTheDay(): bool
+    {
+        return $this->isOpenAt(Time::fromString('23:59'));
+    }
+
     public function isOpenAtNight(Time $time): bool
     {
         foreach ($this->openingHours as $timeRange) {
