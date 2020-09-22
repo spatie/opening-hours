@@ -1281,20 +1281,6 @@ class OpeningHoursTest extends TestCase
         $this->assertSame('2020-09-21 19:30', $range->start()->date()->format('Y-m-d H:i'));
         $this->assertInstanceOf(DateTime::class, $range->end()->date());
         $this->assertSame('2020-09-22 02:30', $range->end()->date()->format('Y-m-d H:i'));
-
-        $dates = array_map(function (DateTime $date) {
-            return $date->format('Y-m-d H:i');
-        }, iterator_to_array($period));
-
-        $this->assertSame([
-            '2020-09-21 19:30',
-            '2020-09-21 20:30',
-            '2020-09-21 21:30',
-            '2020-09-21 22:30',
-            '2020-09-21 23:30',
-            '2020-09-22 00:30',
-            '2020-09-22 01:30',
-        ], $dates);
     }
 
     /** @test */
