@@ -2,8 +2,6 @@
 
 namespace Spatie\OpeningHours;
 
-use DateInterval;
-use DatePeriod;
 use DateTime;
 use DateTimeInterface;
 use DateTimeZone;
