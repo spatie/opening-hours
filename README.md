@@ -454,23 +454,16 @@ if ($range) {
 }
 ```
 
-#### `OpeningHours::currentOpenRangePeriod(DateTimeInterface $dateTime) : false | CarbonPeriod`
-
-Returns a `Carbon\CarbonPeriod` instance of the current open range if the
-business is open, false if the business is closed.
-
-While `currentOpenRange()` return a `TimeRange` instance which contain only
-time information, the `CarbonPeriod` instance contain the whole date and time
-information.
-
-This is useful for ranges overflowing midnight.
+`start()` and `end()` methods return `Spatie\OpeningHours\Time` instances. `Time`
+instances created from a date can be formatted with date information. This is useful
+for ranges overflowing midnight:
 
 ```php
-$period = $openingHours->currentOpenRangePeriod(new DateTime('2016-12-24 11:00:00'));
+$period = $openingHours->currentOpenRange(new DateTime('2016-12-24 11:00:00'));
 
 if ($period) {
-    echo "It's open since ".$period->getStartDate()->format('D G\h')."\n";
-    echo "It will close at ".$period->getEndDate()->format('D G\h')."\n";
+    echo "It's open since ".$period->start()->format('D G\h')."\n";
+    echo "It will close at ".$period->end()->format('D G\h')."\n";
 } else {
     echo "It's closed";
 }

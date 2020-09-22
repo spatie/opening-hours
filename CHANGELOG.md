@@ -4,13 +4,8 @@ All notable changes to `opening-hours` will be documented in this file
 
 ## 3.0.0 - upcoming
 
-- Add `currentOpenRangePeriod()` method
-- Add `TimeRange::startOn()` method
-- Add `TimeRange::endOn()` method
-- Add `TimeRange::startAfter()` method
-- Add `TimeRange::endAfter()` method
-- Add `TimeRange::startBefore()` method
-- Add `TimeRange::endBefore()` method
+- Add `Time::date()` method
+- Add `DateTimeRange` class
 
 ## 2.9.0 - 2020-09-03
 

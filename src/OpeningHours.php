@@ -370,19 +370,6 @@ class OpeningHours
         return $range ? DateTimeRange::fromTimeRange($dateTime, $range) : null;
     }
 
-    public function currentOpenRangePeriod(DateTimeInterface $dateTime, DateInterval $interval = null): ?DatePeriod
-    {
-        $range = $this->currentOpenRange($dateTime);
-
-        return $range
-            ? new DatePeriod(
-                $range->startDate(),
-                $interval ?? new DateInterval('PT1M'),
-                $range->endDate(),
-            )
-            : null;
-    }
-
     public function currentOpenRangeStart(DateTimeInterface $dateTime): ?DateTimeInterface
     {
         $range = $this->currentOpenRange($dateTime);

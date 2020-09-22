@@ -93,12 +93,13 @@ class Time implements TimeDataContainer
 
     public function format(string $format = self::TIME_FORMAT, $timezone = null): string
     {
-        $date = $timezone
+        $date = $this->date ?: ($timezone
             ? new DateTime('1970-01-01 00:00:00', $timezone instanceof DateTimeZone
                 ? $timezone
                 : new DateTimeZone($timezone)
             )
-            : null;
+            : null
+        );
 
         if ($format === self::TIME_FORMAT && $this->hours === 24 && $this->minutes === 0) {
             return '24:00';
