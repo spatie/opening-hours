@@ -10,8 +10,12 @@ class DateTimeRange extends TimeRange
 
     protected function __construct(DateTimeInterface $date, Time $start, Time $end, $data = null)
     {
-        parent::__construct($start, $end, $data);
         $this->date = $date;
+        parent::__construct(
+            Time::fromString($start, $start->getData(), $this->startDate()),
+            Time::fromString($end, $start->getData(), $this->endDate()),
+            $data
+        );
     }
 
     public static function fromTimeRange(DateTimeInterface $date, TimeRange $timeRange, $data = null)

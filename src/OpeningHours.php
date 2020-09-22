@@ -146,6 +146,23 @@ class OpeningHours
     }
 
     /**
+     * @deprecated This method will be removed in 4.0.0. On the next version, OpeningHours
+     * instances will be immutable.
+     *
+     * Replace the whole metadata handled by OpeningHours.
+     *
+     * @param $data
+     *
+     * @return $this
+     */
+    public function setData($data)
+    {
+        $this->data = $data;
+
+        return $this;
+    }
+
+    /**
      * Set the number of days to try before abandoning the search of the next close/open time.
      *
      * @param int $dayLimit number of days
@@ -172,6 +189,18 @@ class OpeningHours
         return $this->filters;
     }
 
+    /**
+     * @deprecated This method will become protected in 4.0.0. On the next version, OpeningHours
+     * instances will be immutable.
+     *
+     * Replace all the opening hours, exception, filters, overflow option and metadata.
+     *
+     * Any of those entry which is not specified explicitly is reset to its default value.
+     *
+     * @param array $data
+     *
+     * @return $this
+     */
     public function fill(array $data): self
     {
         [$openingHours, $exceptions, $metaData, $filters, $overflow] = $this->parseOpeningHoursAndExceptions($data);

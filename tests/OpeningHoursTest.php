@@ -860,14 +860,18 @@ class OpeningHoursTest extends TestCase
             ],
         ]);
 
-        $this->assertTrue($openingHours->isOpenAt(new DateTime('2016-10-10 10:00')));
-        $this->assertTrue($openingHours->isOpenAt(new DateTime('2016-10-10 15:59')));
-        $this->assertTrue($openingHours->isOpenAt(new DateTime('2016-10-10 08:00')));
-        $this->assertFalse($openingHours->isOpenAt(new DateTime('2016-10-10 06:00')));
+        $this->assertTrue($openingHours->isOpenAt(new DateTime('2016-10-10 10:00', new DateTimeZone('UTC'))));
+        $this->assertTrue($openingHours->isOpenAt(new DateTime('2016-10-10 15:59', new DateTimeZone('UTC'))));
+        $this->assertTrue($openingHours->isOpenAt(new DateTime('2016-10-10 08:00', new DateTimeZone('UTC'))));
+        $this->assertTrue($openingHours->isOpenAt(new DateTime('2016-10-10 07:00', new DateTimeZone('UTC'))));
+        $this->assertFalse($openingHours->isOpenAt(new DateTime('2016-10-10 06:00', new DateTimeZone('UTC'))));
+        $this->assertFalse($openingHours->isOpenAt(new DateTime('2016-10-10 06:59', new DateTimeZone('UTC'))));
 
         $this->assertFalse($openingHours->isOpenAt(new DateTime('2016-10-10 06:00', new DateTimeZone('Europe/Amsterdam'))));
+        $this->assertFalse($openingHours->isOpenAt(new DateTime('2016-10-10 08:59', new DateTimeZone('Europe/Amsterdam'))));
         $this->assertTrue($openingHours->isOpenAt(new DateTime('2016-10-10 09:00', new DateTimeZone('Europe/Amsterdam'))));
         $this->assertTrue($openingHours->isOpenAt(new DateTime('2016-10-10 17:59', new DateTimeZone('Europe/Amsterdam'))));
+        $this->assertFalse($openingHours->isOpenAt(new DateTime('2016-10-10 18:01', new DateTimeZone('Europe/Amsterdam'))));
 
         $this->assertFalse($openingHours->isOpenAt(new DateTime('2016-11-14 17:59', new DateTimeZone('Europe/Amsterdam'))));
         $this->assertTrue($openingHours->isOpenAt(new DateTime('2016-11-14 12:59', new DateTimeZone('Europe/Amsterdam'))));
@@ -875,10 +879,10 @@ class OpeningHoursTest extends TestCase
         $this->assertFalse($openingHours->isOpenAt(new DateTime('2016-11-14 15:59', new DateTimeZone('America/Denver'))));
         $this->assertTrue($openingHours->isOpenAt(new DateTime('2016-10-10 09:59', new DateTimeZone('America/Denver'))));
 
-        $this->assertTrue($openingHours->isOpenAt(new DateTimeImmutable('2016-10-10 10:00')));
-        $this->assertTrue($openingHours->isOpenAt(new DateTimeImmutable('2016-10-10 15:59')));
-        $this->assertTrue($openingHours->isOpenAt(new DateTimeImmutable('2016-10-10 08:00')));
-        $this->assertFalse($openingHours->isOpenAt(new DateTimeImmutable('2016-10-10 06:00')));
+        $this->assertTrue($openingHours->isOpenAt(new DateTimeImmutable('2016-10-10 10:00', new DateTimeZone('UTC'))));
+        $this->assertTrue($openingHours->isOpenAt(new DateTimeImmutable('2016-10-10 15:59', new DateTimeZone('UTC'))));
+        $this->assertTrue($openingHours->isOpenAt(new DateTimeImmutable('2016-10-10 08:00', new DateTimeZone('UTC'))));
+        $this->assertFalse($openingHours->isOpenAt(new DateTimeImmutable('2016-10-10 06:00', new DateTimeZone('UTC'))));
 
         $this->assertFalse($openingHours->isOpenAt(new DateTimeImmutable('2016-10-10 06:00', new DateTimeZone('Europe/Amsterdam'))));
         $this->assertTrue($openingHours->isOpenAt(new DateTimeImmutable('2016-10-10 09:00', new DateTimeZone('Europe/Amsterdam'))));
@@ -890,12 +894,25 @@ class OpeningHoursTest extends TestCase
         $this->assertFalse($openingHours->isOpenAt(new DateTime('2016-11-14 15:59', new DateTimeZone('America/Denver'))));
         $this->assertTrue($openingHours->isOpenAt(new DateTime('2016-10-10 09:59', new DateTimeZone('America/Denver'))));
 
+        $timezone = date_default_timezone_get();
         date_default_timezone_set('America/Denver');
+
         $this->assertTrue($openingHours->isOpenAt(new DateTime('2016-10-10 09:59')));
         $this->assertFalse($openingHours->isOpenAt(new DateTime('2016-10-10 10:00')));
 
         $this->assertTrue($openingHours->isOpenAt(new DateTimeImmutable('2016-10-10 09:59')));
         $this->assertFalse($openingHours->isOpenAt(new DateTimeImmutable('2016-10-10 10:00')));
+
+        date_default_timezone_set($timezone);
+    }
+
+    /** @test */
+    public function it_can_set_data()
+    {
+        $openingHours = OpeningHours::create([]);
+        $openingHours->setData(['foo' => 'bar']);
+
+        $this->assertSame(['foo' => 'bar'], $openingHours->getData());
     }
 
     /** @test */

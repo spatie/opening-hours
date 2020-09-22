@@ -18,14 +18,17 @@ class Time implements TimeDataContainer
 
     protected int $minutes;
 
-    protected function __construct(int $hours, int $minutes, $data = null)
+    protected ?DateTimeInterface $date;
+
+    protected function __construct(int $hours, int $minutes, $data = null, DateTimeInterface $date = null)
     {
         $this->hours = $hours;
         $this->minutes = $minutes;
         $this->data = $data;
+        $this->date = $date;
     }
 
-    public static function fromString(string $string, $data = null): self
+    public static function fromString(string $string, $data = null, DateTimeInterface $date = null): self
     {
         if (! preg_match('/^(([0-1][0-9]|2[0-3]):[0-5][0-9]|24:00)$/', $string)) {
             throw InvalidTimeString::forString($string);
@@ -33,7 +36,7 @@ class Time implements TimeDataContainer
 
         [$hours, $minutes] = explode(':', $string);
 
-        return new self($hours, $minutes, $data);
+        return new self($hours, $minutes, $data, $date);
     }
 
     public function hours(): int
@@ -44,6 +47,11 @@ class Time implements TimeDataContainer
     public function minutes(): int
     {
         return $this->minutes;
+    }
+
+    public function date(): DateTimeInterface
+    {
+        return $this->date;
     }
 
     public static function fromDateTime(DateTimeInterface $dateTime, $data = null): self
