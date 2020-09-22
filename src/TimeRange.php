@@ -2,7 +2,6 @@
 
 namespace Spatie\OpeningHours;
 
-use DateTimeInterface;
 use Spatie\OpeningHours\Exceptions\InvalidTimeRangeArray;
 use Spatie\OpeningHours\Exceptions\InvalidTimeRangeList;
 use Spatie\OpeningHours\Exceptions\InvalidTimeRangeString;
