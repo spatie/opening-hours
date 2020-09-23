@@ -372,28 +372,14 @@ class OpeningHours
     {
         $range = $this->currentOpenRange($dateTime);
 
-        if (! $range) {
-            return null;
-        }
-
-        $time = $dateTime->format(TimeDataContainer::TIME_FORMAT);
-        $start = $range->start();
-
-        return $this->copyAndModify($dateTime, $start.($start > $time ? ' - 1 day' : ''));
+        return $range ? $range->start()->date() : null;
     }
 
     public function currentOpenRangeEnd(DateTimeInterface $dateTime): ?DateTimeInterface
     {
         $range = $this->currentOpenRange($dateTime);
 
-        if (! $range) {
-            return null;
-        }
-
-        $time = $dateTime->format(TimeDataContainer::TIME_FORMAT);
-        $end = $range->end();
-
-        return $this->copyAndModify($dateTime, $end.($end < $time ? ' + 1 day' : ''));
+        return $range ? $range->end()->date() : null;
     }
 
     public function nextOpen(DateTimeInterface $dateTime): DateTimeInterface
