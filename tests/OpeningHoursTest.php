@@ -14,6 +14,11 @@ use Spatie\OpeningHours\TimeRange;
 
 class OpeningHoursTest extends TestCase
 {
+    protected function setUp()
+    {
+        date_default_timezone_set('UTC');
+    }
+
     /** @test */
     public function it_can_return_the_opening_hours_for_a_regular_week()
     {
@@ -903,6 +908,39 @@ class OpeningHoursTest extends TestCase
         $this->assertFalse($openingHours->isOpenAt(new DateTimeImmutable('2016-10-10 10:00')));
 
         date_default_timezone_set($timezone);
+    }
+
+    /** @test */
+    public function it_can_set_data()
+    {
+        $openingHours = OpeningHours::create([]);
+        $openingHours->setData(['foo' => 'bar']);
+
+        $this->assertSame(['foo' => 'bar'], $openingHours->getData());
+    }
+
+    /**
+     * @test
+     * @dataProvider timezones
+     */
+    public function it_can_handle_timezone_for_date_string($timezone)
+    {
+        $openingHours = new OpeningHours($timezone);
+        $openingHours->fill([
+            'monday'     => ['09:00-18:00'],
+        ]);
+        $this->assertFalse($openingHours->isOpenOn('2020-10-20'));
+        $this->assertTrue($openingHours->isOpenOn('2020-10-19'));
+    }
+
+    public function timezones()
+    {
+        return [
+            ['-12:00'],
+            ['America/Denver'],
+            ['UTC'],
+            ['+13:30'],
+        ];
     }
 
     /** @test */

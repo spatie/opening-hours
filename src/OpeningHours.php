@@ -316,7 +316,7 @@ class OpeningHours
             [, $year, $month, $day] = $match;
             $year = $year ?: date('Y');
 
-            return count($this->forDate(new DateTime("$year-$month-$day"))) > 0;
+            return count($this->forDate(new DateTime("$year-$month-$day", $this->timezone))) > 0;
         }
 
         return count($this->forDay($day)) > 0;
