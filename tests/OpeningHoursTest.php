@@ -910,15 +910,6 @@ class OpeningHoursTest extends TestCase
         date_default_timezone_set($timezone);
     }
 
-    /** @test */
-    public function it_can_set_data()
-    {
-        $openingHours = OpeningHours::create([]);
-        $openingHours->setData(['foo' => 'bar']);
-
-        $this->assertSame(['foo' => 'bar'], $openingHours->getData());
-    }
-
     /**
      * @test
      * @dataProvider timezones
