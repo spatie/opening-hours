@@ -14,7 +14,7 @@ use Spatie\OpeningHours\TimeRange;
 
 class OpeningHoursTest extends TestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         date_default_timezone_set('UTC');
     }
