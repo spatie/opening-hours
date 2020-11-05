@@ -1405,4 +1405,22 @@ class OpeningHoursTest extends TestCase
         $this->assertSame(-18.5, $openingHours->diffInOpenHours(new DateTimeImmutable('2020-06-25 2pm'), new DateTimeImmutable('2020-06-21 3pm')));
         $this->assertSame(-76.5, $openingHours->diffInClosedHours(new DateTimeImmutable('2020-06-25 2pm'), new DateTimeImmutable('2020-06-21 3pm')));
     }
+
+    public function testMergeOverlappingSupportsHoursAndIgnoreData()
+    {
+        $data = OpeningHours::mergeOverlappingRanges([
+            'monday' => [
+                ['hours' => '09:00-21:00', 'data' => 'foobar'],
+                ['hours' => '20:00-23:00']
+            ],
+            'tuesday' => [[' hours' => '09:00-18:00']],
+        ]);
+
+        $monday = OpeningHours::create($data)->forDay('Monday');
+
+        $this->assertNull($monday->getData());
+        $this->assertNull($monday[0]->getData());
+        $this->assertSame('09:00-23:00', (string) $monday);
+
+    }
 }
