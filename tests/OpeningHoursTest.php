@@ -1411,7 +1411,7 @@ class OpeningHoursTest extends TestCase
         $data = OpeningHours::mergeOverlappingRanges([
             'monday' => [
                 ['hours' => '09:00-21:00', 'data' => 'foobar'],
-                ['hours' => '20:00-23:00']
+                ['hours' => '20:00-23:00'],
             ],
             'tuesday' => [[' hours' => '09:00-18:00']],
         ]);
@@ -1421,6 +1421,5 @@ class OpeningHoursTest extends TestCase
         $this->assertNull($monday->getData());
         $this->assertNull($monday[0]->getData());
         $this->assertSame('09:00-23:00', (string) $monday);
-
     }
 }
