@@ -5,6 +5,7 @@ namespace Spatie\OpeningHours;
 use DateTime;
 use DateTimeInterface;
 use DateTimeZone;
+use Generator;
 use Spatie\OpeningHours\Exceptions\Exception;
 use Spatie\OpeningHours\Exceptions\InvalidDate;
 use Spatie\OpeningHours\Exceptions\InvalidDayName;
@@ -75,11 +76,7 @@ class OpeningHours
         $result = [];
         $ranges = [];
 
-        foreach ($data as $key => $value) {
-            if (in_array($key, $excludedKeys, true)) {
-                continue;
-            }
-
+        foreach (static::filterHours($data, $excludedKeys) as $key => $value) {
             $value = is_array($value)
                 ? static::mergeOverlappingRanges($value, ['data'])
                 : (is_string($value) ? TimeRange::fromString($value) : $value);
@@ -721,5 +718,24 @@ class OpeningHours
         });
 
         return array_merge($regularHours, $exceptions);
+    }
+
+    private static function filterHours(array $data, array $excludedKeys): Generator
+    {
+        foreach ($data as $key => $value) {
+            if (in_array($key, $excludedKeys, true)) {
+                continue;
+            }
+
+            if (is_array($value) && isset($value['hours'])) {
+                foreach ((array) $value['hours'] as $subKey => $hour) {
+                    yield "$key.$subKey" => $hour;
+                }
+
+                continue;
+            }
+
+            yield $key => $value;
+        }
     }
 }
