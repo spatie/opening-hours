@@ -84,6 +84,7 @@ class OpeningHours
 
             if ($value instanceof TimeRange) {
                 $newRanges = [];
+
                 foreach ($ranges as $range) {
                     if ($value->format() === $range->format()) {
                         continue 2;
@@ -728,7 +729,7 @@ class OpeningHours
                 continue;
             }
 
-            if (is_array($value) && isset($value['hours'])) {
+            if (is_int($key) && is_array($value) && isset($value['hours'])) {
                 foreach ((array) $value['hours'] as $subKey => $hour) {
                     yield "$key.$subKey" => $hour;
                 }

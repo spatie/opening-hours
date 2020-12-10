@@ -1422,4 +1422,22 @@ class OpeningHoursTest extends TestCase
         $this->assertNull($monday[0]->getData());
         $this->assertSame('09:00-23:00', (string) $monday);
     }
+
+    public function testHoursRangeAreKept()
+    {
+        $data = OpeningHours::mergeOverlappingRanges([
+            'monday' => [
+                'hours' => [
+                    '09:00-12:00',
+                    '13:00-18:00',
+                ],
+            ],
+        ]);
+
+        $monday = OpeningHours::create($data)->forDay('Monday');
+
+        $this->assertNull($monday->getData());
+        $this->assertNull($monday[0]->getData());
+        $this->assertSame('09:00-12:00,13:00-18:00', (string) $monday);
+    }
 }

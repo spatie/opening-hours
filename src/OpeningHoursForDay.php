@@ -304,6 +304,7 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
     public function __toString()
     {
         $values = [];
+
         foreach ($this->openingHours as $openingHour) {
             $values[] = (string) $openingHour;
         }

@@ -4,3 +4,4 @@ composer.lock
 coverage
 docs
 vendor
+*.cache
