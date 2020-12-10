@@ -544,7 +544,7 @@ class OpeningHours
     public function regularClosingDays(): array
     {
         return array_keys($this->filter(
-            static fn(OpeningHoursForDay $openingHoursForDay) => $openingHoursForDay->isEmpty(),
+            static fn (OpeningHoursForDay $openingHoursForDay) => $openingHoursForDay->isEmpty(),
         ));
     }
 
@@ -556,10 +556,10 @@ class OpeningHours
     public function exceptionalClosingDates(): array
     {
         $dates = array_keys($this->filterExceptions(
-            static fn(OpeningHoursForDay $openingHoursForDay) => $openingHoursForDay->isEmpty(),
+            static fn (OpeningHoursForDay $openingHoursForDay) => $openingHoursForDay->isEmpty(),
         ));
 
-        return Arr::map($dates, static fn($date) => DateTime::createFromFormat('Y-m-d', $date));
+        return Arr::map($dates, static fn ($date) => DateTime::createFromFormat('Y-m-d', $date));
     }
 
     protected function parseOpeningHoursAndExceptions(array $data): array
@@ -680,8 +680,8 @@ class OpeningHours
     public function asStructuredData(string $format = TimeDataContainer::TIME_FORMAT, $timezone = null): array
     {
         $regularHours = $this->flatMap(
-            static fn(OpeningHoursForDay $openingHoursForDay, string $day) => $openingHoursForDay->map(
-                static fn(TimeRange $timeRange) => [
+            static fn (OpeningHoursForDay $openingHoursForDay, string $day) => $openingHoursForDay->map(
+                static fn (TimeRange $timeRange) => [
                     '@type' => 'OpeningHoursSpecification',
                     'dayOfWeek' => ucfirst($day),
                     'opens' => $timeRange->start()->format($format, $timezone),
@@ -705,7 +705,7 @@ class OpeningHours
                 }
 
                 return $openingHoursForDay->map(
-                    static fn(TimeRange $timeRange) => [
+                    static fn (TimeRange $timeRange) => [
                         '@type' => 'OpeningHoursSpecification',
                         'opens' => $timeRange->start()->format($format, $timezone),
                         'closes' => $timeRange->end()->format($format, $timezone),
