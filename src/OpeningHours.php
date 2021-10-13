@@ -406,8 +406,9 @@ class OpeningHours
         return $dateTime->setTime($nextDateTime->format('G'), $nextDateTime->format('i'), 0);
     }
 
-    public function nextOpen(DateTimeInterface $dateTime): DateTimeInterface
+    public function nextOpen(DateTimeInterface $dateTime = null): DateTimeInterface
     {
+        $dateTime = $dateTime ?? new $this->dateTimeClass();
         $dateTime = $this->copyDateTime($dateTime);
         $openingHoursForDay = $this->forDate($dateTime);
         $nextOpen = $openingHoursForDay->nextOpen(Time::fromDateTime($dateTime));
@@ -443,8 +444,9 @@ class OpeningHours
         return $dateTime->setTime($nextDateTime->format('G'), $nextDateTime->format('i'), 0);
     }
 
-    public function nextClose(DateTimeInterface $dateTime): DateTimeInterface
+    public function nextClose(DateTimeInterface $dateTime = null): DateTimeInterface
     {
+        $dateTime = $dateTime ?? new $this->dateTimeClass();
         $dateTime = $this->copyDateTime($dateTime);
         $nextClose = null;
         if ($this->overflow) {
