@@ -78,9 +78,8 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
     }
 
     /**
-     * @param callable[] $filters
-     * @param bool       $reverse
-     *
+     * @param  callable[]  $filters
+     * @param  bool        $reverse
      * @return Time|TimeRange|null
      */
     public function openingHoursFilter(array $filters, bool $reverse = false): ?TimeDataContainer
@@ -99,8 +98,7 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
     }
 
     /**
-     * @param Time $time
-     *
+     * @param  Time  $time
      * @return Time|null
      */
     public function nextOpen(Time $time): ?Time
@@ -113,8 +111,7 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
     }
 
     /**
-     * @param Time $time
-     *
+     * @param  Time  $time
      * @return TimeRange|null
      */
     public function nextOpenRange(Time $time): ?TimeRange
@@ -127,8 +124,7 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
     }
 
     /**
-     * @param Time $time
-     *
+     * @param  Time  $time
      * @return Time|null
      */
     public function nextClose(Time $time): ?Time
@@ -144,8 +140,7 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
     }
 
     /**
-     * @param Time $time
-     *
+     * @param  Time  $time
      * @return TimeRange|null
      */
     public function nextCloseRange(Time $time): ?TimeRange
@@ -161,8 +156,7 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
     }
 
     /**
-     * @param Time $time
-     *
+     * @param  Time  $time
      * @return Time|null
      */
     public function previousOpen(Time $time): ?Time
@@ -178,8 +172,7 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
     }
 
     /**
-     * @param Time $time
-     *
+     * @param  Time  $time
      * @return TimeRange|null
      */
     public function previousOpenRange(Time $time): ?TimeRange
@@ -192,8 +185,7 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
     }
 
     /**
-     * @param Time $time
-     *
+     * @param  Time  $time
      * @return Time|null
      */
     public function previousClose(Time $time): ?Time
@@ -206,8 +198,7 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
     }
 
     /**
-     * @param Time $time
-     *
+     * @param  Time  $time
      * @return TimeRange|null
      */
     public function previousCloseRange(Time $time): ?TimeRange
@@ -258,8 +249,7 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
     }
 
     /**
-     * @param Time $time
-     *
+     * @param  Time  $time
      * @return TimeRange[]
      */
     public function forTime(Time $time): Generator
@@ -274,8 +264,7 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
     }
 
     /**
-     * @param Time $time
-     *
+     * @param  Time  $time
      * @return TimeRange[]
      */
     public function forNightTime(Time $time): Generator
