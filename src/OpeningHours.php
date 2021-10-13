@@ -760,23 +760,4 @@ class OpeningHours
             yield $key => $value;
         }
     }
-
-    private static function filterHours(array $data, array $excludedKeys): Generator
-    {
-        foreach ($data as $key => $value) {
-            if (in_array($key, $excludedKeys, true)) {
-                continue;
-            }
-
-            if (is_int($key) && is_array($value) && isset($value['hours'])) {
-                foreach ((array) $value['hours'] as $subKey => $hour) {
-                    yield "$key.$subKey" => $hour;
-                }
-
-                continue;
-            }
-
-            yield $key => $value;
-        }
-    }
 }
