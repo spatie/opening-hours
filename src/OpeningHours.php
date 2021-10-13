@@ -61,9 +61,8 @@ class OpeningHours
     }
 
     /**
-     * @param string[][]               $data
-     * @param string|DateTimeZone|null $timezone
-     *
+     * @param  string[][]  $data
+     * @param  string|DateTimeZone|null  $timezone
      * @return static
      */
     public static function create(array $data, $timezone = null): self
@@ -72,9 +71,8 @@ class OpeningHours
     }
 
     /**
-     * @param array $data         hours definition array or sub-array
-     * @param array $excludedKeys keys to ignore from parsing
-     *
+     * @param  array  $data  hours definition array or sub-array
+     * @param  array  $excludedKeys  keys to ignore from parsing
      * @return array
      */
     public static function mergeOverlappingRanges(array $data, array $excludedKeys = ['data', 'filters', 'overflow'])
@@ -121,9 +119,8 @@ class OpeningHours
     }
 
     /**
-     * @param string[][]               $data
-     * @param string|DateTimeZone|null $timezone
-     *
+     * @param  string[][]  $data
+     * @param  string|DateTimeZone|null  $timezone
      * @return static
      */
     public static function createAndMergeOverlappingRanges(array $data, $timezone = null)
@@ -132,8 +129,7 @@ class OpeningHours
     }
 
     /**
-     * @param array $data
-     *
+     * @param  array  $data
      * @return bool
      */
     public static function isValid(array $data): bool
@@ -150,15 +146,14 @@ class OpeningHours
     /**
      * Select the class to use to create new date-time instances.
      *
-     * @param string|null $dateTimeClass
-     *
+     * @param  string|null  $dateTimeClass
      * @return $this
      *
      * @throws InvalidDateTimeClass if $dateTimeClass is set with a string that is not a valid DateTimeInterface.
      */
     public function setDateTimeClass(string $dateTimeClass = null)
     {
-        if ($dateTimeClass !== null && !is_a($dateTimeClass, DateTimeInterface::class, true)) {
+        if ($dateTimeClass !== null && ! is_a($dateTimeClass, DateTimeInterface::class, true)) {
             throw InvalidDateTimeClass::forString($dateTimeClass);
         }
 
@@ -170,8 +165,7 @@ class OpeningHours
     /**
      * Set the number of days to try before abandoning the search of the next close/open time.
      *
-     * @param int $dayLimit number of days
-     *
+     * @param  int  $dayLimit  number of days
      * @return $this
      */
     public function setDayLimit(int $dayLimit)
@@ -291,8 +285,7 @@ class OpeningHours
     }
 
     /**
-     * @param DateTimeInterface $date
-     *
+     * @param  DateTimeInterface  $date
      * @return TimeRange[]
      */
     public function forDateTime(DateTimeInterface $date): array

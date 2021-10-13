@@ -8,8 +8,7 @@ use DateTimeInterface;
 trait DateTimeCopier
 {
     /**
-     * @param DateTimeInterface $date
-     *
+     * @param  DateTimeInterface  $date
      * @return \DateTime|\DateTimeImmutable
      */
     protected function copyDateTime(DateTimeInterface $date): DateTimeInterface
