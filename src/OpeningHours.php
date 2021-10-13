@@ -118,8 +118,8 @@ class OpeningHours
     }
 
     /**
-     * @param  string[][]|array[][]     $data
-     * @param  string|DateTimeZone|null $timezone
+     * @param  string[][]|array[][]  $data
+     * @param  string|DateTimeZone|null  $timezone
      * @return static
      */
     public static function createAndMergeOverlappingRanges(array $data, $timezone = null): self
@@ -168,7 +168,6 @@ class OpeningHours
      * Replace the whole metadata handled by OpeningHours.
      *
      * @param $data
-     *
      * @return $this
      */
     public function setData($data)
@@ -214,8 +213,7 @@ class OpeningHours
      *
      * Any of those entry which is not specified explicitly is reset to its default value.
      *
-     * @param array $data
-     *
+     * @param  array  $data
      * @return $this
      */
     public function fill(array $data): self
