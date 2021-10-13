@@ -2,15 +2,10 @@
 
 namespace Spatie\OpeningHours\Test;
 
-use DateTime;
 use DateTimeImmutable;
 use DateTimeZone;
 use PHPUnit\Framework\TestCase;
-use Spatie\OpeningHours\Exceptions\MaximumLimitExceeded;
 use Spatie\OpeningHours\OpeningHours;
-use Spatie\OpeningHours\OpeningHoursForDay;
-use Spatie\OpeningHours\Time;
-use Spatie\OpeningHours\TimeRange;
 
 class OpeningHoursCustomClassTest extends TestCase
 {
@@ -36,14 +31,16 @@ class OpeningHoursCustomClassTest extends TestCase
     /** @test */
     public function it_can_use_mocked_time()
     {
-        $mock1 = new class extends DateTimeImmutable {
-            public function __construct($datetime = "now", DateTimeZone $timezone = null)
+        $mock1 = new class extends DateTimeImmutable
+        {
+            public function __construct($datetime = 'now', DateTimeZone $timezone = null)
             {
                 parent::__construct('2021-10-11 04:30', $timezone);
             }
         };
-        $mock2 = new class extends DateTimeImmutable {
-            public function __construct($datetime = "now", DateTimeZone $timezone = null)
+        $mock2 = new class extends DateTimeImmutable
+        {
+            public function __construct($datetime = 'now', DateTimeZone $timezone = null)
             {
                 parent::__construct('2021-10-11 09:30', $timezone);
             }
