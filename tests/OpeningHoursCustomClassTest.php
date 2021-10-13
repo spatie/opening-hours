@@ -5,6 +5,7 @@ namespace Spatie\OpeningHours\Test;
 use DateTimeImmutable;
 use DateTimeZone;
 use PHPUnit\Framework\TestCase;
+use Spatie\OpeningHours\Exceptions\InvalidDateTimeClass;
 use Spatie\OpeningHours\OpeningHours;
 
 class OpeningHoursCustomClassTest extends TestCase
@@ -59,5 +60,15 @@ class OpeningHoursCustomClassTest extends TestCase
         ]);
 
         $this->assertTrue($openingHours->isOpen());
+    }
+
+    /** @test */
+    public function it_should_refuse_invalid_date_time_class()
+    {
+        $this->expectException(InvalidDateTimeClass::class);
+        OpeningHours::create([
+            'monday' => ['09:00-18:00'],
+            'dateTimeClass' => DateTimeZone::class,
+        ]);
     }
 }
