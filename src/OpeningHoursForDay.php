@@ -79,7 +79,7 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
 
     /**
      * @param  callable[]  $filters
-     * @param  bool        $reverse
+     * @param  bool  $reverse
      * @return Time|TimeRange|null
      */
     public function openingHoursFilter(array $filters, bool $reverse = false): ?TimeDataContainer
