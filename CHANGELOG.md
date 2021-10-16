@@ -2,6 +2,36 @@
 
 All notable changes to `opening-hours` will be documented in this file
 
+## 2.11.0 - 2021-10-16
+
+- Add dateTimeClass option to use other class for date objects
+
+## 2.10.1 - 2020-12-10
+
+- Fix "hours" merge in mergeOverlappingRanges
+
+## 2.10.0 - 2020-11-06
+
+- Add "hours" key support in mergeOverlappingRanges
+
+## 2.9.1 - 2020-10-15
+
+- Use OpeningHours timezone for isOpenOn()
+
+## 2.9.0 - 2020-09-03
+
+- Allow `isOpenOn()` to take date string as parameter
+
+## 2.8.0 - 2020-06-19
+
+- Add `Time::diff()` methods
+
+## 2.7.2 - 2020-06-19
+
+- Fix support of data/filters/overflow with
+  `OpeningHours::createAndMergeOverlappingRanges()` and
+  `OpeningHours::mergeOverlappingRanges()`
+
 ## 2.7.1 - 2020-05-30
 
 - Added `InvalidTimezone` exception
