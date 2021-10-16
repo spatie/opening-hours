@@ -3,11 +3,13 @@
 namespace Spatie\OpeningHours;
 
 use DateTime;
+use DateTimeImmutable;
 use DateTimeInterface;
 use DateTimeZone;
 use Generator;
 use Spatie\OpeningHours\Exceptions\Exception;
 use Spatie\OpeningHours\Exceptions\InvalidDate;
+use Spatie\OpeningHours\Exceptions\InvalidDateTimeClass;
 use Spatie\OpeningHours\Exceptions\InvalidDayName;
 use Spatie\OpeningHours\Exceptions\InvalidTimezone;
 use Spatie\OpeningHours\Exceptions\MaximumLimitExceeded;
@@ -39,6 +41,9 @@ class OpeningHours
     /** @var int|null Number of days to try before abandoning the search of the next close/open time */
     protected ?int $dayLimit = null;
 
+    /** @var string Class of new date instances used for now, nextOpen, nextClose */
+    protected string $dateTimeClass = DateTime::class;
+
     public function __construct($timezone = null)
     {
         if ($timezone instanceof DateTimeZone) {
@@ -53,9 +58,8 @@ class OpeningHours
     }
 
     /**
-     * @param string[][]               $data
-     * @param string|DateTimeZone|null $timezone
-     *
+     * @param  string[][]  $data
+     * @param  string|DateTimeZone|null  $timezone
      * @return static
      */
     public static function create(array $data, $timezone = null): self
@@ -64,9 +68,8 @@ class OpeningHours
     }
 
     /**
-     * @param array $data         hours definition array or sub-array
-     * @param array $excludedKeys keys to ignore from parsing
-     *
+     * @param  array  $data  hours definition array or sub-array
+     * @param  array  $excludedKeys  keys to ignore from parsing
      * @return array
      */
     public static function mergeOverlappingRanges(array $data, array $excludedKeys = ['data', 'filters', 'overflow']): array
@@ -113,9 +116,8 @@ class OpeningHours
     }
 
     /**
-     * @param string[][]|array[][]     $data
-     * @param string|DateTimeZone|null $timezone
-     *
+     * @param  string[][]|array[][]  $data
+     * @param  string|DateTimeZone|null  $timezone
      * @return static
      */
     public static function createAndMergeOverlappingRanges(array $data, $timezone = null): self
@@ -124,8 +126,7 @@ class OpeningHours
     }
 
     /**
-     * @param array $data
-     *
+     * @param  array  $data
      * @return bool
      */
     public static function isValid(array $data): bool
@@ -140,16 +141,34 @@ class OpeningHours
     }
 
     /**
+     * Select the class to use to create new date-time instances.
+     *
+     * @param  string|null  $dateTimeClass
+     * @return $this
+     *
+     * @throws InvalidDateTimeClass if $dateTimeClass is set with a string that is not a valid DateTimeInterface.
+     */
+    public function setDateTimeClass(?string $dateTimeClass = null): self
+    {
+        if ($dateTimeClass !== null && ! is_a($dateTimeClass, DateTimeInterface::class, true)) {
+            throw InvalidDateTimeClass::forString($dateTimeClass);
+        }
+
+        $this->dateTimeClass = $dateTimeClass ?? DateTime::class;
+
+        return $this;
+    }
+
+    /**
      * @deprecated This method will be removed in 4.0.0. On the next version, OpeningHours
      * instances will be immutable.
      *
      * Replace the whole metadata handled by OpeningHours.
      *
      * @param $data
-     *
      * @return $this
      */
-    public function setData($data)
+    public function setData($data): self
     {
         $this->data = $data;
 
@@ -159,7 +178,8 @@ class OpeningHours
     /**
      * Set the number of days to try before abandoning the search of the next close/open time.
      *
-     * @param int $dayLimit number of days
+     * @param  int  $dayLimit  number of days
+     * @return $this
      */
     public function setDayLimit(int $dayLimit): self
     {
@@ -191,13 +211,13 @@ class OpeningHours
      *
      * Any of those entry which is not specified explicitly is reset to its default value.
      *
-     * @param array $data
-     *
+     * @param  array  $data
      * @return $this
      */
     public function fill(array $data): self
     {
-        [$openingHours, $exceptions, $metaData, $filters, $overflow] = $this->parseOpeningHoursAndExceptions($data);
+        [$openingHours, $exceptions, $metaData, $filters, $overflow, $dateTimeClass] = $this
+            ->parseOpeningHoursAndExceptions($data);
 
         $this->overflow = $overflow;
 
@@ -209,7 +229,7 @@ class OpeningHours
         $this->data = $metaData;
         $this->filters = $filters;
 
-        return $this;
+        return $this->setDateTimeClass($dateTimeClass);
     }
 
     public function forWeek(): array
@@ -287,8 +307,7 @@ class OpeningHours
     }
 
     /**
-     * @param DateTimeInterface $date
-     *
+     * @param  DateTimeInterface  $date
      * @return TimeRange[]
      */
     public function forDateTime(DateTimeInterface $date): array
@@ -312,7 +331,7 @@ class OpeningHours
             [, $year, $month, $day] = $match;
             $year = $year ?: date('Y');
 
-            return count($this->forDate(new DateTime("$year-$month-$day", $this->timezone))) > 0;
+            return count($this->forDate(new DateTimeImmutable("$year-$month-$day", $this->timezone))) > 0;
         }
 
         return count($this->forDay($day)) > 0;
@@ -348,12 +367,12 @@ class OpeningHours
 
     public function isOpen(): bool
     {
-        return $this->isOpenAt(new DateTime());
+        return $this->isOpenAt(new $this->dateTimeClass());
     }
 
     public function isClosed(): bool
     {
-        return $this->isClosedAt(new DateTime());
+        return $this->isClosedAt(new $this->dateTimeClass());
     }
 
     public function currentOpenRange(DateTimeInterface $dateTime): ?DateTimeRange
@@ -378,8 +397,9 @@ class OpeningHours
         return $range ? $range->end()->date() : null;
     }
 
-    public function nextOpen(DateTimeInterface $dateTime): DateTimeInterface
+    public function nextOpen(?DateTimeInterface $dateTime = null): DateTimeInterface
     {
+        $dateTime = $dateTime ?? new $this->dateTimeClass();
         $dateTime = $this->copyDateTime($dateTime);
         $openingHoursForDay = $this->forDate($dateTime);
         $nextOpen = $openingHoursForDay->nextOpen(Time::fromDateTime($dateTime));
@@ -417,8 +437,9 @@ class OpeningHours
         return $dateTime->setTime($nextDateTime->format('G'), $nextDateTime->format('i'), 0);
     }
 
-    public function nextClose(DateTimeInterface $dateTime): DateTimeInterface
+    public function nextClose(?DateTimeInterface $dateTime = null): DateTimeInterface
     {
+        $dateTime = $dateTime ?? new $this->dateTimeClass();
         $dateTime = $this->copyDateTime($dateTime);
         $nextClose = null;
         if ($this->overflow) {
@@ -564,6 +585,7 @@ class OpeningHours
 
     protected function parseOpeningHoursAndExceptions(array $data): array
     {
+        $dateTimeClass = Arr::pull($data, 'dateTimeClass', null);
         $metaData = Arr::pull($data, 'data', null);
         $exceptions = [];
         $filters = Arr::pull($data, 'filters', []);
@@ -585,7 +607,7 @@ class OpeningHours
             $openingHours[$this->normalizeDayName($day)] = $openingHoursData;
         }
 
-        return [$openingHours, $exceptions, $metaData, $filters, $overflow];
+        return [$openingHours, $exceptions, $metaData, $filters, $overflow, $dateTimeClass];
     }
 
     protected function setOpeningHoursFromStrings(string $day, array $openingHours): void
