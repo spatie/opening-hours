@@ -41,8 +41,8 @@ class OpeningHours
     /** @var int|null Number of days to try before abandoning the search of the next close/open time */
     protected ?int $dayLimit = null;
 
-    /** @var string */
-    protected $dateTimeClass = DateTime::class;
+    /** @var string Class of new date instances used for now, nextOpen, nextClose */
+    protected string $dateTimeClass = DateTime::class;
 
     public function __construct($timezone = null)
     {
@@ -148,7 +148,7 @@ class OpeningHours
      *
      * @throws InvalidDateTimeClass if $dateTimeClass is set with a string that is not a valid DateTimeInterface.
      */
-    public function setDateTimeClass(string $dateTimeClass = null)
+    public function setDateTimeClass(?string $dateTimeClass = null): self
     {
         if ($dateTimeClass !== null && ! is_a($dateTimeClass, DateTimeInterface::class, true)) {
             throw InvalidDateTimeClass::forString($dateTimeClass);
@@ -168,7 +168,7 @@ class OpeningHours
      * @param $data
      * @return $this
      */
-    public function setData($data)
+    public function setData($data): self
     {
         $this->data = $data;
 
@@ -228,9 +228,8 @@ class OpeningHours
         $this->setExceptionsFromStrings($exceptions);
         $this->data = $metaData;
         $this->filters = $filters;
-        $this->dateTimeClass = $dateTimeClass;
 
-        return $this;
+        return $this->setDateTimeClass($dateTimeClass);
     }
 
     public function forWeek(): array
