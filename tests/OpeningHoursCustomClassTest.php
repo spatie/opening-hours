@@ -10,7 +10,7 @@ use Spatie\OpeningHours\OpeningHours;
 
 class OpeningHoursCustomClassTest extends TestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         date_default_timezone_set('UTC');
     }
