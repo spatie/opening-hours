@@ -80,8 +80,6 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
         foreach (($reverse ? array_reverse($this->openingHours) : $this->openingHours) as $timeRange) {
             foreach ($filters as $filter) {
                 if ($result = $filter($timeRange)) {
-                    reset($timeRange);
-
                     return $result;
                 }
             }
@@ -216,16 +214,19 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
         return isset($this->openingHours[$offset]);
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset)
     {
         return $this->openingHours[$offset];
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetSet($offset, $value)
     {
         throw NonMutableOffsets::forClass(static::class);
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetUnset($offset)
     {
         unset($this->openingHours[$offset]);
@@ -236,7 +237,7 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
         return count($this->openingHours);
     }
 
-    public function getIterator()
+    public function getIterator(): ArrayIterator
     {
         return new ArrayIterator($this->openingHours);
     }
