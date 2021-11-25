@@ -14,11 +14,6 @@ use Spatie\OpeningHours\TimeRange;
 
 class OpeningHoursTest extends TestCase
 {
-    protected function setUp()
-    {
-        date_default_timezone_set('UTC');
-    }
-
     /** @test */
     public function it_can_return_the_opening_hours_for_a_regular_week()
     {

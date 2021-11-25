@@ -10,11 +10,6 @@ use Spatie\OpeningHours\OpeningHours;
 
 class OpeningHoursCustomClassTest extends TestCase
 {
-    protected function setUp()
-    {
-        date_default_timezone_set('UTC');
-    }
-
     /** @test */
     public function it_can_use_immutable_date_time()
     {
