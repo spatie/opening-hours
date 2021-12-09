@@ -62,15 +62,16 @@ class OpeningHours
 
     /**
      * @param  array{
-     *             monday: array<string|array>,
-     *             tuesday: array<string|array>,
-     *             wednesday: array<string|array>,
-     *             thursday: array<string|array>,
-     *             friday: array<string|array>,
-     *             saturday: array<string|array>,
-     *             sunday: array<string|array>,
-     *             exceptions: array<array<string|array>>,
-     *             filters: callable[],
+     *             monday?: array<string|array>,
+     *             tuesday?: array<string|array>,
+     *             wednesday?: array<string|array>,
+     *             thursday?: array<string|array>,
+     *             friday?: array<string|array>,
+     *             saturday?: array<string|array>,
+     *             sunday?: array<string|array>,
+     *             exceptions?: array<array<string|array>>,
+     *             filters?: callable[],
+     *             overflow?: bool,
      *         }                         $data
      * @param  string|DateTimeZone|null  $timezone
      * @return static
@@ -130,15 +131,16 @@ class OpeningHours
 
     /**
      * @param  array{
-     *             monday: array<string|array>,
-     *             tuesday: array<string|array>,
-     *             wednesday: array<string|array>,
-     *             thursday: array<string|array>,
-     *             friday: array<string|array>,
-     *             saturday: array<string|array>,
-     *             sunday: array<string|array>,
-     *             exceptions: array<array<string|array>>,
-     *             filters: callable[],
+     *             monday?: array<string|array>,
+     *             tuesday?: array<string|array>,
+     *             wednesday?: array<string|array>,
+     *             thursday?: array<string|array>,
+     *             friday?: array<string|array>,
+     *             saturday?: array<string|array>,
+     *             sunday?: array<string|array>,
+     *             exceptions?: array<array<string|array>>,
+     *             filters?: callable[],
+     *             overflow?: bool,
      *         }                         $data
      * @param  string|DateTimeZone|null  $timezone
      * @return static
