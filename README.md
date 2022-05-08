@@ -515,6 +515,12 @@ Value object describing a period with a start and an end time. Can be cast to a 
 
 Value object describing a single time. Can be cast to a string in a `H:i` format.
 
+## Adapters
+
+### OpenStreetMap
+
+You can convert OpenStreetMap format to `OpeningHours` object using [osm-opening-hours](https://github.com/ujamii/osm-opening-hours) (thanks to [mgrundkoetter](https://github.com/mgrundkoetter))
+
 ## Changelog
 
 Please see [CHANGELOG](CHANGELOG.md) for more information about what has changed recently.
