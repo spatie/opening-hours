@@ -694,6 +694,10 @@ class OpeningHours
     protected function applyTimezone(DateTimeInterface $date)
     {
         if ($this->timezone) {
+            if ($date instanceof DateTime) {
+                $date = clone $date;
+            }
+
             $date = $date->setTimezone($this->timezone);
         }
 
