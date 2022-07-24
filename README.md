@@ -231,14 +231,38 @@ The package should only be used through the `OpeningHours` class. There are also
 
 ### `Spatie\OpeningHours\OpeningHours`
 
-#### `OpeningHours::create(array $data, $timezone = null): Spatie\OpeningHours\OpeningHours`
+#### `OpeningHours::create(array $data, $timezone = null, $toutputTimezone = null): Spatie\OpeningHours\OpeningHours`
 
 Static factory method to fill the set of opening hours.
 
-``` php
+```php
 $openingHours = OpeningHours::create([
     'monday' => ['09:00-12:00', '13:00-18:00'],
     // ...
+]);
+```
+
+If no timezone is specified, `OpeningHours` will just assume you always
+pass `DateTime` objects that have already the timezone matching your schedule.
+
+If you pass a `$timezone` as a second argument or via the array-key `'timezone'`
+(it can be either a `DateTimeZone` object or a `string`), then passed dates will
+be converted to this timezone at the beginning of each method, then if the method
+return a date object (such as `nextOpen`, `nextClose`, `previousOpen`,
+`previousClose`, `currentOpenRangeStart` or `currentOpenRangeEnd`), then it's
+converted back to original timezone before output so the object can reflect
+a moment in user local time while `OpeningHours` can stick in its own business
+timezone.
+
+Alternatively you can also specify both input and output timezone (using second
+and third argument) or using an array:
+```php
+$openingHours = OpeningHours::create([
+    'monday' => ['09:00-12:00', '13:00-18:00'],
+    'timezone' => [
+        'input' => 'America/New_York',
+        'output' => 'Europe/Olso',
+    ],
 ]);
 ```
 
@@ -246,7 +270,7 @@ $openingHours = OpeningHours::create([
 
 For safety sake, creating `OpeningHours` object with overlapping ranges will throw an exception unless you pass explicitly `'overflow' => true,` in the opening hours array definition. You can also explicitly merge them.
 
-``` php
+```php
 $ranges = [
   'monday' => ['08:00-11:00', '10:00-12:00'],
 ];
@@ -263,7 +287,7 @@ Not all days are mandatory, if a day is missing, it will be set as closed.
 
 The same as `create`, but non-static.
 
-``` php
+```php
 $openingHours = (new OpeningHours)->fill([
     'monday' => ['09:00-12:00', '13:00-18:00'],
     // ...

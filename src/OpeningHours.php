@@ -36,6 +36,9 @@ class OpeningHours
     /** @var DateTimeZone|null */
     protected $timezone = null;
 
+    /** @var DateTimeZone|null */
+    protected $outputTimezone = null;
+
     /** @var bool Allow for overflowing time ranges which overflow into the next day */
     protected $overflow;
 
@@ -45,17 +48,16 @@ class OpeningHours
     /** @var string */
     protected $dateTimeClass = DateTime::class;
 
-    public function __construct($timezone = null)
+    /**
+     * @param  string|DateTimeZone|null  $timezone
+     * @param  string|DateTimeZone|null  $outputTimezone
+     */
+    public function __construct($timezone = null, $outputTimezone = null)
     {
-        if ($timezone instanceof DateTimeZone) {
-            $this->timezone = $timezone;
-        } elseif (is_string($timezone)) {
-            $this->timezone = new DateTimeZone($timezone);
-        } elseif ($timezone) {
-            throw InvalidTimezone::create();
-        }
+        $this->setTimezone($timezone);
+        $this->setOutputTimezone($outputTimezone);
 
-        $this->openingHours = Day::mapDays(function () {
+        $this->openingHours = Day::mapDays(static function () {
             return new OpeningHoursForDay();
         });
     }
@@ -74,11 +76,12 @@ class OpeningHours
      *             overflow?: bool,
      *         }                         $data
      * @param  string|DateTimeZone|null  $timezone
+     * @param  string|DateTimeZone|null  $outputTimezone
      * @return static
      */
-    public static function create(array $data, $timezone = null): self
+    public static function create(array $data, $timezone = null, $outputTimezone = null): self
     {
-        return (new static($timezone))->fill($data);
+        return (new static($timezone, $outputTimezone))->fill($data);
     }
 
     /**
@@ -143,11 +146,12 @@ class OpeningHours
      *             overflow?: bool,
      *         }                         $data
      * @param  string|DateTimeZone|null  $timezone
+     * @param  string|DateTimeZone|null  $outputTimezone
      * @return static
      */
-    public static function createAndMergeOverlappingRanges(array $data, $timezone = null)
+    public static function createAndMergeOverlappingRanges(array $data, $timezone = null, $outputTimezone = null)
     {
-        return static::create(static::mergeOverlappingRanges($data), $timezone);
+        return static::create(static::mergeOverlappingRanges($data), $timezone, $outputTimezone);
     }
 
     /**
@@ -221,6 +225,21 @@ class OpeningHours
 
     public function fill(array $data)
     {
+        $timezones = array_key_exists('timezone', $data) ? $data['timezone'] : [];
+        unset($data['timezone']);
+
+        if (! is_array($timezones)) {
+            $timezones = ['input' => $timezones];
+        }
+
+        if (array_key_exists('input', $timezones)) {
+            $this->timezone = $this->parseTimezone($timezones['input']);
+        }
+
+        if (array_key_exists('output', $timezones)) {
+            $this->outputTimezone = $this->parseTimezone($timezones['output']);
+        }
+
         list($openingHours, $exceptions, $metaData, $filters, $overflow, $dateTimeClass) = $this
             ->parseOpeningHoursAndExceptions($data);
 
@@ -312,6 +331,8 @@ class OpeningHours
      */
     public function forDateTime(DateTimeInterface $date): array
     {
+        $date = $this->applyTimezone($date);
+
         return array_merge(
             iterator_to_array($this->forDate(
                 $this->yesterday($date)
@@ -376,6 +397,7 @@ class OpeningHours
 
     public function currentOpenRange(DateTimeInterface $dateTime)
     {
+        $dateTime = $this->applyTimezone($dateTime);
         $list = $this->forDateTime($dateTime);
 
         return end($list) ?: false;
@@ -383,6 +405,8 @@ class OpeningHours
 
     public function currentOpenRangeStart(DateTimeInterface $dateTime)
     {
+        $outputTimezone = $this->getOutputTimezone($dateTime);
+        $dateTime = $this->applyTimezone($dateTime);
         /** @var TimeRange $range */
         $range = $this->currentOpenRange($dateTime);
 
@@ -398,11 +422,16 @@ class OpeningHours
             $dateTime = $dateTime->modify('-1 day');
         }
 
-        return $dateTime->setTime($nextDateTime->format('G'), $nextDateTime->format('i'), 0);
+        return $this->getDateWithTimezone(
+            $dateTime->setTime($nextDateTime->format('G'), $nextDateTime->format('i'), 0),
+            $outputTimezone
+        );
     }
 
     public function currentOpenRangeEnd(DateTimeInterface $dateTime)
     {
+        $outputTimezone = $this->getOutputTimezone($dateTime);
+        $dateTime = $this->applyTimezone($dateTime);
         /** @var TimeRange $range */
         $range = $this->currentOpenRange($dateTime);
 
@@ -418,12 +447,16 @@ class OpeningHours
             $dateTime = $dateTime->modify('+1 day');
         }
 
-        return $dateTime->setTime($nextDateTime->format('G'), $nextDateTime->format('i'), 0);
+        return $this->getDateWithTimezone(
+            $dateTime->setTime($nextDateTime->format('G'), $nextDateTime->format('i'), 0),
+            $outputTimezone
+        );
     }
 
     public function nextOpen(DateTimeInterface $dateTime = null): DateTimeInterface
     {
-        $dateTime = $dateTime ?? new $this->dateTimeClass();
+        $outputTimezone = $this->getOutputTimezone($dateTime);
+        $dateTime = $this->applyTimezone($dateTime ?? new $this->dateTimeClass());
         $dateTime = $this->copyDateTime($dateTime);
         $openingHoursForDay = $this->forDate($dateTime);
         $nextOpen = $openingHoursForDay->nextOpen(Time::fromDateTime($dateTime));
@@ -442,7 +475,7 @@ class OpeningHours
                 ->setTime(0, 0, 0);
 
             if ($this->isOpenAt($dateTime) && ! $openingHoursForDay->isOpenAt(Time::fromString('23:59'))) {
-                return $dateTime;
+                return $this->getDateWithTimezone($dateTime, $outputTimezone);
             }
 
             $openingHoursForDay = $this->forDate($dateTime);
@@ -451,17 +484,24 @@ class OpeningHours
         }
 
         if ($dateTime->format('H:i') === '00:00' && $this->isOpenAt((clone $dateTime)->modify('-1 second'))) {
-            return $this->nextOpen($dateTime->modify('+1 minute'));
+            return $this->getDateWithTimezone(
+                $this->nextOpen($dateTime->modify('+1 minute')),
+                $outputTimezone
+            );
         }
 
         $nextDateTime = $nextOpen->toDateTime();
 
-        return $dateTime->setTime($nextDateTime->format('G'), $nextDateTime->format('i'), 0);
+        return $this->getDateWithTimezone(
+            $dateTime->setTime($nextDateTime->format('G'), $nextDateTime->format('i'), 0),
+            $outputTimezone
+        );
     }
 
     public function nextClose(DateTimeInterface $dateTime = null): DateTimeInterface
     {
-        $dateTime = $dateTime ?? new $this->dateTimeClass();
+        $outputTimezone = $this->getOutputTimezone($dateTime);
+        $dateTime = $this->applyTimezone($dateTime ?? new $this->dateTimeClass());
         $dateTime = $this->copyDateTime($dateTime);
         $nextClose = null;
         if ($this->overflow) {
@@ -496,7 +536,7 @@ class OpeningHours
                 ->setTime(0, 0, 0);
 
             if ($this->isClosedAt($dateTime) && $openingHoursForDay->isOpenAt(Time::fromString('23:59'))) {
-                return $dateTime;
+                return $this->getDateWithTimezone($dateTime, $outputTimezone);
             }
 
             $openingHoursForDay = $this->forDate($dateTime);
@@ -506,12 +546,16 @@ class OpeningHours
 
         $nextDateTime = $nextClose->toDateTime();
 
-        return $dateTime->setTime($nextDateTime->format('G'), $nextDateTime->format('i'), 0);
+        return $this->getDateWithTimezone(
+            $dateTime->setTime($nextDateTime->format('G'), $nextDateTime->format('i'), 0),
+            $outputTimezone
+        );
     }
 
     public function previousOpen(DateTimeInterface $dateTime): DateTimeInterface
     {
-        $dateTime = $this->copyDateTime($dateTime);
+        $outputTimezone = $this->getOutputTimezone($dateTime);
+        $dateTime = $this->copyDateTime($this->applyTimezone($dateTime));
         $openingHoursForDay = $this->forDate($dateTime);
         $previousOpen = $openingHoursForDay->previousOpen(Time::fromDateTime($dateTime));
         $tries = $this->getDayLimit();
@@ -531,7 +575,7 @@ class OpeningHours
             $openingHoursForDay = $this->forDate($dateTime);
 
             if ($this->isOpenAt($midnight) && ! $openingHoursForDay->isOpenAt(Time::fromString('23:59'))) {
-                return $midnight;
+                return $this->getDateWithTimezone($midnight, $outputTimezone);
             }
 
             $previousOpen = $openingHoursForDay->previousOpen(Time::fromDateTime($dateTime));
@@ -539,12 +583,16 @@ class OpeningHours
 
         $nextDateTime = $previousOpen->toDateTime();
 
-        return $dateTime->setTime($nextDateTime->format('G'), $nextDateTime->format('i'), 0);
+        return $this->getDateWithTimezone(
+            $dateTime->setTime($nextDateTime->format('G'), $nextDateTime->format('i'), 0),
+            $outputTimezone
+        );
     }
 
     public function previousClose(DateTimeInterface $dateTime): DateTimeInterface
     {
-        $dateTime = $this->copyDateTime($dateTime);
+        $outputTimezone = $this->getOutputTimezone($dateTime);
+        $dateTime = $this->copyDateTime($this->applyTimezone($dateTime));
         $previousClose = null;
         if ($this->overflow) {
             $dateTimeMinus1Day = $this->copyDateTime($dateTime)->modify('-1 day');
@@ -575,7 +623,7 @@ class OpeningHours
             $openingHoursForDay = $this->forDate($dateTime);
 
             if ($this->isClosedAt($midnight) && $openingHoursForDay->isOpenAt(Time::fromString('23:59'))) {
-                return $midnight;
+                return $this->getDateWithTimezone($midnight, $outputTimezone);
             }
 
             $previousClose = $openingHoursForDay->previousClose(Time::fromDateTime($dateTime));
@@ -583,12 +631,15 @@ class OpeningHours
 
         $previousDateTime = $previousClose->toDateTime();
 
-        return $dateTime->setTime($previousDateTime->format('G'), $previousDateTime->format('i'), 0);
+        return $this->getDateWithTimezone(
+            $dateTime->setTime($previousDateTime->format('G'), $previousDateTime->format('i'), 0),
+            $outputTimezone
+        );
     }
 
     public function regularClosingDays(): array
     {
-        return array_keys($this->filter(function (OpeningHoursForDay $openingHoursForDay) {
+        return array_keys($this->filter(static function (OpeningHoursForDay $openingHoursForDay) {
             return $openingHoursForDay->isEmpty();
         }));
     }
@@ -600,18 +651,31 @@ class OpeningHours
 
     public function exceptionalClosingDates(): array
     {
-        $dates = array_keys($this->filterExceptions(function (OpeningHoursForDay $openingHoursForDay) {
+        $dates = array_keys($this->filterExceptions(static function (OpeningHoursForDay $openingHoursForDay) {
             return $openingHoursForDay->isEmpty();
         }));
 
-        return Arr::map($dates, function ($date) {
+        return Arr::map($dates, static function ($date) {
             return DateTime::createFromFormat('Y-m-d', $date);
         });
     }
 
+    /**
+     * @param  string|DateTimeZone|null  $timezone
+     * @return void
+     */
     public function setTimezone($timezone)
     {
-        $this->timezone = new DateTimeZone($timezone);
+        $this->timezone = $this->parseTimezone($timezone);
+    }
+
+    /**
+     * @param  string|DateTimeZone|null  $timezone
+     * @return void
+     */
+    public function setOutputTimezone($timezone)
+    {
+        $this->outputTimezone = $this->parseTimezone($timezone);
     }
 
     protected function parseOpeningHoursAndExceptions(array $data): array
@@ -665,7 +729,7 @@ class OpeningHours
             $this->dayLimit = 366;
         }
 
-        $this->exceptions = Arr::map($exceptions, function (array $openingHours, string $date) {
+        $this->exceptions = Arr::map($exceptions, static function (array $openingHours, string $date) {
             $recurring = DateTime::createFromFormat('m-d', $date);
 
             if ($recurring === false || $recurring->format('m-d') !== $date) {
@@ -693,12 +757,22 @@ class OpeningHours
 
     protected function applyTimezone(DateTimeInterface $date)
     {
-        if ($this->timezone) {
+        return $this->getDateWithTimezone($date, $this->timezone);
+    }
+
+    /**
+     * @param  DateTimeInterface  $date
+     * @param  DateTimeZone|null  $timezone
+     * @return DateTimeInterface
+     */
+    protected function getDateWithTimezone(DateTimeInterface $date, $timezone)
+    {
+        if ($timezone) {
             if ($date instanceof DateTime) {
                 $date = clone $date;
             }
 
-            $date = $date->setTimezone($this->timezone);
+            $date = $date->setTimezone($timezone);
         }
 
         return $date;
@@ -736,8 +810,8 @@ class OpeningHours
 
     public function asStructuredData(string $format = 'H:i', $timezone = null): array
     {
-        $regularHours = $this->flatMap(function (OpeningHoursForDay $openingHoursForDay, string $day) use ($format, $timezone) {
-            return $openingHoursForDay->map(function (TimeRange $timeRange) use ($format, $timezone, $day) {
+        $regularHours = $this->flatMap(static function (OpeningHoursForDay $openingHoursForDay, string $day) use ($format, $timezone) {
+            return $openingHoursForDay->map(static function (TimeRange $timeRange) use ($format, $timezone, $day) {
                 return [
                     '@type' => 'OpeningHoursSpecification',
                     'dayOfWeek' => ucfirst($day),
@@ -747,7 +821,7 @@ class OpeningHours
             });
         });
 
-        $exceptions = $this->flatMapExceptions(function (OpeningHoursForDay $openingHoursForDay, string $date) use ($format, $timezone) {
+        $exceptions = $this->flatMapExceptions(static function (OpeningHoursForDay $openingHoursForDay, string $date) use ($format, $timezone) {
             if ($openingHoursForDay->isEmpty()) {
                 $zero = Time::fromString('00:00')->format($format, $timezone);
 
@@ -760,7 +834,7 @@ class OpeningHours
                 ]];
             }
 
-            return $openingHoursForDay->map(function (TimeRange $timeRange) use ($format, $date, $timezone) {
+            return $openingHoursForDay->map(static function (TimeRange $timeRange) use ($format, $date, $timezone) {
                 return [
                     '@type' => 'OpeningHoursSpecification',
                     'opens' => $timeRange->start()->format($format, $timezone),
@@ -791,5 +865,43 @@ class OpeningHours
 
             yield $key => $value;
         }
+    }
+
+    /**
+     * @param  mixed  $timezone
+     * @return DateTimeZone|null
+     */
+    private function parseTimezone($timezone)
+    {
+        if ($timezone instanceof DateTimeZone) {
+            return $timezone;
+        }
+
+        if (is_string($timezone)) {
+            return new DateTimeZone($timezone);
+        }
+
+        if ($timezone) {
+            throw InvalidTimezone::create();
+        }
+
+        return null;
+    }
+
+    /**
+     * @param  DateTimeInterface|null  $dateTime
+     * @return DateTimeZone|null
+     */
+    private function getOutputTimezone(DateTimeInterface $dateTime = null)
+    {
+        if ($this->outputTimezone !== null) {
+            return $this->outputTimezone;
+        }
+
+        if ($this->timezone === null || $dateTime === null) {
+            return $this->timezone;
+        }
+
+        return $dateTime->getTimezone();
     }
 }
