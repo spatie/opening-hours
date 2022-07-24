@@ -33,11 +33,11 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
             unset($strings['data']);
         }
 
-        uasort($strings, function ($a, $b) {
+        uasort($strings, static function ($a, $b) {
             return strcmp(static::getHoursFromRange($a), static::getHoursFromRange($b));
         });
 
-        $timeRanges = Arr::map($strings, function ($string) {
+        $timeRanges = Arr::map($strings, static function ($string) {
             return TimeRange::fromDefinition($string);
         });
 
