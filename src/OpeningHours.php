@@ -228,7 +228,7 @@ class OpeningHours
         $timezones = array_key_exists('timezone', $data) ? $data['timezone'] : [];
         unset($data['timezone']);
 
-        if (!is_array($timezones)) {
+        if (! is_array($timezones)) {
             $timezones = ['input' => $timezones];
         }
 
@@ -868,7 +868,7 @@ class OpeningHours
     }
 
     /**
-     * @param mixed $timezone
+     * @param  mixed  $timezone
      * @return DateTimeZone|null
      */
     private function parseTimezone($timezone)
