@@ -2,13 +2,9 @@
 
 namespace Spatie\OpeningHours;
 
-use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
 use DateTimeZone;
-use Spatie\OpeningHours\Exceptions\InvalidTimeString;
-use Spatie\OpeningHours\Helpers\DataTrait;
-use Spatie\OpeningHours\Helpers\DateTimeCopier;
 
 class PreciseTime extends Time
 {
