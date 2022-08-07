@@ -28,18 +28,21 @@ class PreciseTimeTest extends TestCase
     {
         $date = new DateTimeImmutable('2022-08-07 23:32:58.123456 America/Toronto');
         $this->assertSame($date, PreciseTime::fromDateTime($date)->toDateTime());
-        $this->assertSame('2021-11-25 23:32:58.123456 Asia/Tokyo', PreciseTime::fromDateTime($date)->toDateTime(
+        $this->assertSame('2021-11-25 23:32:58'.(PHP_VERSION < 7.1 ? '' : '.123456').' Asia/Tokyo', PreciseTime::fromDateTime($date)->toDateTime(
             new DateTimeImmutable('2021-11-25 15:02:03.987654 Asia/Tokyo')
-        )->format('Y-m-d H:i:s.u e'));
+        )->format('Y-m-d H:i:s'.(PHP_VERSION < 7.1 ? '' : '.u').' e'));
     }
 
     /** @test */
     public function it_can_return_diff()
     {
-        $date = new DateTimeImmutable('2022-08-07 23:32:58.123456 America/Toronto');
-        $this->assertSame('21 30 54 135802', PreciseTime::fromDateTime($date)->diff(PreciseTime::fromDateTime(
-            new DateTimeImmutable('2021-11-25 15:02:03.987654 Asia/Tokyo')
-        ))->format('%H %I %S %F'));
+        $date = new DateTimeImmutable('2021-08-07 23:32:58.123456 America/Toronto');
+        $this->assertSame(
+            '02 29 05 '.(PHP_VERSION < 7.1 ? '%F' : '864198'),
+            PreciseTime::fromDateTime($date)->diff(PreciseTime::fromDateTime(
+                new DateTimeImmutable('2022-11-25 15:02:03.987654 Asia/Tokyo')
+            ))->format('%H %I %S %F')
+        );
     }
 
     /** @test */
