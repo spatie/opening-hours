@@ -430,6 +430,10 @@ class OpeningHoursTest extends TestCase
         $friday = new DateTimeImmutable('2019-02-08 02:00:00');
         $this->assertSame('2019-02-07 00:00:00', $openingHours->previousClose($friday)->format('Y-m-d H:i:s'));
         $this->assertSame('2019-02-08 00:00:00', $openingHours->previousOpen($friday)->format('Y-m-d H:i:s'));
+
+        $friday = new DateTimeImmutable('2019-02-08 03:00:00');
+        $this->assertSame('2019-02-08 03:00:00', $openingHours->previousClose($friday)->format('Y-m-d H:i:s'));
+        $this->assertFalse($openingHours->currentOpenRange($friday));
     }
 
     /** @test */

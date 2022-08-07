@@ -82,7 +82,7 @@ trait RangeFinder
     {
         $end = $timeRange->end();
 
-        if ($end->isBefore($time)) {
+        if ($end->isSame($time) || $end->isBefore($time)) {
             return $end;
         }
     }
