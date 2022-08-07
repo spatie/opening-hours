@@ -9,7 +9,7 @@ trait RangeFinder
 {
     protected function findRangeInFreeTime(Time $time, TimeRange $timeRange)
     {
-        if ($timeRange->start()->isAfter($time)) {
+        if ($time->isBefore($timeRange->start())) {
             return $timeRange;
         }
     }
@@ -25,7 +25,7 @@ trait RangeFinder
 
     protected function findOpenRangeInWorkingHours(Time $time, TimeRange $timeRange)
     {
-        if ($timeRange->start()->isBefore($time)) {
+        if ($time->isAfter($timeRange->start())) {
             return $timeRange;
         }
     }
@@ -64,7 +64,7 @@ trait RangeFinder
 
     protected function findPreviousRangeInFreeTime(Time $time, TimeRange $timeRange)
     {
-        if ($timeRange->end()->isBefore($time)) {
+        if ($time->isAfter($timeRange->end())) {
             return $timeRange;
         }
     }
@@ -82,7 +82,7 @@ trait RangeFinder
     {
         $end = $timeRange->end();
 
-        if ($end->isBefore($time)) {
+        if ($time->isAfter($end)) {
             return $end;
         }
     }
