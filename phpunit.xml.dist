@@ -18,6 +18,7 @@
     </filter>
     <php>
         <ini name="date.timezone" value="UTC"/>
+        <ini name="max_execution_time" value="10"/>
     </php>
     <logging>
         <log type="tap" target="build/report.tap"/>

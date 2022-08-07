@@ -3,6 +3,7 @@
 namespace Spatie\OpeningHours;
 
 use DateTime;
+use DateTimeImmutable;
 use DateTimeInterface;
 use DateTimeZone;
 use Spatie\OpeningHours\Exceptions\InvalidTimeString;
@@ -104,8 +105,11 @@ class Time
             )
             : null;
 
-        if ($format === 'H:i' && $this->hours === 24 && $this->minutes === 0) {
-            return '24:00';
+        if ($this->hours === 24 && $this->minutes === 0 && substr($format, 0, 3) === 'H:i') {
+            return '24:00'.(strlen($format) > 3
+                    ? ($date ?? new DateTimeImmutable('1970-01-01 00:00:00'))->format(substr($format, 3))
+                    : ''
+                );
         }
 
         return $this->toDateTime($date)->format($format);

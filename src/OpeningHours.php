@@ -370,14 +370,14 @@ class OpeningHours
         if ($this->overflow) {
             $dateTimeMinus1Day = $this->yesterday($dateTime);
             $openingHoursForDayBefore = $this->forDate($dateTimeMinus1Day);
-            if ($openingHoursForDayBefore->isOpenAtNight(Time::fromDateTime($dateTimeMinus1Day))) {
+            if ($openingHoursForDayBefore->isOpenAtNight(PreciseTime::fromDateTime($dateTimeMinus1Day))) {
                 return true;
             }
         }
 
         $openingHoursForDay = $this->forDate($dateTime);
 
-        return $openingHoursForDay->isOpenAt(Time::fromDateTime($dateTime));
+        return $openingHoursForDay->isOpenAt(PreciseTime::fromDateTime($dateTime));
     }
 
     public function isClosedAt(DateTimeInterface $dateTime): bool
@@ -459,7 +459,7 @@ class OpeningHours
         $dateTime = $this->applyTimezone($dateTime ?? new $this->dateTimeClass());
         $dateTime = $this->copyDateTime($dateTime);
         $openingHoursForDay = $this->forDate($dateTime);
-        $nextOpen = $openingHoursForDay->nextOpen(Time::fromDateTime($dateTime));
+        $nextOpen = $openingHoursForDay->nextOpen(PreciseTime::fromDateTime($dateTime));
         $tries = $this->getDayLimit();
 
         while ($nextOpen === false || $nextOpen->hours() >= 24) {
@@ -480,7 +480,7 @@ class OpeningHours
 
             $openingHoursForDay = $this->forDate($dateTime);
 
-            $nextOpen = $openingHoursForDay->nextOpen(Time::fromDateTime($dateTime));
+            $nextOpen = $openingHoursForDay->nextOpen(PreciseTime::fromDateTime($dateTime));
         }
 
         if ($dateTime->format('H:i') === '00:00' && $this->isOpenAt((clone $dateTime)->modify('-1 second'))) {
@@ -507,14 +507,14 @@ class OpeningHours
         if ($this->overflow) {
             $dateTimeMinus1Day = $this->copyDateTime($dateTime)->modify('-1 day');
             $openingHoursForDayBefore = $this->forDate($dateTimeMinus1Day);
-            if ($openingHoursForDayBefore->isOpenAtNight(Time::fromDateTime($dateTimeMinus1Day))) {
-                $nextClose = $openingHoursForDayBefore->nextClose(Time::fromDateTime($dateTime));
+            if ($openingHoursForDayBefore->isOpenAtNight(PreciseTime::fromDateTime($dateTimeMinus1Day))) {
+                $nextClose = $openingHoursForDayBefore->nextClose(PreciseTime::fromDateTime($dateTime));
             }
         }
 
         $openingHoursForDay = $this->forDate($dateTime);
         if (! $nextClose) {
-            $nextClose = $openingHoursForDay->nextClose(Time::fromDateTime($dateTime));
+            $nextClose = $openingHoursForDay->nextClose(PreciseTime::fromDateTime($dateTime));
 
             if ($nextClose && $nextClose->hours() < 24 && $nextClose->format('Gi') < $dateTime->format('Gi')) {
                 $dateTime = $dateTime->modify('+1 day');
@@ -541,7 +541,7 @@ class OpeningHours
 
             $openingHoursForDay = $this->forDate($dateTime);
 
-            $nextClose = $openingHoursForDay->nextClose(Time::fromDateTime($dateTime));
+            $nextClose = $openingHoursForDay->nextClose(PreciseTime::fromDateTime($dateTime));
         }
 
         $nextDateTime = $nextClose->toDateTime();
@@ -557,7 +557,7 @@ class OpeningHours
         $outputTimezone = $this->getOutputTimezone($dateTime);
         $dateTime = $this->copyDateTime($this->applyTimezone($dateTime));
         $openingHoursForDay = $this->forDate($dateTime);
-        $previousOpen = $openingHoursForDay->previousOpen(Time::fromDateTime($dateTime));
+        $previousOpen = $openingHoursForDay->previousOpen(PreciseTime::fromDateTime($dateTime));
         $tries = $this->getDayLimit();
 
         while ($previousOpen === false || ($previousOpen->hours() === 0 && $previousOpen->minutes() === 0)) {
@@ -578,7 +578,7 @@ class OpeningHours
                 return $this->getDateWithTimezone($midnight, $outputTimezone);
             }
 
-            $previousOpen = $openingHoursForDay->previousOpen(Time::fromDateTime($dateTime));
+            $previousOpen = $openingHoursForDay->previousOpen(PreciseTime::fromDateTime($dateTime));
         }
 
         $nextDateTime = $previousOpen->toDateTime();
@@ -597,14 +597,14 @@ class OpeningHours
         if ($this->overflow) {
             $dateTimeMinus1Day = $this->copyDateTime($dateTime)->modify('-1 day');
             $openingHoursForDayBefore = $this->forDate($dateTimeMinus1Day);
-            if ($openingHoursForDayBefore->isOpenAtNight(Time::fromDateTime($dateTimeMinus1Day))) {
-                $previousClose = $openingHoursForDayBefore->previousClose(Time::fromDateTime($dateTime));
+            if ($openingHoursForDayBefore->isOpenAtNight(PreciseTime::fromDateTime($dateTimeMinus1Day))) {
+                $previousClose = $openingHoursForDayBefore->previousClose(PreciseTime::fromDateTime($dateTime));
             }
         }
 
         $openingHoursForDay = $this->forDate($dateTime);
         if (! $previousClose) {
-            $previousClose = $openingHoursForDay->previousClose(Time::fromDateTime($dateTime));
+            $previousClose = $openingHoursForDay->previousClose(PreciseTime::fromDateTime($dateTime));
         }
 
         $tries = $this->getDayLimit();
@@ -626,7 +626,7 @@ class OpeningHours
                 return $this->getDateWithTimezone($midnight, $outputTimezone);
             }
 
-            $previousClose = $openingHoursForDay->previousClose(Time::fromDateTime($dateTime));
+            $previousClose = $openingHoursForDay->previousClose(PreciseTime::fromDateTime($dateTime));
         }
 
         $previousDateTime = $previousClose->toDateTime();
