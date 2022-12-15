@@ -261,7 +261,7 @@ $openingHours = OpeningHours::create([
     'monday' => ['09:00-12:00', '13:00-18:00'],
     'timezone' => [
         'input' => 'America/New_York',
-        'output' => 'Europe/Olso',
+        'output' => 'Europe/Oslo',
     ],
 ]);
 ```
