@@ -599,7 +599,9 @@ class OpeningHours
             $openingHoursForDay = $this->forDate($dateTime);
 
             if ($this->isOpenAt($midnight) && ! $openingHoursForDay->isOpenAtTheEndOfTheDay()) {
-                return $this->getDateWithTimezone($midnight, $outputTimezone);return $midnight;
+                return $this->getDateWithTimezone($midnight, $outputTimezone);
+
+                return $midnight;
             }
 
             $previousOpen = $openingHoursForDay->previousOpen(PreciseTime::fromDateTime($dateTime));
