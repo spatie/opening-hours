@@ -14,11 +14,6 @@ use Spatie\OpeningHours\TimeRange;
 
 class OpeningHoursTest extends TestCase
 {
-    protected function setUp(): void
-    {
-        date_default_timezone_set('UTC');
-    }
-
     /** @test */
     public function it_can_return_the_opening_hours_for_a_regular_week()
     {
@@ -435,6 +430,12 @@ class OpeningHoursTest extends TestCase
         $friday = new DateTimeImmutable('2019-02-08 02:00:00');
         $this->assertSame('2019-02-07 00:00:00', $openingHours->previousClose($friday)->format('Y-m-d H:i:s'));
         $this->assertSame('2019-02-08 00:00:00', $openingHours->previousOpen($friday)->format('Y-m-d H:i:s'));
+
+        $friday = new DateTimeImmutable('2022-08-05 03:00:00.000001');
+        $this->assertSame('2022-08-05 03:00:00', $openingHours->previousClose($friday)->format('Y-m-d H:i:s'));
+
+        $friday = new DateTimeImmutable('2022-08-05 00:00:00.000000');
+        $this->assertSame('2022-08-04 00:00:00', $openingHours->previousClose($friday)->format('Y-m-d H:i:s'));
     }
 
     /** @test */

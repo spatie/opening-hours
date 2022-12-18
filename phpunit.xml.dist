@@ -23,4 +23,7 @@
             <html outputDirectory="coverage" />
         </report>
     </coverage>
+    <php>
+        <ini name="date.timezone" value="UTC"/>
+    </php>
 </phpunit>
