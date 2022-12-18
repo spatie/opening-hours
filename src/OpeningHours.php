@@ -434,7 +434,7 @@ class OpeningHours
         $range = $this->currentOpenRange($dateTime);
 
         if (! $range) {
-            return false;
+            return null;
         }
 
         $dateTime = $this->copyDateTime($dateTime);
@@ -459,7 +459,7 @@ class OpeningHours
         $range = $this->currentOpenRange($dateTime);
 
         if (! $range) {
-            return false;
+            return null;
         }
 
         $dateTime = $this->copyDateTime($dateTime);
