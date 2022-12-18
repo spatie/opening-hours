@@ -434,7 +434,7 @@ class OpeningHours
         $range = $this->currentOpenRange($dateTime);
 
         if (! $range) {
-            return false;
+            return null;
         }
 
         $dateTime = $this->copyDateTime($dateTime);
@@ -459,7 +459,7 @@ class OpeningHours
         $range = $this->currentOpenRange($dateTime);
 
         if (! $range) {
-            return false;
+            return null;
         }
 
         $dateTime = $this->copyDateTime($dateTime);
@@ -599,7 +599,7 @@ class OpeningHours
             $openingHoursForDay = $this->forDate($dateTime);
 
             if ($this->isOpenAt($midnight) && ! $openingHoursForDay->isOpenAtTheEndOfTheDay()) {
-                return $this->getDateWithTimezone($midnight, $outputTimezone);return $midnight;
+                return $this->getDateWithTimezone($midnight, $outputTimezone);
             }
 
             $previousOpen = $openingHoursForDay->previousOpen(PreciseTime::fromDateTime($dateTime));

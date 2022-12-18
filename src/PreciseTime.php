@@ -11,12 +11,13 @@ class PreciseTime extends Time
     /** @var DateTimeInterface */
     protected $dateTime;
 
-    protected function __construct(DateTimeInterface $dateTime)
+    protected function __construct(DateTimeInterface $dateTime, $data = null)
     {
         $this->dateTime = $dateTime;
+        $this->data = $data;
     }
 
-    public static function fromString(string $string): parent
+    public static function fromString(string $string, $data = null, DateTimeInterface $date = null): parent
     {
         return self::fromDateTime(new DateTimeImmutable($string));
     }
@@ -31,7 +32,7 @@ class PreciseTime extends Time
         return (int) $this->dateTime->format('i');
     }
 
-    public static function fromDateTime(DateTimeInterface $dateTime): parent
+    public static function fromDateTime(DateTimeInterface $dateTime, $data = null): parent
     {
         return new self($dateTime);
     }
