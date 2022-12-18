@@ -83,8 +83,6 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
         foreach (($reverse ? array_reverse($this->openingHours) : $this->openingHours) as $timeRange) {
             foreach ($filters as $filter) {
                 if ($result = $filter($timeRange)) {
-                    reset($timeRange);
-
                     return $result;
                 }
             }

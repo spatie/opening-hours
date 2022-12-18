@@ -10,11 +10,6 @@ use Spatie\OpeningHours\OpeningHours;
 
 class OpeningHoursCustomClassTest extends TestCase
 {
-    protected function setUp(): void
-    {
-        date_default_timezone_set('UTC');
-    }
-
     /** @test */
     public function it_can_use_immutable_date_time()
     {
@@ -27,6 +22,85 @@ class OpeningHoursCustomClassTest extends TestCase
 
         $this->assertInstanceOf(DateTimeImmutable::class, $date);
         $this->assertSame('2021-10-11 09:00:00', $date->format('Y-m-d H:i:s'));
+    }
+
+    /** @test */
+    public function it_can_use_timezones()
+    {
+        $openingHours = OpeningHours::create([
+            'monday' => ['09:00-18:00'],
+        ]);
+
+        $date = $openingHours->nextOpen(new DateTimeImmutable('2022-07-25 07:30 UTC'));
+
+        $this->assertInstanceOf(DateTimeImmutable::class, $date);
+        $this->assertSame('2022-07-25 09:00:00 UTC', $date->format('Y-m-d H:i:s e'));
+
+        $date = $openingHours->nextOpen(new DateTimeImmutable('2022-07-25 07:30 Europe/Oslo'));
+
+        $this->assertInstanceOf(DateTimeImmutable::class, $date);
+        $this->assertSame('2022-07-25 09:00:00 Europe/Oslo', $date->format('Y-m-d H:i:s e'));
+
+        $openingHours = OpeningHours::create([
+            'monday' => ['09:00-18:00'],
+            'timezone' => 'Europe/Oslo',
+        ]);
+
+        $date = $openingHours->nextOpen(new DateTimeImmutable('2022-07-25 06:30 UTC'));
+
+        $this->assertInstanceOf(DateTimeImmutable::class, $date);
+        $this->assertSame('2022-07-25 07:00:00 UTC', $date->format('Y-m-d H:i:s e'));
+
+        $date = $openingHours->nextOpen(new DateTimeImmutable('2022-07-25 07:30 UTC'));
+
+        $this->assertInstanceOf(DateTimeImmutable::class, $date);
+        $this->assertSame('2022-08-01 07:00:00 UTC', $date->format('Y-m-d H:i:s e'));
+
+        $openingHours = OpeningHours::create([
+            'monday' => ['09:00-18:00'],
+        ], new DateTimeZone('Europe/Oslo'));
+        $openingHours->setOutputTimezone('Europe/Oslo');
+
+        $date = $openingHours->nextOpen(new DateTimeImmutable('2022-07-25 06:30 UTC'));
+
+        $this->assertInstanceOf(DateTimeImmutable::class, $date);
+        $this->assertSame('2022-07-25 09:00:00 Europe/Oslo', $date->format('Y-m-d H:i:s e'));
+
+        $date = $openingHours->nextOpen(new DateTimeImmutable('2022-07-25 07:30 UTC'));
+
+        $this->assertInstanceOf(DateTimeImmutable::class, $date);
+        $this->assertSame('2022-08-01 09:00:00 Europe/Oslo', $date->format('Y-m-d H:i:s e'));
+
+        $openingHours = OpeningHours::create([
+            'monday' => ['09:00-18:00'],
+            'timezone' => [
+                'input' => 'Europe/Oslo',
+                'output' => 'UTC',
+            ],
+        ]);
+
+        $date = $openingHours->nextOpen(new DateTimeImmutable('2022-07-25 06:30 UTC'));
+
+        $this->assertInstanceOf(DateTimeImmutable::class, $date);
+        $this->assertSame('2022-07-25 07:00:00 UTC', $date->format('Y-m-d H:i:s e'));
+
+        $date = $openingHours->nextOpen(new DateTimeImmutable('2022-07-25 07:30 UTC'));
+
+        $this->assertInstanceOf(DateTimeImmutable::class, $date);
+        $this->assertSame('2022-08-01 07:00:00 UTC', $date->format('Y-m-d H:i:s e'));
+        $openingHours = OpeningHours::create([
+            'monday' => ['09:00-18:00'],
+        ], 'Europe/Oslo', 'America/New_York');
+
+        $date = $openingHours->nextOpen(new DateTimeImmutable('2022-07-25 06:30 UTC'));
+
+        $this->assertInstanceOf(DateTimeImmutable::class, $date);
+        $this->assertSame('2022-07-25 03:00:00 America/New_York', $date->format('Y-m-d H:i:s e'));
+
+        $date = $openingHours->nextOpen(new DateTimeImmutable('2022-07-25 07:30 UTC'));
+
+        $this->assertInstanceOf(DateTimeImmutable::class, $date);
+        $this->assertSame('2022-08-01 03:00:00 America/New_York', $date->format('Y-m-d H:i:s e'));
     }
 
     /** @test */
