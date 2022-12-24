@@ -19,7 +19,7 @@
         }
     ],
     "require": {
-        "php": "^8.0"
+        "php": "^8.1"
     },
     "require-dev": {
         "kylekatarnls/multi-tester": "^2.2",
