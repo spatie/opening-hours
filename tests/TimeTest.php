@@ -1,155 +1,107 @@
 <?php
 
-namespace Spatie\OpeningHours\Test;
-
-use DateTime;
-use DateTimeImmutable;
-use PHPUnit\Framework\TestCase;
 use Spatie\OpeningHours\Exceptions\InvalidTimeString;
 use Spatie\OpeningHours\Time;
 
-class TimeTest extends TestCase
-{
-    /** @test */
-    public function it_can_be_created_from_a_string()
-    {
-        $this->assertSame('00:00', (string) Time::fromString('00:00'));
-        $this->assertSame('16:32', (string) Time::fromString('16:32'));
-        $this->assertSame('24:00', (string) Time::fromString('24:00'));
-    }
+it('can be created from a string', function () {
+    expect((string)Time::fromString('00:00'))->toBe('00:00')
+        ->and((string)Time::fromString('16:32'))->toBe('16:32')
+        ->and((string)Time::fromString('24:00'))->toBe('24:00');
+});
 
-    /** @test */
-    public function it_cant_be_created_from_an_invalid_string()
-    {
-        $this->expectException(InvalidTimeString::class);
+it('cant be created from an invalid string', function () {
+    Time::fromString('aa:bb');
+})->throws(InvalidTimeString::class);
 
-        Time::fromString('aa:bb');
-    }
+it('cant be created from an invalid hour', function () {
+    Time::fromString('26:00');
+})->throws(InvalidTimeString::class);
 
-    /** @test */
-    public function it_cant_be_created_from_an_invalid_hour()
-    {
-        $this->expectException(InvalidTimeString::class);
+it('cant be created from an out of bound hour', function () {
+    Time::fromString('24:01');
+})->throws(InvalidTimeString::class);
 
-        Time::fromString('26:00');
-    }
+it('cant be created from an invalid minute', function () {
+    Time::fromString('14:60');
+})->throws(InvalidTimeString::class);
 
-    /** @test */
-    public function it_cant_be_created_from_an_out_of_bound_hour()
-    {
-        $this->expectException(InvalidTimeString::class);
+it('can be created from a date time instance', function () {
+    $dateTime = new DateTime('2016-09-27 16:00:00');
 
-        Time::fromString('24:01');
-    }
+    expect((string) Time::fromDateTime($dateTime))->toBe('16:00');
 
-    /** @test */
-    public function it_cant_be_created_from_an_invalid_minute()
-    {
-        $this->expectException(InvalidTimeString::class);
+    $dateTime = new DateTimeImmutable('2016-09-27 16:00:00');
 
-        Time::fromString('14:60');
-    }
+    expect((string) Time::fromDateTime($dateTime))->toBe('16:00');
+});
 
-    /** @test */
-    public function it_can_be_created_from_a_date_time_instance()
-    {
-        $dateTime = new DateTime('2016-09-27 16:00:00');
+it('can determine that its the same as another time', function () {
+    expect(Time::fromString('09:00')->isSame(Time::fromString('09:00')))->toBeTrue()
+        ->and(Time::fromString('09:00')->isSame(Time::fromString('10:00')))->toBeFalse()
+        ->and(Time::fromString('09:00')->isSame(Time::fromString('09:30')))->toBeFalse();
+});
 
-        $this->assertSame('16:00', (string) Time::fromDateTime($dateTime));
+it('can determine that its before another time', function () {
+    expect(Time::fromString('09:00')->isBefore(Time::fromString('10:00')))->toBeTrue()
+        ->and(Time::fromString('09:00')->isBefore(Time::fromString('09:30')))->toBeTrue()
+        ->and(Time::fromString('09:00')->isBefore(Time::fromString('09:00')))->toBeFalse()
+        ->and(Time::fromString('09:00')->isBefore(Time::fromString('08:00')))->toBeFalse()
+        ->and(Time::fromString('09:00')->isBefore(Time::fromString('08:30')))->toBeFalse()
+        ->and(Time::fromString('08:30')->isBefore(Time::fromString('08:00')))->toBeFalse();
+});
 
-        $dateTime = new DateTimeImmutable('2016-09-27 16:00:00');
+it('can determine that its after another time', function () {
+    expect(Time::fromString('09:00')->isAfter(Time::fromString('08:00')))->toBeTrue()
+        ->and(Time::fromString('09:30')->isAfter(Time::fromString('09:00')))->toBeTrue()
+        ->and(Time::fromString('09:00')->isAfter(Time::fromString('08:30')))->toBeTrue()
+        ->and(Time::fromString('09:00')->isAfter(Time::fromString('09:00')))->toBeFalse()
+        ->and(Time::fromString('09:00')->isAfter(Time::fromString('09:30')))->toBeFalse()
+        ->and(Time::fromString('09:00')->isAfter(Time::fromString('10:00')))->toBeFalse();
+});
 
-        $this->assertSame('16:00', (string) Time::fromDateTime($dateTime));
-    }
+it('can determine that its the same or after another time', function () {
+    expect(Time::fromString('09:00')->isSameOrAfter(Time::fromString('08:00')))->toBeTrue()
+        ->and(Time::fromString('09:00')->isSameOrAfter(Time::fromString('09:00')))->toBeTrue()
+        ->and(Time::fromString('09:30')->isSameOrAfter(Time::fromString('09:30')))->toBeTrue()
+        ->and(Time::fromString('09:30')->isSameOrAfter(Time::fromString('09:00')))->toBeTrue()
+        ->and(Time::fromString('09:00')->isSameOrAfter(Time::fromString('10:00')))->toBeFalse();
+});
 
-    /** @test */
-    public function it_can_determine_that_its_the_same_as_another_time()
-    {
-        $this->assertTrue(Time::fromString('09:00')->isSame(Time::fromString('09:00')));
-        $this->assertFalse(Time::fromString('09:00')->isSame(Time::fromString('10:00')));
-        $this->assertFalse(Time::fromString('09:00')->isSame(Time::fromString('09:30')));
-    }
+it('can accept any date format with the date time interface', function () {
+    $dateTime = date_create_immutable('2012-11-06 13:25:59.123456');
 
-    /** @test */
-    public function it_can_determine_that_its_before_another_time()
-    {
-        $this->assertTrue(Time::fromString('09:00')->isBefore(Time::fromString('10:00')));
-        $this->assertTrue(Time::fromString('09:00')->isBefore(Time::fromString('09:30')));
-        $this->assertFalse(Time::fromString('09:00')->isBefore(Time::fromString('09:00')));
-        $this->assertFalse(Time::fromString('09:00')->isBefore(Time::fromString('08:00')));
-        $this->assertFalse(Time::fromString('09:00')->isBefore(Time::fromString('08:30')));
-        $this->assertFalse(Time::fromString('08:30')->isBefore(Time::fromString('08:00')));
-    }
+    expect((string) Time::fromDateTime($dateTime))->toBe('13:25');
+});
 
-    /** @test */
-    public function it_can_determine_that_its_after_another_time()
-    {
-        $this->assertTrue(Time::fromString('09:00')->isAfter(Time::fromString('08:00')));
-        $this->assertTrue(Time::fromString('09:30')->isAfter(Time::fromString('09:00')));
-        $this->assertTrue(Time::fromString('09:00')->isAfter(Time::fromString('08:30')));
-        $this->assertFalse(Time::fromString('09:00')->isAfter(Time::fromString('09:00')));
-        $this->assertFalse(Time::fromString('09:00')->isAfter(Time::fromString('09:30')));
-        $this->assertFalse(Time::fromString('09:00')->isAfter(Time::fromString('10:00')));
-    }
+it('can be formatted', function () {
+    expect(Time::fromString('09:00')->format())->toBe('09:00')
+        ->and(Time::fromString('09:00')->format('H:i'))->toBe('09:00')
+        ->and(Time::fromString('09:00')->format('g A'))->toBe('9 AM');
+});
 
-    /** @test */
-    public function it_can_determine_that_its_the_same_or_after_another_time()
-    {
-        $this->assertTrue(Time::fromString('09:00')->isSameOrAfter(Time::fromString('08:00')));
-        $this->assertTrue(Time::fromString('09:00')->isSameOrAfter(Time::fromString('09:00')));
-        $this->assertTrue(Time::fromString('09:30')->isSameOrAfter(Time::fromString('09:30')));
-        $this->assertTrue(Time::fromString('09:30')->isSameOrAfter(Time::fromString('09:00')));
-        $this->assertFalse(Time::fromString('09:00')->isSameOrAfter(Time::fromString('10:00')));
-    }
+it('can get hours and minutes', function () {
+    $time = Time::fromString('16:30');
+    expect($time->hours())->toBe(16)
+        ->and($time->minutes())->toBe(30);
+});
 
-    /** @test */
-    public function it_can_accept_any_date_format_with_the_date_time_interface()
-    {
-        $dateTime = date_create_immutable('2012-11-06 13:25:59.123456');
+it('can calculate diff', function () {
+    $time1 = Time::fromString('16:30');
+    $time2 = Time::fromString('16:05');
+    expect($time1->diff($time2)->h)->toBe(0)
+        ->and($time1->diff($time2)->i)->toBe(25);
+});
 
-        $this->assertSame('13:25', (string) Time::fromDateTime($dateTime));
-    }
+it('should not mutate passed datetime', function () {
+    $dateTime = new DateTime('2016-09-27 12:00:00');
+    $time = Time::fromString('15:00');
+    expect($time->toDateTime($dateTime)->format('Y-m-d H:i:s'))->toBe('2016-09-27 15:00:00')
+        ->and($dateTime->format('Y-m-d H:i:s'))->toBe('2016-09-27 12:00:00');
+});
 
-    /** @test */
-    public function it_can_be_formatted()
-    {
-        $this->assertSame('09:00', Time::fromString('09:00')->format());
-        $this->assertSame('09:00', Time::fromString('09:00')->format('H:i'));
-        $this->assertSame('9 AM', Time::fromString('09:00')->format('g A'));
-    }
-
-    /** @test */
-    public function it_can_get_hours_and_minutes()
-    {
-        $time = Time::fromString('16:30');
-        $this->assertSame(16, $time->hours());
-        $this->assertSame(30, $time->minutes());
-    }
-
-    /** @test */
-    public function it_can_calculate_diff()
-    {
-        $time1 = Time::fromString('16:30');
-        $time2 = Time::fromString('16:05');
-        $this->assertSame(0, $time1->diff($time2)->h);
-        $this->assertSame(25, $time1->diff($time2)->i);
-    }
-
-    /** @test */
-    public function it_should_not_mutate_passed_datetime()
-    {
-        $dateTime = new DateTime('2016-09-27 12:00:00');
-        $time = Time::fromString('15:00');
-        $this->assertSame('2016-09-27 15:00:00', $time->toDateTime($dateTime)->format('Y-m-d H:i:s'));
-        $this->assertSame('2016-09-27 12:00:00', $dateTime->format('Y-m-d H:i:s'));
-    }
-
-    /** @test */
-    public function it_should_not_mutate_passed_datetime_immutable()
-    {
-        $dateTime = new DateTimeImmutable('2016-09-27 12:00:00');
-        $time = Time::fromString('15:00');
-        $this->assertSame('2016-09-27 15:00:00', $time->toDateTime($dateTime)->format('Y-m-d H:i:s'));
-        $this->assertSame('2016-09-27 12:00:00', $dateTime->format('Y-m-d H:i:s'));
-    }
-}
+it('should not mutate passed datetime immutable', function () {
+    $dateTime = new DateTimeImmutable('2016-09-27 12:00:00');
+    $time = Time::fromString('15:00');
+    expect($time->toDateTime($dateTime)->format('Y-m-d H:i:s'))->toBe('2016-09-27 15:00:00')
+        ->and($dateTime->format('Y-m-d H:i:s'))->toBe('2016-09-27 12:00:00');
+});

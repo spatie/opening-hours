@@ -1,91 +1,64 @@
 <?php
 
-namespace Spatie\OpeningHours\Test;
-
-use PHPUnit\Framework\TestCase;
 use Spatie\OpeningHours\Exceptions\NonMutableOffsets;
 use Spatie\OpeningHours\Exceptions\OverlappingTimeRanges;
 use Spatie\OpeningHours\OpeningHoursForDay;
 use Spatie\OpeningHours\Time;
 use Spatie\OpeningHours\TimeRange;
 
-class OpeningHoursForDayTest extends TestCase
-{
-    /** @test */
-    public function it_can_be_created_from_an_array_of_time_range_strings()
-    {
-        $openingHoursForDay = OpeningHoursForDay::fromStrings(['09:00-12:00', '13:00-18:00']);
+it('can be created from an array of time range strings', function () {
+    $openingHoursForDay = OpeningHoursForDay::fromStrings(['09:00-12:00', '13:00-18:00']);
 
-        $this->assertCount(2, $openingHoursForDay);
+    expect($openingHoursForDay)->toHaveCount(2)
+        ->and($openingHoursForDay[0])->toBeInstanceOf(TimeRange::class)
+        ->and((string)$openingHoursForDay[0])->toBe('09:00-12:00')
+        ->and($openingHoursForDay[1])->toBeInstanceOf(TimeRange::class)
+        ->and((string)$openingHoursForDay[1])->toBe('13:00-18:00');
 
-        $this->assertInstanceOf(TimeRange::class, $openingHoursForDay[0]);
-        $this->assertSame('09:00-12:00', (string) $openingHoursForDay[0]);
+});
 
-        $this->assertInstanceOf(TimeRange::class, $openingHoursForDay[1]);
-        $this->assertSame('13:00-18:00', (string) $openingHoursForDay[1]);
-    }
+it('cant be created when time ranges overlap', function () {
+    OpeningHoursForDay::fromStrings(['09:00-18:00', '14:00-20:00']);
+})->throws(OverlappingTimeRanges::class);
 
-    /** @test */
-    public function it_cant_be_created_when_time_ranges_overlap()
-    {
-        $this->expectException(OverlappingTimeRanges::class);
+it('can determine whether its open at a time', function () {
+    $openingHoursForDay = OpeningHoursForDay::fromStrings(['09:00-18:00']);
 
-        OpeningHoursForDay::fromStrings(['09:00-18:00', '14:00-20:00']);
-    }
+    expect($openingHoursForDay->isOpenAt(Time::fromString('09:00')))->toBeTrue()
+        ->and($openingHoursForDay->isOpenAt(Time::fromString('08:00')))->toBeFalse()
+        ->and($openingHoursForDay->isOpenAt(Time::fromString('18:00')))->toBeFalse();
+});
 
-    /** @test */
-    public function it_can_determine_whether_its_open_at_a_time()
-    {
-        $openingHoursForDay = OpeningHoursForDay::fromStrings(['09:00-18:00']);
+it('casts to string', function () {
+    $openingHoursForDay = OpeningHoursForDay::fromStrings(['09:00-12:00', '13:00-18:00']);
 
-        $this->assertTrue($openingHoursForDay->isOpenAt(Time::fromString('09:00')));
-        $this->assertFalse($openingHoursForDay->isOpenAt(Time::fromString('08:00')));
-        $this->assertFalse($openingHoursForDay->isOpenAt(Time::fromString('18:00')));
-    }
+    expect((string) $openingHoursForDay)->toEqual('09:00-12:00,13:00-18:00');
+});
 
-    /** @test */
-    public function it_casts_to_string()
-    {
-        $openingHoursForDay = OpeningHoursForDay::fromStrings(['09:00-12:00', '13:00-18:00']);
+it('can offset is existed', function () {
+    $openingHoursForDay = OpeningHoursForDay::fromStrings(['09:00-12:00', '13:00-18:00']);
 
-        $this->assertSame('09:00-12:00,13:00-18:00', (string) $openingHoursForDay);
-    }
+    expect($openingHoursForDay->offsetExists(0))->toBeTrue()
+        ->and($openingHoursForDay->offsetExists(1))->toBeTrue()
+        ->and($openingHoursForDay->offsetExists(2))->toBeFalse();
+});
 
-    /** @test */
-    public function it_can_offset_is_existed()
-    {
-        $openingHoursForDay = OpeningHoursForDay::fromStrings(['09:00-12:00', '13:00-18:00']);
+it('can unset offset', function () {
+    $openingHoursForDay = OpeningHoursForDay::fromStrings(['09:00-12:00', '13:00-18:00']);
 
-        $this->assertTrue($openingHoursForDay->offsetExists(0));
-        $this->assertTrue($openingHoursForDay->offsetExists(1));
-        $this->assertFalse($openingHoursForDay->offsetExists(2));
-    }
+    expect($openingHoursForDay->offsetUnset(0))->toBeNull()
+        ->and($openingHoursForDay->offsetUnset(1))->toBeNull()
+        ->and($openingHoursForDay->offsetUnset(2))->toBeNull();
+});
 
-    /** @test */
-    public function it_can_unset_offset()
-    {
-        $openingHoursForDay = OpeningHoursForDay::fromStrings(['09:00-12:00', '13:00-18:00']);
+it('can get iterator', function () {
+    $openingHoursForDay = OpeningHoursForDay::fromStrings(['09:00-12:00', '13:00-18:00']);
 
-        $this->assertNull($openingHoursForDay->offsetUnset(0));
-        $this->assertNull($openingHoursForDay->offsetUnset(1));
-        $this->assertNull($openingHoursForDay->offsetUnset(2));
-    }
+    expect($openingHoursForDay->getIterator()->getArrayCopy())->toHaveCount(2);
+});
 
-    /** @test */
-    public function it_can_get_iterator()
-    {
-        $openingHoursForDay = OpeningHoursForDay::fromStrings(['09:00-12:00', '13:00-18:00']);
+it('cant set iterator item', function () {
+    $openingHoursForDay = OpeningHoursForDay::fromStrings(['09:00-12:00', '13:00-18:00']);
 
-        $this->assertCount(2, $openingHoursForDay->getIterator()->getArrayCopy());
-    }
-
-    /** @test */
-    public function it_cant_set_iterator_item()
-    {
-        $this->expectException(NonMutableOffsets::class);
-
-        $openingHoursForDay = OpeningHoursForDay::fromStrings(['09:00-12:00', '13:00-18:00']);
-
-        $openingHoursForDay[0] = TimeRange::fromString('07:00-11:00');
-    }
-}
+    $openingHoursForDay[0] = TimeRange::fromString('07:00-11:00');
+})->throws(NonMutableOffsets::class);
