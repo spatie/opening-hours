@@ -12,7 +12,7 @@ jobs:
 
     strategy:
       matrix:
-        php: ['7.4']
+        php: ['8.0']
         setup: ['stable']
 
     name: PHP ${{ matrix.php }} - ${{ matrix.setup || 'stable' }}
