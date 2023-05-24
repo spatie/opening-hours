@@ -13,6 +13,7 @@ use Spatie\OpeningHours\Exceptions\InvalidDateTimeClass;
 use Spatie\OpeningHours\Exceptions\InvalidDayName;
 use Spatie\OpeningHours\Exceptions\InvalidTimezone;
 use Spatie\OpeningHours\Exceptions\MaximumLimitExceeded;
+use Spatie\OpeningHours\Exceptions\SearchLimitReached;
 use Spatie\OpeningHours\Helpers\Arr;
 use Spatie\OpeningHours\Helpers\DataTrait;
 use Spatie\OpeningHours\Helpers\DateTimeCopier;
@@ -24,7 +25,7 @@ class OpeningHours
 
     use DataTrait, DateTimeCopier, DiffTrait;
 
-    /** @var \Spatie\OpeningHours\Day[] */
+    /** @var \Spatie\OpeningHours\OpeningHoursForDay[] */
     protected $openingHours = [];
 
     /** @var \Spatie\OpeningHours\OpeningHoursForDay[] */
@@ -453,8 +454,11 @@ class OpeningHours
         );
     }
 
-    public function nextOpen(DateTimeInterface $dateTime = null): DateTimeInterface
-    {
+    public function nextOpen(
+        DateTimeInterface $dateTime = null,
+        DateTimeInterface $searchUntil = null,
+        DateTimeInterface $cap = null
+    ): DateTimeInterface {
         $outputTimezone = $this->getOutputTimezone($dateTime);
         $dateTime = $this->applyTimezone($dateTime ?? new $this->dateTimeClass());
         $dateTime = $this->copyDateTime($dateTime);
@@ -478,6 +482,14 @@ class OpeningHours
                 return $this->getDateWithTimezone($dateTime, $outputTimezone);
             }
 
+            if ($cap && $dateTime > $cap) {
+                return $cap;
+            }
+
+            if ($searchUntil && $dateTime > $searchUntil) {
+                throw SearchLimitReached::forDate($searchUntil);
+            }
+
             $openingHoursForDay = $this->forDate($dateTime);
 
             $nextOpen = $openingHoursForDay->nextOpen(PreciseTime::fromDateTime($dateTime));
@@ -498,21 +510,27 @@ class OpeningHours
         );
     }
 
-    public function nextClose(DateTimeInterface $dateTime = null): DateTimeInterface
-    {
+    public function nextClose(
+        DateTimeInterface $dateTime = null,
+        DateTimeInterface $searchUntil = null,
+        DateTimeInterface $cap = null
+    ): DateTimeInterface {
         $outputTimezone = $this->getOutputTimezone($dateTime);
         $dateTime = $this->applyTimezone($dateTime ?? new $this->dateTimeClass());
         $dateTime = $this->copyDateTime($dateTime);
         $nextClose = null;
+
         if ($this->overflow) {
             $dateTimeMinus1Day = $this->copyDateTime($dateTime)->modify('-1 day');
             $openingHoursForDayBefore = $this->forDate($dateTimeMinus1Day);
+
             if ($openingHoursForDayBefore->isOpenAtNight(PreciseTime::fromDateTime($dateTimeMinus1Day))) {
                 $nextClose = $openingHoursForDayBefore->nextClose(PreciseTime::fromDateTime($dateTime));
             }
         }
 
         $openingHoursForDay = $this->forDate($dateTime);
+
         if (! $nextClose) {
             $nextClose = $openingHoursForDay->nextClose(PreciseTime::fromDateTime($dateTime));
 
@@ -539,6 +557,14 @@ class OpeningHours
                 return $this->getDateWithTimezone($dateTime, $outputTimezone);
             }
 
+            if ($cap && $dateTime > $cap) {
+                return $cap;
+            }
+
+            if ($searchUntil && $dateTime > $searchUntil) {
+                throw SearchLimitReached::forDate($searchUntil);
+            }
+
             $openingHoursForDay = $this->forDate($dateTime);
 
             $nextClose = $openingHoursForDay->nextClose(PreciseTime::fromDateTime($dateTime));
@@ -552,8 +578,11 @@ class OpeningHours
         );
     }
 
-    public function previousOpen(DateTimeInterface $dateTime): DateTimeInterface
-    {
+    public function previousOpen(
+        DateTimeInterface $dateTime,
+        DateTimeInterface $searchUntil = null,
+        DateTimeInterface $cap = null
+    ): DateTimeInterface {
         $outputTimezone = $this->getOutputTimezone($dateTime);
         $dateTime = $this->copyDateTime($this->applyTimezone($dateTime));
         $openingHoursForDay = $this->forDate($dateTime);
@@ -578,6 +607,14 @@ class OpeningHours
                 return $this->getDateWithTimezone($midnight, $outputTimezone);
             }
 
+            if ($cap && $dateTime < $cap) {
+                return $cap;
+            }
+
+            if ($searchUntil && $dateTime < $searchUntil) {
+                throw SearchLimitReached::forDate($searchUntil);
+            }
+
             $previousOpen = $openingHoursForDay->previousOpen(PreciseTime::fromDateTime($dateTime));
         }
 
@@ -589,8 +626,11 @@ class OpeningHours
         );
     }
 
-    public function previousClose(DateTimeInterface $dateTime): DateTimeInterface
-    {
+    public function previousClose(
+        DateTimeInterface $dateTime,
+        DateTimeInterface $searchUntil = null,
+        DateTimeInterface $cap = null
+    ): DateTimeInterface {
         $outputTimezone = $this->getOutputTimezone($dateTime);
         $dateTime = $this->copyDateTime($this->applyTimezone($dateTime));
         $previousClose = null;
@@ -624,6 +664,14 @@ class OpeningHours
 
             if ($this->isClosedAt($midnight) && $openingHoursForDay->isOpenAt(Time::fromString('23:59'))) {
                 return $this->getDateWithTimezone($midnight, $outputTimezone);
+            }
+
+            if ($cap && $dateTime < $cap) {
+                return $cap;
+            }
+
+            if ($searchUntil && $dateTime < $searchUntil) {
+                throw SearchLimitReached::forDate($searchUntil);
             }
 
             $previousClose = $openingHoursForDay->previousClose(PreciseTime::fromDateTime($dateTime));
