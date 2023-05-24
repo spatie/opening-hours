@@ -862,9 +862,9 @@ class OpeningHours
             return $openingHoursForDay->map(static function (TimeRange $timeRange) use ($format, $timezone, $day) {
                 return [
                     '@type' => 'OpeningHoursSpecification',
-                    'dayOfWeek' => Carbon::parse($day . ' ' . $timeRange->start()->format())->setTimezone($timezone)->format('l'),
-                    'opens' => Carbon::parse($day . ' ' . $timeRange->start()->format())->setTimezone($timezone)->format($format),
-                    'closes' => Carbon::parse($day . ' ' . $timeRange->end()->format())->setTimezone($timezone)->format($format),
+                    'dayOfWeek' => Carbon::parse($day.' '.$timeRange->start()->format())->setTimezone($timezone)->format('l'),
+                    'opens' => Carbon::parse($day.' '.$timeRange->start()->format())->setTimezone($timezone)->format($format),
+                    'closes' => Carbon::parse($day.' '.$timeRange->end()->format())->setTimezone($timezone)->format($format),
                 ];
             });
         });
@@ -885,8 +885,8 @@ class OpeningHours
             return $openingHoursForDay->map(static function (TimeRange $timeRange) use ($format, $date, $timezone) {
                 return [
                     '@type' => 'OpeningHoursSpecification',
-                    'opens' => Carbon::parse($date . ' ' . $timeRange->start()->format())->setTimezone($timezone)->format($format),
-                    'closes' => Carbon::parse($date . ' ' . $timeRange->end()->format())->setTimezone($timezone)->format($format),
+                    'opens' => Carbon::parse($date.' '.$timeRange->start()->format())->setTimezone($timezone)->format($format),
+                    'closes' => Carbon::parse($date.' '.$timeRange->end()->format())->setTimezone($timezone)->format($format),
                     'validFrom' => $date,
                     'validThrough' => $date,
                 ];
