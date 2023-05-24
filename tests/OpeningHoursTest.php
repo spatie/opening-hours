@@ -905,6 +905,7 @@ class OpeningHoursTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider timezones
      */
     public function it_can_handle_timezone_for_date_string($timezone)
