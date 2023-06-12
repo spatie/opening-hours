@@ -328,7 +328,7 @@ Returns an `OpeningHoursForDay` object for a regular day. A day is lowercase str
 $openingHours->forDay('monday');
 ```
 
-#### `OpeningHours::forDate(DateTime $dateTime): Spatie\OpeningHours\OpeningHoursForDay`
+#### `OpeningHours::forDate(DateTimeInterface $dateTime): Spatie\OpeningHours\OpeningHoursForDay`
 
 Returns an `OpeningHoursForDay` object for a specific date. It looks for an exception on that day, and otherwise it returns the opening hours based on the regular schedule.
 
@@ -400,33 +400,90 @@ Checks if the business is closed right now.
 $openingHours->isClosed();
 ```
 
-#### `OpeningHours::nextOpen(DateTimeInterface $dateTime) : DateTime`
+#### `OpeningHours::nextOpen`
 
-Returns next open DateTime from the given DateTime
+```php
+OpeningHours::nextOpen(
+    ?DateTimeInterface $dateTime = null,
+    ?DateTimeInterface $searchUntil = null,
+    ?DateTimeInterface $cap = null,
+) : DateTimeInterface`
+```
+
+Returns next open `DateTime` from the given `DateTime` (`$dateTime` or from now if this parameter is null or omitted).
+
+If a `DateTimeImmutable` object is passed, a `DateTimeImmutable` object is returned.
+
+Set `$searchUntil` to a date to throw an exception if no open time can be found before this moment.
+
+Set `$cap` to a date so if no open time can be found before this moment, `$cap` is returned.
 
 ```php
 $openingHours->nextOpen(new DateTime('2016-12-24 11:00:00'));
 ```
+`
 
-#### `OpeningHours::nextClose(DateTimeInterface $dateTime) : DateTime`
+#### `OpeningHours::nextClose`
 
-Returns next close DateTime from the given DateTime
+```php
+OpeningHours::nextClose(
+    ?DateTimeInterface $dateTime = null,
+    ?DateTimeInterface $searchUntil = null,
+    ?DateTimeInterface $cap = null,
+) : DateTimeInterface`
+```
+
+Returns next close `DateTime` from the given `DateTime` (`$dateTime` or from now if this parameter is null or omitted).
+
+If a `DateTimeImmutable` object is passed, a `DateTimeImmutable` object is returned.
+
+Set `$searchUntil` to a date to throw an exception if no closed time can be found before this moment.
+
+Set `$cap` to a date so if no closed time can be found before this moment, `$cap` is returned.
 
 ```php
 $openingHours->nextClose(new DateTime('2016-12-24 11:00:00'));
 ```
 
-#### `OpeningHours::previousOpen(DateTimeInterface $dateTime) : DateTime`
+#### `OpeningHours::previousOpen`
 
-Returns previous open DateTime from the given DateTime
+```php
+OpeningHours::previousOpen(
+    ?DateTimeInterface $dateTime = null,
+    ?DateTimeInterface $searchUntil = null,
+    ?DateTimeInterface $cap = null,
+) : DateTimeInterface`
+```
+
+Returns previous open `DateTime` from the given `DateTime` (`$dateTime` or from now if this parameter is null or omitted).
+
+If a `DateTimeImmutable` object is passed, a `DateTimeImmutable` object is returned.
+
+Set `$searchUntil` to a date to throw an exception if no open time can be found after this moment.
+
+Set `$cap` to a date so if no open time can be found after this moment, `$cap` is returned.
 
 ```php
 $openingHours->previousOpen(new DateTime('2016-12-24 11:00:00'));
 ```
 
-#### `OpeningHours::previousClose(DateTimeInterface $dateTime) : DateTime`
+#### `OpeningHours::previousClose`
 
-Returns previous close DateTime from the given DateTime
+```php
+OpeningHours::previousClose(
+    ?DateTimeInterface $dateTime = null,
+    ?DateTimeInterface $searchUntil = null,
+    ?DateTimeInterface $cap = null,
+) : DateTimeInterface`
+```
+
+Returns previous close `DateTime` from the given `DateTime` (`$dateTime` or from now if this parameter is null or omitted).
+
+If a `DateTimeImmutable` object is passed, a `DateTimeImmutable` object is returned.
+
+Set `$searchUntil` to a date to throw an exception if no closed time can be found after this moment.
+
+Set `$cap` to a date so if no closed time can be found after this moment, `$cap` is returned.
 
 ```php
 $openingHours->nextClose(new DateTime('2016-12-24 11:00:00'));

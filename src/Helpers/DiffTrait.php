@@ -18,11 +18,12 @@ trait DiffTrait
 
         while ($date < $endDate) {
             if ($this->$stateCheckMethod($date)) {
-                $date = $this->$skipDateMethod($date);
+                $date = $this->$skipDateMethod($date, null, $endDate);
+
                 continue;
             }
 
-            $nextDate = min($endDate, $this->$nextDateMethod($date));
+            $nextDate = min($endDate, $this->$nextDateMethod($date, null, $endDate));
             $time += floatval($nextDate->format('U.u')) - floatval($date->format('U.u'));
             $date = $nextDate;
         }

@@ -99,17 +99,14 @@ class Time
     public function format(string $format = 'H:i', $timezone = null): string
     {
         $date = $timezone
-            ? new DateTime('1970-01-01 00:00:00', $timezone instanceof DateTimeZone
+            ? new DateTimeImmutable('1970-01-01 00:00:00', $timezone instanceof DateTimeZone
                 ? $timezone
                 : new DateTimeZone($timezone)
             )
             : null;
 
         if ($this->hours === 24 && $this->minutes === 0 && substr($format, 0, 3) === 'H:i') {
-            return '24:00'.(strlen($format) > 3
-                    ? ($date ?? new DateTimeImmutable('1970-01-01 00:00:00'))->format(substr($format, 3))
-                    : ''
-                );
+            return '24:00'.$this->formatSecond($format, $date);
         }
 
         return $this->toDateTime($date)->format($format);
@@ -118,5 +115,12 @@ class Time
     public function __toString(): string
     {
         return $this->format();
+    }
+
+    private function formatSecond(string $format, DateTimeImmutable $date = null): string
+    {
+        return strlen($format) > 3
+            ? ($date ?? new DateTimeImmutable('1970-01-01 00:00:00'))->format(substr($format, 3))
+            : '';
     }
 }

@@ -905,6 +905,7 @@ class OpeningHoursTest extends TestCase
 
     /**
      * @test
+     *
      * @dataProvider timezones
      */
     public function it_can_handle_timezone_for_date_string($timezone)
@@ -1440,5 +1441,35 @@ class OpeningHoursTest extends TestCase
         $this->assertNull($monday->getData());
         $this->assertNull($monday[0]->getData());
         $this->assertSame('09:00-12:00,13:00-18:00', (string) $monday);
+    }
+
+    public function testSearchWithEmptyHours()
+    {
+        $openingHours = OpeningHours::create([
+            'monday'     => [],
+            'tuesday'    => [],
+            'wednesday'  => [],
+            'thursday'   => [],
+            'friday'     => [],
+            'saturday'   => [],
+            'sunday'     => [],
+            'exceptions' => [
+                '2016-11-11' => ['09:00-12:00'],
+            ],
+        ]);
+
+        $minutes = $openingHours->diffInClosedMinutes(
+            new DateTimeImmutable('2023-05-17 12:00'),
+            new DateTimeImmutable('2023-05-23 12:00')
+        );
+
+        $this->assertSame(6.0, $minutes / 60 / 24);
+
+        $minutes = $openingHours->diffInOpenMinutes(
+            new DateTimeImmutable('2023-05-17 12:00'),
+            new DateTimeImmutable('2023-05-23 12:00')
+        );
+
+        $this->assertSame(0.0, $minutes);
     }
 }
