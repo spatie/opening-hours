@@ -368,7 +368,7 @@ Checks if the business is closed on a day in the regular schedule.
 $openingHours->isClosedOn('sunday');
 ```
 
-#### `OpeningHours::isOpenAt(DateTime $dateTime): bool`
+#### `OpeningHours::isOpenAt(DateTimeInterface $dateTime): bool`
 
 Checks if the business is open on a specific day, at a specific time.
 
@@ -376,7 +376,7 @@ Checks if the business is open on a specific day, at a specific time.
 $openingHours->isOpenAt(new DateTime('2016-26-09 20:00'));
 ```
 
-#### `OpeningHours::isClosedAt(DateTime $dateTime): bool`
+#### `OpeningHours::isClosedAt(DateTimeInterface $dateTime): bool`
 
 Checks if the business is closed on a specific day, at a specific time.
 
