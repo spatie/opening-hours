@@ -191,7 +191,7 @@ class OpeningHours
      *
      * Replace the whole metadata handled by OpeningHours.
      *
-     * @param $data
+     * @param  $data
      * @return $this
      */
     public function setData($data): self
