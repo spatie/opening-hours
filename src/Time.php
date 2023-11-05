@@ -106,7 +106,7 @@ class Time implements TimeDataContainer
             return '24:00'.(strlen($format) > 3
                     ? ($date ?? new DateTimeImmutable('1970-01-01 00:00:00'))->format(substr($format, 3))
                     : ''
-                );
+            );
         }
 
         return $this->toDateTime($date)->format($format);

@@ -15,12 +15,12 @@ class DateTimeRange extends TimeRange
             $start > $date->format(self::TIME_FORMAT)
                 ? ' - 1 day'
                 : ''
-            ));
+        ));
         $endDate = $this->copyAndModify($date, $end.(
             $end < $date->format(self::TIME_FORMAT)
                 ? ' + 1 day'
                 : ''
-            ));
+        ));
         parent::__construct(
             Time::fromString($start, $start->getData(), $startDate),
             Time::fromString($end, $start->getData(), $endDate),
