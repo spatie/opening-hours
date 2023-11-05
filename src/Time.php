@@ -95,7 +95,7 @@ class Time implements TimeDataContainer
     public function format(string $format = self::TIME_FORMAT, $timezone = null): string
     {
         $date = $this->date ?: ($timezone
-            ? new DateTime('1970-01-01 00:00:00', $timezone instanceof DateTimeZone
+            ? new DateTimeImmutable('1970-01-01 00:00:00', $timezone instanceof DateTimeZone
                 ? $timezone
                 : new DateTimeZone($timezone)
             )
@@ -103,10 +103,7 @@ class Time implements TimeDataContainer
         );
 
         if ($this->hours === 24 && $this->minutes === 0 && substr($format, 0, 3) === self::TIME_FORMAT) {
-            return '24:00'.(strlen($format) > 3
-                    ? ($date ?? new DateTimeImmutable('1970-01-01 00:00:00'))->format(substr($format, 3))
-                    : ''
-                );
+            return '24:00'.$this->formatSecond($format, $date);
         }
 
         return $this->toDateTime($date)->format($format);
@@ -115,5 +112,12 @@ class Time implements TimeDataContainer
     public function __toString(): string
     {
         return $this->format();
+    }
+
+    private function formatSecond(string $format, ?DateTimeImmutable $date = null): string
+    {
+        return strlen($format) > 3
+            ? ($date ?? new DateTimeImmutable('1970-01-01 00:00:00'))->format(substr($format, 3))
+            : '';
     }
 }
