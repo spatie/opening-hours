@@ -7,6 +7,7 @@ use DateTimeImmutable;
 use DateTimeZone;
 use PHPUnit\Framework\TestCase;
 use Spatie\OpeningHours\Exceptions\MaximumLimitExceeded;
+use Spatie\OpeningHours\Exceptions\SearchLimitReached;
 use Spatie\OpeningHours\OpeningHours;
 use Spatie\OpeningHours\OpeningHoursForDay;
 use Spatie\OpeningHours\Time;
@@ -1079,7 +1080,7 @@ class OpeningHoursTest extends TestCase
     }
 
     /** @test */
-    public function it_throw_an_exception_on_invalid_timezone()
+    public function it_throws_an_exception_on_invalid_timezone()
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid Timezone');
@@ -1088,7 +1089,7 @@ class OpeningHoursTest extends TestCase
     }
 
     /** @test */
-    public function it_throw_an_exception_on_limit_exceeded_void_array_next_open()
+    public function it_throws_an_exception_on_limit_exceeded_void_array_next_open()
     {
         $this->expectException(MaximumLimitExceeded::class);
         $this->expectExceptionMessage('No open date/time found in the next 8 days, use $openingHours->setDayLimit() to increase the limit.');
@@ -1097,7 +1098,7 @@ class OpeningHoursTest extends TestCase
     }
 
     /** @test */
-    public function it_throw_an_exception_on_limit_exceeded_void_array_previous_open()
+    public function it_throws_an_exception_on_limit_exceeded_void_array_previous_open()
     {
         $this->expectException(MaximumLimitExceeded::class);
         $this->expectExceptionMessage('No open date/time found in the previous 8 days, use $openingHours->setDayLimit() to increase the limit.');
@@ -1106,7 +1107,7 @@ class OpeningHoursTest extends TestCase
     }
 
     /** @test */
-    public function it_throw_an_exception_on_limit_exceeded_full_array_next_open()
+    public function it_throws_an_exception_on_limit_exceeded_full_array_next_open()
     {
         $this->expectException(MaximumLimitExceeded::class);
         $this->expectExceptionMessage('No open date/time found in the next 8 days, use $openingHours->setDayLimit() to increase the limit.');
@@ -1123,7 +1124,7 @@ class OpeningHoursTest extends TestCase
     }
 
     /** @test */
-    public function it_throw_an_exception_on_limit_exceeded_full_array_previous_open()
+    public function it_throws_an_exception_on_limit_exceeded_full_array_previous_open()
     {
         $this->expectException(MaximumLimitExceeded::class);
         $this->expectExceptionMessage('No open date/time found in the previous 8 days, use $openingHours->setDayLimit() to increase the limit.');
@@ -1140,7 +1141,7 @@ class OpeningHoursTest extends TestCase
     }
 
     /** @test */
-    public function it_throw_an_exception_on_limit_exceeded_full_array_next_open_with_exceptions()
+    public function it_throws_an_exception_on_limit_exceeded_full_array_next_open_with_exceptions()
     {
         $this->expectException(MaximumLimitExceeded::class);
         $this->expectExceptionMessage('No open date/time found in the next 366 days, use $openingHours->setDayLimit() to increase the limit.');
@@ -1160,7 +1161,107 @@ class OpeningHoursTest extends TestCase
     }
 
     /** @test */
-    public function it_throw_an_exception_on_limit_exceeded_void_array_next_close()
+    public function it_throws_an_exception_on_search_limit_exceeded_with_next_open()
+    {
+        $this->expectException(SearchLimitReached::class);
+        $this->expectExceptionMessage('Search reached the limit: 2019-06-13 19:02:00.000000 UTC');
+
+        OpeningHours::create([])->nextOpen(
+            new DateTime('2019-06-06 19:02:00'),
+            new DateTime('2019-06-13 19:02:00'),
+        );
+    }
+
+    /** @test */
+    public function it_throws_an_exception_on_search_limit_exceeded_with_next_close()
+    {
+        $this->expectException(SearchLimitReached::class);
+        $this->expectExceptionMessage('Search reached the limit: 2019-06-13 19:02:00.000000 UTC');
+
+        OpeningHours::create([])->nextClose(
+            new DateTime('2019-06-06 19:02:00'),
+            new DateTime('2019-06-13 19:02:00'),
+        );
+    }
+
+    /** @test */
+    public function it_throws_an_exception_on_search_limit_exceeded_with_previous_open()
+    {
+        $this->expectException(SearchLimitReached::class);
+        $this->expectExceptionMessage('Search reached the limit: 2019-06-03 19:02:00.000000 UTC');
+
+        OpeningHours::create([])->previousOpen(
+            new DateTime('2019-06-06 19:02:00'),
+            new DateTime('2019-06-03 19:02:00'),
+        );
+    }
+
+    /** @test */
+    public function it_throws_an_exception_on_search_limit_exceeded_with_previous_close()
+    {
+        $this->expectException(SearchLimitReached::class);
+        $this->expectExceptionMessage('Search reached the limit: 2019-06-03 19:02:00.000000 UTC');
+
+        OpeningHours::create([])->previousClose(
+            new DateTime('2019-06-06 19:02:00'),
+            new DateTime('2019-06-03 19:02:00'),
+        );
+    }
+
+    /** @test */
+    public function it_stops_at_cap_limit_with_next_open()
+    {
+        $this->assertSame(
+            '2019-06-13 19:02:00',
+            OpeningHours::create([])->nextOpen(
+                new DateTime('2019-06-06 19:02:00'),
+                null,
+                new DateTime('2019-06-13 19:02:00'),
+            )->format('Y-m-d H:i:s'),
+        );
+    }
+
+    /** @test */
+    public function it_stops_at_cap_limit_exceeded_with_next_close()
+    {
+        $this->assertSame(
+            '2019-06-13 19:02:00',
+            OpeningHours::create([])->nextClose(
+                new DateTime('2019-06-06 19:02:00'),
+                null,
+                new DateTime('2019-06-13 19:02:00'),
+            )->format('Y-m-d H:i:s'),
+        );
+    }
+
+    /** @test */
+    public function it_stops_at_cap_limit_with_previous_open()
+    {
+        $this->assertSame(
+            '2019-06-03 19:02:00',
+            OpeningHours::create([])->previousOpen(
+                new DateTime('2019-06-06 19:02:00'),
+                null,
+                new DateTime('2019-06-03 19:02:00'),
+            )->format('Y-m-d H:i:s'),
+        );
+    }
+
+    /** @test */
+    public function it_stops_at_cap_limit_exceeded_with_previous_close()
+    {
+        $this->assertSame(
+            '2019-06-03 19:02:00',
+            OpeningHours::create([])->previousClose(
+                new DateTime('2019-06-06 19:02:00'),
+                null,
+                new DateTime('2019-06-03 19:02:00'),
+            )->format('Y-m-d H:i:s'),
+        );
+    }
+
+    /** @test */
+    public function it_throws_an_exception_on_limit_exceeded_void_array_next_close()
     {
         $this->expectException(MaximumLimitExceeded::class);
         $this->expectExceptionMessage('No close date/time found in the next 8 days, use $openingHours->setDayLimit() to increase the limit.');
@@ -1169,7 +1270,7 @@ class OpeningHoursTest extends TestCase
     }
 
     /** @test */
-    public function it_throw_an_exception_on_limit_exceeded_void_array_previous_close()
+    public function it_throws_an_exception_on_limit_exceeded_void_array_previous_close()
     {
         $this->expectException(MaximumLimitExceeded::class);
         $this->expectExceptionMessage('No close date/time found in the previous 8 days, use $openingHours->setDayLimit() to increase the limit.');
@@ -1178,7 +1279,7 @@ class OpeningHoursTest extends TestCase
     }
 
     /** @test */
-    public function it_throw_an_exception_on_limit_exceeded_full_array_next_close()
+    public function it_throws_an_exception_on_limit_exceeded_full_array_next_close()
     {
         $this->expectException(MaximumLimitExceeded::class);
         $this->expectExceptionMessage('No close date/time found in the next 8 days, use $openingHours->setDayLimit() to increase the limit.');
@@ -1195,7 +1296,7 @@ class OpeningHoursTest extends TestCase
     }
 
     /** @test */
-    public function it_throw_an_exception_on_limit_exceeded_full_array_previous_close()
+    public function it_throws_an_exception_on_limit_exceeded_full_array_previous_close()
     {
         $this->expectException(MaximumLimitExceeded::class);
         $this->expectExceptionMessage('No close date/time found in the previous 8 days, use $openingHours->setDayLimit() to increase the limit.');
