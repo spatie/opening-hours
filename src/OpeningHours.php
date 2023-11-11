@@ -817,6 +817,10 @@ class OpeningHours
         $dashChunks = explode('-', $key);
         $chunksCount = count($dashChunks);
 
+        if ($chunksCount === 2) {
+            return $this->daysBetween(trim($dashChunks[0]), trim($dashChunks[1]));
+        }
+
         if ($chunksCount >= 4) {
             $middle = ceil($chunksCount / 2);
 
@@ -829,12 +833,40 @@ class OpeningHours
         return [$key];
     }
 
-    protected function daysBetween(string $start, string $end): DatePeriod
+    /** @return Generator<string> */
+    protected function daysBetween(string $start, string $end): Generator
     {
+        $count = count(explode('-', $start));
+
+        if ($count === 2) {
+            // Use an arbitrary leap year
+            $start = "2024-$start";
+            $end = "2024-$end";
+        }
+
         $startDate = new DateTimeImmutable($start);
         $endDate = $startDate->modify($end)->modify('+12 hours');
 
-        return new DatePeriod($startDate, new DateInterval('P1D'), $endDate);
+        if ($endDate < $startDate) {
+            echo "TOO CLOSE\n";
+            var_dump($startDate, $endDate);
+            exit;
+        }
+
+        if ($endDate > $startDate->modify('+30 days')) {
+            echo "TOO FAR\n";
+            var_dump($startDate, $endDate);
+            exit;
+        }
+
+        $format = ([
+            2 => 'm-d',
+            3 => 'Y-m-d',
+        ])[$count] ?? 'l';
+
+        foreach (new DatePeriod($startDate, new DateInterval('P1D'), $endDate) as $date) {
+            yield $date->format($format);
+        }
     }
 
     protected function setOpeningHoursFromStrings(string $day, array $openingHours): void
