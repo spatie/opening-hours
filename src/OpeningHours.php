@@ -859,10 +859,10 @@ class OpeningHours
             exit;
         }
 
-        $format = ([
+        $format = [
             2 => 'm-d',
             3 => 'Y-m-d',
-        ])[$count] ?? 'l';
+        ][$count] ?? 'l';
 
         foreach (new DatePeriod($startDate, new DateInterval('P1D'), $endDate) as $date) {
             yield $date->format($format);
