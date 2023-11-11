@@ -1184,7 +1184,6 @@ class OpeningHoursTest extends TestCase
         );
     }
 
-
     /** @test */
     public function it_throws_an_exception_on_search_limit_exceeded_with_previous_open()
     {
