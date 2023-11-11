@@ -6,6 +6,7 @@ use DateTime;
 use DateTimeImmutable;
 use DateTimeZone;
 use PHPUnit\Framework\TestCase;
+use Spatie\OpeningHours\Exceptions\InvalidDateRange;
 use Spatie\OpeningHours\Exceptions\MaximumLimitExceeded;
 use Spatie\OpeningHours\Exceptions\SearchLimitReached;
 use Spatie\OpeningHours\OpeningHours;
@@ -1582,5 +1583,62 @@ class OpeningHoursTest extends TestCase
         );
 
         $this->assertSame(0.0, $minutes);
+    }
+
+    public function testRanges()
+    {
+        $openingHours = OpeningHours::create([
+            'monday - wednesday' => ['08:30-12:00', '14:30-16:00'],
+            'thursday to friday'  => ['14:30-18:00'],
+            'saturday-sunday'    => [],
+            'exceptions' => [
+                '2016-11-11-2016-11-14' => ['09:00-12:00'],
+                '11-30-12-01' => ['09:00-14:00'],
+                '12-24 to 12-26' => [],
+                '11-10 - 11-12' => ['07:00-10:00'],
+            ],
+        ]);
+
+        $this->assertSame([
+            'monday' => '08:30-12:00,14:30-16:00',
+            'tuesday' => '08:30-12:00,14:30-16:00',
+            'wednesday' => '08:30-12:00,14:30-16:00',
+            'thursday' => '14:30-18:00',
+            'friday' => '14:30-18:00',
+            'saturday' => '',
+            'sunday' => '',
+        ], array_map(
+            static fn (OpeningHoursForDay $day) => (string) $day,
+            $openingHours->forWeek(),
+        ));
+        $this->assertSame('07:00-10:00', (string) $openingHours->forDate(new DateTimeImmutable('2016-11-10 11:00')));
+        $this->assertSame('09:00-12:00', (string) $openingHours->forDate(new DateTimeImmutable('2016-11-12 11:00')));
+        $this->assertSame('09:00-14:00', (string) $openingHours->forDate(new DateTimeImmutable('2023-12-01 11:00')));
+        $this->assertSame('', (string) $openingHours->forDate(new DateTimeImmutable('2024-12-25 11:00')));
+    }
+
+    public function testRangesWeekOverlap()
+    {
+        $this->expectException(InvalidDateRange::class);
+        $this->expectExceptionMessage('Unable to record `tuesday to friday` as it would override `tuesday`.');
+
+        OpeningHours::create([
+            'monday - wednesday' => ['08:30-12:00', '14:30-16:00'],
+            'tuesday to friday'  => ['14:30-18:00'],
+        ]);
+    }
+
+    public function testRangesExceptionOverlap()
+    {
+        $this->expectException(InvalidDateRange::class);
+        $this->expectExceptionMessage('Unable to record `11-10 to 11-12` as it would override `11-11`.');
+
+        OpeningHours::create([
+            'monday - wednesday' => ['08:30-12:00', '14:30-16:00'],
+            'exceptions' => [
+                '11-11-11-14' => ['09:00-12:00'],
+                '11-10 to 11-12' => ['07:00-10:00'],
+            ],
+        ]);
     }
 }
