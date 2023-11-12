@@ -1075,7 +1075,7 @@ class OpeningHoursTest extends TestCase
         $this->expectExceptionMessage('Invalid Timezone');
 
         OpeningHours::create([
-            'timezone' => ['input' => ['foo']]
+            'timezone' => ['input' => ['foo']],
         ]);
     }
 
