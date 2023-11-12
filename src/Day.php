@@ -3,7 +3,6 @@
 namespace Spatie\OpeningHours;
 
 use DateTimeInterface;
-use Spatie\OpeningHours\Helpers\Arr;
 
 enum Day: string
 {

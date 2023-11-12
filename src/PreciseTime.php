@@ -21,7 +21,7 @@ readonly class PreciseTime extends Time
     public static function fromString(string $string, mixed $data = null, ?DateTimeInterface $date = null): parent
     {
         if ($date !== null) {
-            throw new InvalidArgumentException(static::class . ' does not support date reference point');
+            throw new InvalidArgumentException(static::class.' does not support date reference point');
         }
 
         return self::fromDateTime(new DateTimeImmutable($string), $data);
