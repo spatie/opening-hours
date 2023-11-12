@@ -5,6 +5,7 @@ namespace Spatie\OpeningHours\Test;
 use DateTime;
 use DateTimeImmutable;
 use DateTimeZone;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Spatie\OpeningHours\Exceptions\InvalidDateRange;
 use Spatie\OpeningHours\Exceptions\MaximumLimitExceeded;
@@ -859,13 +860,12 @@ class OpeningHoursTest extends TestCase
     /** @test */
     public function it_can_set_the_timezone_on_the_openings_hours_object()
     {
-        $openingHours = new OpeningHours('Europe/Amsterdam');
-        $openingHours->fill([
+        $openingHours = OpeningHours::create([
             'monday'     => ['09:00-18:00'],
             'exceptions' => [
                 '2016-11-14' => ['09:00-13:00'],
             ],
-        ]);
+        ], 'Europe/Amsterdam');
 
         $this->assertTrue($openingHours->isOpenAt(new DateTime('2016-10-10 10:00', new DateTimeZone('UTC'))));
         $this->assertTrue($openingHours->isOpenAt(new DateTime('2016-10-10 15:59', new DateTimeZone('UTC'))));
@@ -920,10 +920,9 @@ class OpeningHoursTest extends TestCase
      */
     public function it_can_handle_timezone_for_date_string($timezone)
     {
-        $openingHours = new OpeningHours($timezone);
-        $openingHours->fill([
+        $openingHours = OpeningHours::create([
             'monday'     => ['09:00-18:00'],
-        ]);
+        ], $timezone);
         $this->assertFalse($openingHours->isOpenOn('2020-10-20'));
         $this->assertTrue($openingHours->isOpenOn('2020-10-19'));
     }
@@ -936,15 +935,6 @@ class OpeningHoursTest extends TestCase
             ['UTC'],
             ['+13:30'],
         ];
-    }
-
-    /** @test */
-    public function it_can_set_data()
-    {
-        $openingHours = OpeningHours::create([]);
-        $openingHours->setData(['foo' => 'bar']);
-
-        $this->assertSame(['foo' => 'bar'], $openingHours->getData());
     }
 
     /** @test */
@@ -1045,10 +1035,9 @@ class OpeningHoursTest extends TestCase
     /** @test */
     public function it_can_set_the_timezone_on_construct_with_date_time_zone()
     {
-        $openingHours = new OpeningHours(new DateTimeZone('Asia/Taipei'));
-        $openingHours->fill([
+        $openingHours = OpeningHours::create([
             'monday' => ['00:00-16:00'],
-        ]);
+        ], new DateTimeZone('Asia/Taipei'));
         $openingHoursForWeek = $openingHours->forWeek();
 
         $this->assertCount(7, $openingHoursForWeek);
@@ -1064,10 +1053,9 @@ class OpeningHoursTest extends TestCase
     /** @test */
     public function it_can_set_the_timezone_on_construct_with_string()
     {
-        $openingHours = new OpeningHours('Asia/Taipei');
-        $openingHours->fill([
+        $openingHours = OpeningHours::create([
             'monday' => ['00:00-16:00'],
-        ]);
+        ], 'Asia/Taipei');
         $openingHoursForWeek = $openingHours->forWeek();
 
         $this->assertCount(7, $openingHoursForWeek);
@@ -1083,10 +1071,12 @@ class OpeningHoursTest extends TestCase
     /** @test */
     public function it_throws_an_exception_on_invalid_timezone()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid Timezone');
 
-        new OpeningHours(['foo']);
+        OpeningHours::create([
+            'timezone' => ['input' => ['foo']]
+        ]);
     }
 
     /** @test */

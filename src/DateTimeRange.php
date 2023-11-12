@@ -4,11 +4,11 @@ namespace Spatie\OpeningHours;
 
 use DateTimeInterface;
 
-class DateTimeRange extends TimeRange
+readonly class DateTimeRange extends TimeRange
 {
     protected DateTimeInterface $date;
 
-    protected function __construct(DateTimeInterface $date, Time $start, Time $end, $data = null)
+    protected function __construct(DateTimeInterface $date, Time $start, Time $end, mixed $data = null)
     {
         $this->date = $date;
         $startDate = $this->copyAndModify($date, $start.(
@@ -28,7 +28,7 @@ class DateTimeRange extends TimeRange
         );
     }
 
-    public static function fromTimeRange(DateTimeInterface $date, TimeRange $timeRange, $data = null)
+    public static function fromTimeRange(DateTimeInterface $date, TimeRange $timeRange, mixed $data = null)
     {
         return new self($date, $timeRange->start, $timeRange->end, $data);
     }

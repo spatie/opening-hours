@@ -8,7 +8,7 @@ use Spatie\OpeningHours\Exceptions\InvalidTimeRangeString;
 use Spatie\OpeningHours\Helpers\DataTrait;
 use Spatie\OpeningHours\Helpers\DateTimeCopier;
 
-class TimeRange implements TimeDataContainer
+readonly class TimeRange implements TimeDataContainer
 {
     use DateTimeCopier;
     use DataTrait;

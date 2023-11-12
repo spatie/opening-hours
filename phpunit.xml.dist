@@ -1,29 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/9.4/phpunit.xsd"
+    xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.4/phpunit.xsd"
     bootstrap="vendor/autoload.php"
     colors="true"
-    verbose="true"
+    cacheDirectory=".phpunit.cache"
 >
-    <testsuites>
-        <testsuite name="Spatie Test Suite">
-            <directory>tests</directory>
-        </testsuite>
-    </testsuites>
-    <coverage
-        processUncoveredFiles="true"
-        ignoreDeprecatedCodeUnits="true"
-        disableCodeCoverageIgnore="true"
-    >
-        <include>
-            <directory>src</directory>
-        </include>
-        <report>
-            <html outputDirectory="coverage" />
-        </report>
-    </coverage>
-    <php>
-        <ini name="date.timezone" value="UTC"/>
-    </php>
+  <testsuites>
+    <testsuite name="Spatie Test Suite">
+      <directory>tests</directory>
+    </testsuite>
+  </testsuites>
+  <coverage ignoreDeprecatedCodeUnits="true" disableCodeCoverageIgnore="true">
+    <report>
+      <html outputDirectory="coverage"/>
+    </report>
+  </coverage>
+  <php>
+    <ini name="date.timezone" value="UTC"/>
+  </php>
+  <source>
+    <include>
+      <directory>src</directory>
+    </include>
+  </source>
 </phpunit>

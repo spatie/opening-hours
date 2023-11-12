@@ -16,14 +16,19 @@
             "email": "sebastian@spatie.be",
             "homepage": "https://spatie.be",
             "role": "Developer"
+        },
+        {
+            "name": "kylekatarnls",
+            "homepage": "https://github.com/kylekatarnls",
+            "role": "Developer"
         }
     ],
     "require": {
-        "php": "^7.4 || ^8.0"
+        "php": "^8.2"
     },
     "require-dev": {
-        "kylekatarnls/multi-tester": "^1.1",
-        "phpunit/phpunit": "^9.4"
+        "kylekatarnls/multi-tester": "^1.4",
+        "phpunit/phpunit": "^10.4.2"
     },
     "autoload": {
         "psr-4": {

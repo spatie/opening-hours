@@ -6,9 +6,14 @@ use DateTimeInterface;
 
 trait DiffTrait
 {
-    private function diffInSeconds(string $stateCheckMethod, string $nextDateMethod, string $skipDateMethod, DateTimeInterface $startDate, DateTimeInterface $endDate): float
-    {
-        $time = 0;
+    private function diffInSeconds(
+        string $stateCheckMethod,
+        string $nextDateMethod,
+        string $skipDateMethod,
+        DateTimeInterface $startDate,
+        DateTimeInterface $endDate,
+    ): float {
+        $time = 0.0;
 
         if ($endDate < $startDate) {
             return -$this->diffInSeconds($stateCheckMethod, $nextDateMethod, $skipDateMethod, $endDate, $startDate);
@@ -24,7 +29,7 @@ trait DiffTrait
             }
 
             $nextDate = min($endDate, $this->$nextDateMethod($date, null, $endDate));
-            $time += floatval($nextDate->format('U.u')) - floatval($date->format('U.u'));
+            $time += ((float) $nextDate->format('U.u')) - ((float) $date->format('U.u'));
             $date = $nextDate;
         }
 

@@ -4,10 +4,9 @@ namespace Spatie\OpeningHours\Helpers;
 
 trait DataTrait
 {
-    /** @var mixed */
-    protected $data = null;
+    protected readonly mixed $data;
 
-    public function getData()
+    public function getData(): mixed
     {
         return $this->data;
     }

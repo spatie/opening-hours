@@ -11,7 +11,7 @@ use Spatie\OpeningHours\Exceptions\InvalidTimeString;
 use Spatie\OpeningHours\Helpers\DataTrait;
 use Spatie\OpeningHours\Helpers\DateTimeCopier;
 
-class Time implements TimeDataContainer
+readonly class Time implements TimeDataContainer
 {
     use DataTrait, DateTimeCopier;
 
@@ -21,7 +21,7 @@ class Time implements TimeDataContainer
 
     protected ?DateTimeInterface $date;
 
-    protected function __construct(int $hours, int $minutes, $data = null, DateTimeInterface $date = null)
+    protected function __construct(int $hours, int $minutes, mixed $data = null, ?DateTimeInterface $date = null)
     {
         $this->hours = $hours;
         $this->minutes = $minutes;
@@ -29,7 +29,7 @@ class Time implements TimeDataContainer
         $this->date = $date;
     }
 
-    public static function fromString(string $string, $data = null, DateTimeInterface $date = null): self
+    public static function fromString(string $string, mixed $data = null, ?DateTimeInterface $date = null): self
     {
         if (! preg_match('/^(([0-1][0-9]|2[0-3]):[0-5][0-9]|24:00)$/', $string)) {
             throw InvalidTimeString::forString($string);
@@ -55,7 +55,7 @@ class Time implements TimeDataContainer
         return $this->date;
     }
 
-    public static function fromDateTime(DateTimeInterface $dateTime, $data = null): self
+    public static function fromDateTime(DateTimeInterface $dateTime, mixed $data = null): self
     {
         return static::fromString($dateTime->format(self::TIME_FORMAT), $data);
     }
@@ -92,7 +92,7 @@ class Time implements TimeDataContainer
         return $date->setTime($this->hours, $this->minutes);
     }
 
-    public function format(string $format = self::TIME_FORMAT, $timezone = null): string
+    public function format(string $format = self::TIME_FORMAT, DateTimeZone|string|null $timezone = null): string
     {
         $date = $this->date ?: ($timezone
             ? new DateTimeImmutable('1970-01-01 00:00:00', $timezone instanceof DateTimeZone

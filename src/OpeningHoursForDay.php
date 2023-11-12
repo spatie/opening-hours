@@ -17,33 +17,30 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
 {
     use DataTrait, RangeFinder;
 
-    /** @var \Spatie\OpeningHours\TimeRange[] */
-    protected array $openingHours = [];
+    private function __construct(
+        /** @var \Spatie\OpeningHours\TimeRange[] */
+        protected readonly array $openingHours,
+        mixed $data,
+    ) {
+        $this->guardAgainstTimeRangeOverlaps($openingHours);
+        $this->data = $data;
+    }
 
-    public static function fromStrings(array $strings, $data = null): self
+    public static function fromStrings(array $strings, mixed $data = null): static
     {
         if (isset($strings['hours'])) {
             return static::fromStrings($strings['hours'], $strings['data'] ?? $data);
         }
 
-        $openingHoursForDay = new static();
-
-        if (isset($strings['data'])) {
-            $data = $strings['data'] ?? null;
-            unset($strings['data']);
-        }
-
-        $openingHoursForDay->data = $data;
+        $data ??= $strings['data'] ?? null;
+        unset($strings['data']);
 
         uasort($strings, static fn ($a, $b) => strcmp(static::getHoursFromRange($a), static::getHoursFromRange($b)));
 
-        $timeRanges = Arr::map($strings, static fn ($string) => TimeRange::fromDefinition($string));
-
-        $openingHoursForDay->guardAgainstTimeRangeOverlaps($timeRanges);
-
-        $openingHoursForDay->openingHours = $timeRanges;
-
-        return $openingHoursForDay;
+        return new static(
+            Arr::map($strings, static fn ($string) => TimeRange::fromDefinition($string)),
+            $data,
+        );
     }
 
     public function isOpenAt(Time $time): bool
@@ -207,7 +204,7 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
 
     public function offsetUnset($offset): void
     {
-        unset($this->openingHours[$offset]);
+        throw NonMutableOffsets::forClass(static::class);
     }
 
     public function count(): int

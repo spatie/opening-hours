@@ -13,7 +13,6 @@ use Spatie\OpeningHours\Exceptions\Exception;
 use Spatie\OpeningHours\Exceptions\InvalidDate;
 use Spatie\OpeningHours\Exceptions\InvalidDateRange;
 use Spatie\OpeningHours\Exceptions\InvalidDateTimeClass;
-use Spatie\OpeningHours\Exceptions\InvalidDayName;
 use Spatie\OpeningHours\Exceptions\InvalidTimezone;
 use Spatie\OpeningHours\Exceptions\MaximumLimitExceeded;
 use Spatie\OpeningHours\Exceptions\SearchLimitReached;
@@ -21,6 +20,7 @@ use Spatie\OpeningHours\Helpers\Arr;
 use Spatie\OpeningHours\Helpers\DataTrait;
 use Spatie\OpeningHours\Helpers\DateTimeCopier;
 use Spatie\OpeningHours\Helpers\DiffTrait;
+use ValueError;
 
 class OpeningHours
 {
@@ -50,16 +50,50 @@ class OpeningHours
     /** @var string Class of new date instances used for now, nextOpen, nextClose */
     protected string $dateTimeClass = DateTime::class;
 
-    /**
-     * @param  string|DateTimeZone|null  $timezone
-     * @param  string|DateTimeZone|null  $outputTimezone
-     */
-    public function __construct($timezone = null, $outputTimezone = null)
-    {
+    private function __construct(
+        array $data,
+        string|DateTimeZone|null $timezone = null,
+        string|DateTimeZone|null $outputTimezone = null,
+    ) {
         $this->setTimezone($timezone);
         $this->setOutputTimezone($outputTimezone);
 
-        $this->openingHours = Day::mapDays(static fn () => new OpeningHoursForDay());
+        $days = Day::cases();
+
+        $timezones = array_key_exists('timezone', $data) ? $data['timezone'] : [];
+        unset($data['timezone']);
+
+        if (! is_array($timezones)) {
+            $timezones = ['input' => $timezones];
+        }
+
+        if (array_key_exists('input', $timezones)) {
+            $this->timezone = $this->parseTimezone($timezones['input']);
+        }
+
+        if (array_key_exists('output', $timezones)) {
+            $this->outputTimezone = $this->parseTimezone($timezones['output']);
+        }
+
+        [$openingHours, $exceptions, $metaData, $filters, $overflow, $dateTimeClass] = $this
+            ->parseOpeningHoursAndExceptions($data);
+
+        $this->overflow = $overflow;
+
+        $this->openingHours = array_combine(
+            array_map(static fn (Day $day) => $day->value, $days),
+            array_map(fn (Day $day) => $this->getOpeningHoursFromStrings($openingHours[$day->value] ?? []), $days),
+        );
+
+        $this->setExceptionsFromStrings($exceptions);
+        $this->data = $metaData;
+        $this->filters = $filters;
+
+        if ($dateTimeClass !== null && ! is_a($dateTimeClass, DateTimeInterface::class, true)) {
+            throw InvalidDateTimeClass::forString($dateTimeClass);
+        }
+
+        $this->dateTimeClass = $dateTimeClass ?? DateTime::class;
     }
 
     /**
@@ -74,14 +108,19 @@ class OpeningHours
      *             exceptions?: array<array<string|array>>,
      *             filters?: callable[],
      *             overflow?: bool,
+     *             data?: mixed,
+     *             dateTimeClass?: class-string,
      *         }                         $data
      * @param  string|DateTimeZone|null  $timezone
      * @param  string|DateTimeZone|null  $outputTimezone
      * @return static
      */
-    public static function create(array $data, $timezone = null, $outputTimezone = null): self
-    {
-        return (new static($timezone, $outputTimezone))->fill($data);
+    public static function create(
+        array $data,
+        string|DateTimeZone|null $timezone = null,
+        string|DateTimeZone|null $outputTimezone = null,
+    ): self {
+        return new static($data, $timezone, $outputTimezone);
     }
 
     /**
@@ -164,44 +203,9 @@ class OpeningHours
             static::create($data);
 
             return true;
-        } catch (Exception $exception) {
+        } catch (Exception|ValueError) {
             return false;
         }
-    }
-
-    /**
-     * Select the class to use to create new date-time instances.
-     *
-     * @param  string|null  $dateTimeClass
-     * @return $this
-     *
-     * @throws InvalidDateTimeClass if $dateTimeClass is set with a string that is not a valid DateTimeInterface.
-     */
-    public function setDateTimeClass(?string $dateTimeClass = null): self
-    {
-        if ($dateTimeClass !== null && ! is_a($dateTimeClass, DateTimeInterface::class, true)) {
-            throw InvalidDateTimeClass::forString($dateTimeClass);
-        }
-
-        $this->dateTimeClass = $dateTimeClass ?? DateTime::class;
-
-        return $this;
-    }
-
-    /**
-     * @deprecated This method will be removed in 4.0.0. On the next version, OpeningHours
-     * instances will be immutable.
-     *
-     * Replace the whole metadata handled by OpeningHours.
-     *
-     * @param  $data
-     * @return $this
-     */
-    public function setData($data): self
-    {
-        $this->data = $data;
-
-        return $this;
     }
 
     /**
@@ -230,50 +234,6 @@ class OpeningHours
     public function getFilters(): array
     {
         return $this->filters;
-    }
-
-    /**
-     * @deprecated This method will become protected in 4.0.0. On the next version, OpeningHours
-     * instances will be immutable.
-     *
-     * Replace all the opening hours, exception, filters, overflow option and metadata.
-     *
-     * Any of those entry which is not specified explicitly is reset to its default value.
-     *
-     * @param  array  $data
-     * @return $this
-     */
-    public function fill(array $data): self
-    {
-        $timezones = array_key_exists('timezone', $data) ? $data['timezone'] : [];
-        unset($data['timezone']);
-
-        if (! is_array($timezones)) {
-            $timezones = ['input' => $timezones];
-        }
-
-        if (array_key_exists('input', $timezones)) {
-            $this->timezone = $this->parseTimezone($timezones['input']);
-        }
-
-        if (array_key_exists('output', $timezones)) {
-            $this->outputTimezone = $this->parseTimezone($timezones['output']);
-        }
-
-        [$openingHours, $exceptions, $metaData, $filters, $overflow, $dateTimeClass] = $this
-            ->parseOpeningHoursAndExceptions($data);
-
-        $this->overflow = $overflow;
-
-        foreach ($openingHours as $day => $openingHoursForThisDay) {
-            $this->setOpeningHoursFromStrings($day, $openingHoursForThisDay);
-        }
-
-        $this->setExceptionsFromStrings($exceptions);
-        $this->data = $metaData;
-        $this->filters = $filters;
-
-        return $this->setDateTimeClass($dateTimeClass);
     }
 
     public function forWeek(): array
@@ -328,7 +288,7 @@ class OpeningHours
         return $concatenatedDays;
     }
 
-    public function forDay(string $day): OpeningHoursForDay
+    public function forDay(Day|string $day): OpeningHoursForDay
     {
         return $this->openingHours[$this->normalizeDayName($day)];
     }
@@ -608,8 +568,8 @@ class OpeningHours
 
     public function previousOpen(
         DateTimeInterface $dateTime,
-        DateTimeInterface $searchUntil = null,
-        DateTimeInterface $cap = null
+        ?DateTimeInterface $searchUntil = null,
+        ?DateTimeInterface $cap = null
     ): DateTimeInterface {
         $outputTimezone = $this->getOutputTimezone($dateTime);
         $dateTime = $this->copyDateTime($this->applyTimezone($dateTime));
@@ -655,8 +615,8 @@ class OpeningHours
 
     public function previousClose(
         DateTimeInterface $dateTime,
-        DateTimeInterface $searchUntil = null,
-        DateTimeInterface $cap = null
+        ?DateTimeInterface $searchUntil = null,
+        ?DateTimeInterface $cap = null
     ): DateTimeInterface {
         $outputTimezone = $this->getOutputTimezone($dateTime);
         $dateTime = $this->copyDateTime($this->applyTimezone($dateTime));
@@ -720,7 +680,10 @@ class OpeningHours
 
     public function regularClosingDaysISO(): array
     {
-        return Arr::map($this->regularClosingDays(), [Day::class, 'toISO']);
+        return array_map(
+            static fn (string $dayName) => Day::from($dayName)->toISO(),
+            $this->regularClosingDays(),
+        );
     }
 
     public function exceptionalClosingDates(): array
@@ -806,8 +769,12 @@ class OpeningHours
         return $openingHours;
     }
 
-    protected function readDatesRange(string $key): iterable
+    protected function readDatesRange(Day|string $key): iterable
     {
+        if ($key instanceof Day) {
+            return [$key->value];
+        }
+
         $toChunks = preg_split('/\sto\s/', $key, 2);
 
         if (count($toChunks) === 2) {
@@ -858,18 +825,12 @@ class OpeningHours
         }
     }
 
-    protected function setOpeningHoursFromStrings(string $day, array $openingHours): void
+    protected function getOpeningHoursFromStrings(array $openingHours): OpeningHoursForDay
     {
-        $day = $this->normalizeDayName($day);
+        $data = $openingHours['data'] ?? null;
+        unset($openingHours['data']);
 
-        $data = null;
-
-        if (isset($openingHours['data'])) {
-            $data = $openingHours['data'];
-            unset($openingHours['data']);
-        }
-
-        $this->openingHours[$day] = OpeningHoursForDay::fromStrings($openingHours, $data);
+        return OpeningHoursForDay::fromStrings($openingHours, $data);
     }
 
     protected function setExceptionsFromStrings(array $exceptions): void
@@ -897,15 +858,9 @@ class OpeningHours
         });
     }
 
-    protected function normalizeDayName(string $day): string
+    protected function normalizeDayName(Day|string $day): string
     {
-        $day = strtolower($day);
-
-        if (! Day::isValid($day)) {
-            throw InvalidDayName::invalidDayName($day);
-        }
-
-        return $day;
+        return (is_string($day) ? Day::fromName($day) : $day)->value;
     }
 
     protected function applyTimezone(DateTimeInterface $date): DateTimeInterface
@@ -913,12 +868,7 @@ class OpeningHours
         return $this->getDateWithTimezone($date, $this->timezone);
     }
 
-    /**
-     * @param  DateTimeInterface  $date
-     * @param  DateTimeZone|null  $timezone
-     * @return DateTimeInterface
-     */
-    protected function getDateWithTimezone(DateTimeInterface $date, $timezone)
+    protected function getDateWithTimezone(DateTimeInterface $date, ?DateTimeZone $timezone): DateTimeInterface
     {
         if ($timezone) {
             if ($date instanceof DateTime) {
@@ -961,8 +911,10 @@ class OpeningHours
         return Arr::flatMap($this->exceptions, $callback);
     }
 
-    public function asStructuredData(string $format = TimeDataContainer::TIME_FORMAT, $timezone = null): array
-    {
+    public function asStructuredData(
+        string $format = TimeDataContainer::TIME_FORMAT,
+        DateTimeZone|string|null $timezone = null,
+    ): array {
         $regularHours = $this->flatMap(
             static fn (OpeningHoursForDay $openingHoursForDay, string $day) => $openingHoursForDay->map(
                 static fn (TimeRange $timeRange) => [
@@ -1022,11 +974,7 @@ class OpeningHours
         }
     }
 
-    /**
-     * @param  mixed  $timezone
-     * @return DateTimeZone|null
-     */
-    private function parseTimezone($timezone)
+    private function parseTimezone(mixed $timezone): ?DateTimeZone
     {
         if ($timezone instanceof DateTimeZone) {
             return $timezone;
@@ -1043,11 +991,7 @@ class OpeningHours
         return null;
     }
 
-    /**
-     * @param  DateTimeInterface|null  $dateTime
-     * @return DateTimeZone|null
-     */
-    private function getOutputTimezone(DateTimeInterface $dateTime = null)
+    private function getOutputTimezone(?DateTimeInterface $dateTime = null): ?DateTimeZone
     {
         if ($this->outputTimezone !== null) {
             return $this->outputTimezone;

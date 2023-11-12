@@ -2,24 +2,29 @@
 
 namespace Spatie\OpeningHours;
 
+use DateInterval;
 use DateTimeImmutable;
 use DateTimeInterface;
 use DateTimeZone;
+use InvalidArgumentException;
 
-class PreciseTime extends Time
+readonly class PreciseTime extends Time
 {
-    /** @var DateTimeInterface */
-    protected $dateTime;
+    protected DateTimeInterface $dateTime;
 
-    protected function __construct(DateTimeInterface $dateTime, $data = null)
+    protected function __construct(DateTimeInterface $dateTime, mixed $data = null)
     {
         $this->dateTime = $dateTime;
-        $this->data = $data;
+        parent::__construct(0, 0, $data);
     }
 
-    public static function fromString(string $string, $data = null, DateTimeInterface $date = null): parent
+    public static function fromString(string $string, mixed $data = null, ?DateTimeInterface $date = null): parent
     {
-        return self::fromDateTime(new DateTimeImmutable($string));
+        if ($date !== null) {
+            throw new InvalidArgumentException(static::class . ' does not support date reference point');
+        }
+
+        return self::fromDateTime(new DateTimeImmutable($string), $data);
     }
 
     public function hours(): int
@@ -32,9 +37,9 @@ class PreciseTime extends Time
         return (int) $this->dateTime->format('i');
     }
 
-    public static function fromDateTime(DateTimeInterface $dateTime, $data = null): parent
+    public static function fromDateTime(DateTimeInterface $dateTime, mixed $data = null): parent
     {
-        return new self($dateTime);
+        return new self($dateTime, $data);
     }
 
     public function isSame(parent $time): bool
@@ -57,7 +62,7 @@ class PreciseTime extends Time
         return $this->format('H:i:s.u') >= $time->format('H:i:s.u');
     }
 
-    public function diff(parent $time): \DateInterval
+    public function diff(parent $time): DateInterval
     {
         return $this->toDateTime()->diff($time->toDateTime());
     }
@@ -69,7 +74,7 @@ class PreciseTime extends Time
             : $this->copyDateTime($this->dateTime);
     }
 
-    public function format(string $format = 'H:i', $timezone = null): string
+    public function format(string $format = 'H:i', DateTimeZone|string|null $timezone = null): string
     {
         $date = $timezone
             ? $this->copyDateTime($this->dateTime)->setTimezone($timezone instanceof DateTimeZone

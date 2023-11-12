@@ -14,9 +14,7 @@ trait RangeFinder
 
     protected function findOpenInFreeTime(Time $time, TimeRange $timeRange): ?Time
     {
-        $range = $this->findRangeInFreeTime($time, $timeRange);
-
-        return $range ? $range->start() : null;
+        return $this->findRangeInFreeTime($time, $timeRange)?->start();
     }
 
     protected function findOpenRangeInWorkingHours(Time $time, TimeRange $timeRange): ?TimeRange
@@ -26,9 +24,7 @@ trait RangeFinder
 
     protected function findOpenInWorkingHours(Time $time, TimeRange $timeRange): ?Time
     {
-        $range = $this->findOpenRangeInWorkingHours($time, $timeRange);
-
-        return $range ? $range->start() : null;
+        return $this->findOpenRangeInWorkingHours($time, $timeRange)?->start();
     }
 
     protected function findCloseInWorkingHours(Time $time, TimeRange $timeRange): ?Time
@@ -43,9 +39,7 @@ trait RangeFinder
 
     protected function findCloseInFreeTime(Time $time, TimeRange $timeRange): ?Time
     {
-        $range = $this->findRangeInFreeTime($time, $timeRange);
-
-        return $range ? $range->end() : null;
+        return $this->findRangeInFreeTime($time, $timeRange)?->end();
     }
 
     protected function findPreviousRangeInFreeTime(Time $time, TimeRange $timeRange): ?TimeRange
@@ -55,9 +49,7 @@ trait RangeFinder
 
     protected function findPreviousOpenInFreeTime(Time $time, TimeRange $timeRange): ?Time
     {
-        $range = $this->findPreviousRangeInFreeTime($time, $timeRange);
-
-        return $range ? $range->start() : null;
+        return $this->findPreviousRangeInFreeTime($time, $timeRange)?->start();
     }
 
     protected function findPreviousCloseInWorkingHours(Time $time, TimeRange $timeRange): ?Time

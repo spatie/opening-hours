@@ -35,18 +35,13 @@ class Arr
         return $flattened;
     }
 
-    public static function pull(&$array, $key, $default = null)
+    public static function pull(array &$array, string $key, mixed $default = null): mixed
     {
         $value = $array[$key] ?? $default;
 
         unset($array[$key]);
 
         return $value;
-    }
-
-    public static function mirror(array $array): array
-    {
-        return array_combine($array, $array);
     }
 
     public static function createUniquePairs(array $array): array

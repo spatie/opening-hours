@@ -64,11 +64,11 @@ class OpeningHoursForDayTest extends TestCase
     /** @test */
     public function it_can_unset_offset()
     {
+        $this->expectException(NonMutableOffsets::class);
+
         $openingHoursForDay = OpeningHoursForDay::fromStrings(['09:00-12:00', '13:00-18:00']);
 
-        $this->assertNull($openingHoursForDay->offsetUnset(0));
-        $this->assertNull($openingHoursForDay->offsetUnset(1));
-        $this->assertNull($openingHoursForDay->offsetUnset(2));
+        $openingHoursForDay->offsetUnset(0);
     }
 
     /** @test */

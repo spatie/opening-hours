@@ -7,10 +7,10 @@ use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 use Spatie\OpeningHours\Day;
 use Spatie\OpeningHours\Exceptions\InvalidDate;
-use Spatie\OpeningHours\Exceptions\InvalidDayName;
 use Spatie\OpeningHours\OpeningHours;
 use Spatie\OpeningHours\OpeningHoursForDay;
 use Spatie\OpeningHours\TimeRange;
+use ValueError;
 
 class OpeningHoursFillTest extends TestCase
 {
@@ -104,8 +104,8 @@ class OpeningHoursFillTest extends TestCase
     {
         $openingHours = OpeningHours::create([]);
 
-        foreach (Day::days() as $dayName) {
-            $this->assertCount(0, $openingHours->forDay($dayName));
+        foreach (Day::cases() as $day) {
+            $this->assertCount(0, $openingHours->forDay($day));
         }
     }
 
@@ -128,7 +128,7 @@ class OpeningHoursFillTest extends TestCase
     /** @test */
     public function it_will_throw_an_exception_when_using_an_invalid_day_name()
     {
-        $this->expectException(InvalidDayName::class);
+        $this->expectException(ValueError::class);
 
         OpeningHours::create(['mmmmonday' => ['09:00-18:00']]);
     }
