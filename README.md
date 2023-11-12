@@ -92,7 +92,7 @@ $openingHours->forDate(new DateTime('2016-12-25'));
 $openingHours->exceptions();
 ```
 
-On construction you can set a flag for overflowing times across days. For example, for a night club opens until 3am on Friday and Saturday:
+On construction, you can set a flag for overflowing times across days. For example, for a nightclub opens until 3am on Friday and Saturday:
 
 ```php
 $openingHours = \Spatie\OpeningHours\OpeningHours::create([
@@ -102,7 +102,7 @@ $openingHours = \Spatie\OpeningHours\OpeningHours::create([
 ], null);
 ```
 
-This allows the API to further at yesterdays data to check if the opening hours are open from yesterdays time range. 
+This allows the API to further at previous day's data to check if the opening hours are open from its time range. 
 
 You can add data in definitions then retrieve them:
 
@@ -158,6 +158,27 @@ $openingHours = OpeningHours::create([
         '2016-12-25' => [
             'hours' => [],
             'data'  => 'Closed for Christmas',
+        ],
+    ],
+]);
+```
+
+You can use the separator `to` to specify multiple days at once, for the week or for exceptions:
+
+```php
+$openingHours = OpeningHours::create([
+    'monday to friday' => ['09:00-19:00'],
+    'saturday to sunday' => [],
+    'exceptions' => [
+        // Every year
+        '12-24 to 12-26' => [
+            'hours' => [],
+            'data'  => 'Holidays',
+        ],
+        // Only happening in 2024
+        '2024-06-25 to 2024-07-01' => [
+            'hours' => [],
+            'data'  => 'Closed for works',
         ],
     ],
 ]);

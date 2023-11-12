@@ -2,10 +2,37 @@
 
 All notable changes to `opening-hours` will be documented in this file
 
-## 3.0.0 - upcoming
+## 3.0.0 - 2023-11-12
 
 - Add `Time::date()` method
 - Add `DateTimeRange` class
+- Add ranges support via `to` or `-` separator
+- Deprecate `fill()` and `setData()`
+- Remove `setFilters()`
+
+## 2.41.0 - 2023-06-02
+
+- Cap holidays check to end date when calculating diff
+
+## 2.13.0 - 2022-08-07
+
+- Make comparison microsecond-precise
+
+## 2.12.0 - 2022-07-24
+
+- Apply timezone for all methods and both input/output
+
+## 2.11.3 - 2022-07-23
+
+- Copy non immutable dates to apply timezone
+
+## 2.11.2 - 2021-12-09
+
+- Add array-shape create() PHPDoc
+
+## 2.11.1 - 2021-12-04
+
+- Fix compatibility with PHP 8.1
 
 ## 2.11.0 - 2021-10-16
 

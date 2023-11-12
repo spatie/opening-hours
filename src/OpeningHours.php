@@ -2,6 +2,8 @@
 
 namespace Spatie\OpeningHours;
 
+use DateInterval;
+use DatePeriod;
 use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
@@ -9,6 +11,7 @@ use DateTimeZone;
 use Generator;
 use Spatie\OpeningHours\Exceptions\Exception;
 use Spatie\OpeningHours\Exceptions\InvalidDate;
+use Spatie\OpeningHours\Exceptions\InvalidDateRange;
 use Spatie\OpeningHours\Exceptions\InvalidDateTimeClass;
 use Spatie\OpeningHours\Exceptions\InvalidDayName;
 use Spatie\OpeningHours\Exceptions\InvalidTimezone;
@@ -751,27 +754,108 @@ class OpeningHours
     {
         $dateTimeClass = Arr::pull($data, 'dateTimeClass', null);
         $metaData = Arr::pull($data, 'data', null);
-        $exceptions = [];
-        $filters = Arr::pull($data, 'filters', []);
         $overflow = (bool) Arr::pull($data, 'overflow', false);
+        [$exceptions, $filters] = $this->parseExceptions(
+            Arr::pull($data, 'exceptions', []),
+            Arr::pull($data, 'filters', []),
+        );
+        $openingHours = $this->parseDaysOfWeeks($data);
 
-        foreach (Arr::pull($data, 'exceptions', []) as $key => $exception) {
+        return [$openingHours, $exceptions, $metaData, $filters, $overflow, $dateTimeClass];
+    }
+
+    protected function parseExceptions(array $data, array $filters): array
+    {
+        $exceptions = [];
+
+        foreach ($data as $key => $exception) {
             if (is_callable($exception)) {
                 $filters[] = $exception;
 
                 continue;
             }
 
-            $exceptions[$key] = $exception;
+            foreach ($this->readDatesRange($key) as $date) {
+                if (isset($exceptions[$date])) {
+                    throw InvalidDateRange::invalidDateRange($key, $date);
+                }
+
+                $exceptions[$date] = $exception;
+            }
         }
 
+        return [$exceptions, $filters];
+    }
+
+    protected function parseDaysOfWeeks(array $data): array
+    {
         $openingHours = [];
 
-        foreach ($data as $day => $openingHoursData) {
-            $openingHours[$this->normalizeDayName($day)] = $openingHoursData;
+        foreach ($data as $dayKey => $openingHoursData) {
+            foreach ($this->readDatesRange($dayKey) as $rawDay) {
+                $day = $this->normalizeDayName($rawDay);
+
+                if (isset($openingHours[$day])) {
+                    throw InvalidDateRange::invalidDateRange($dayKey, $day);
+                }
+
+                $openingHours[$day] = $openingHoursData;
+            }
         }
 
-        return [$openingHours, $exceptions, $metaData, $filters, $overflow, $dateTimeClass];
+        return $openingHours;
+    }
+
+    protected function readDatesRange(string $key): iterable
+    {
+        $toChunks = preg_split('/\sto\s/', $key, 2);
+
+        if (count($toChunks) === 2) {
+            return $this->daysBetween(trim($toChunks[0]), trim($toChunks[1]));
+        }
+
+        $dashChunks = explode('-', $key);
+        $chunksCount = count($dashChunks);
+        $firstChunk = trim($dashChunks[0]);
+
+        if ($chunksCount === 2 && preg_match('/^[A-Za-z]+$/', $firstChunk)) {
+            return $this->daysBetween($firstChunk, trim($dashChunks[1]));
+        }
+
+        if ($chunksCount >= 4) {
+            $middle = ceil($chunksCount / 2);
+
+            return $this->daysBetween(
+                trim(implode('-', array_slice($dashChunks, 0, $middle))),
+                trim(implode('-', array_slice($dashChunks, $middle))),
+            );
+        }
+
+        return [$key];
+    }
+
+    /** @return Generator<string> */
+    protected function daysBetween(string $start, string $end): Generator
+    {
+        $count = count(explode('-', $start));
+
+        if ($count === 2) {
+            // Use an arbitrary leap year
+            $start = "2024-$start";
+            $end = "2024-$end";
+        }
+
+        $startDate = new DateTimeImmutable($start);
+        $endDate = $startDate->modify($end)->modify('+12 hours');
+
+        $format = [
+            2 => 'm-d',
+            3 => 'Y-m-d',
+        ][$count] ?? 'l';
+
+        foreach (new DatePeriod($startDate, new DateInterval('P1D'), $endDate) as $date) {
+            yield $date->format($format);
+        }
     }
 
     protected function setOpeningHoursFromStrings(string $day, array $openingHours): void
