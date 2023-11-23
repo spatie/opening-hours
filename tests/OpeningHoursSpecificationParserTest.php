@@ -41,9 +41,7 @@ class OpeningHoursSpecificationParserTest extends TestCase
         "@type": "OpeningHoursSpecification",
         "opens": "08:00:00",
         "closes": "12:00:00",
-        "dayOfWeek": [
-            "https://schema.org/Saturday"
-        ]
+        "dayOfWeek": "https://schema.org/Saturday"
     },
     {
         "@type": "OpeningHoursSpecification",

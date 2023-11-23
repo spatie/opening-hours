@@ -124,7 +124,7 @@ class OpeningHours
     }
 
     public static function createFromStructuredData(
-        array $structuredData,
+        array|string $structuredData,
         string|DateTimeZone|null $timezone = null,
         string|DateTimeZone|null $outputTimezone = null,
     ): self {

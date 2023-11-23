@@ -607,6 +607,48 @@ if ($date) {
 }
 ```
 
+#### `OpeningHours::createFromStructuredData(array|string $data, $timezone = null, $outputTimezone = null): Spatie\OpeningHours\OpeningHours`
+
+Static factory method to fill the set with a https://schema.org/OpeningHoursSpecification array or JSON string.
+
+`dayOfWeek` supports array of day names (Google-flavored) or array of day URLs (official schema.org specification).
+
+```php
+$openingHours = OpeningHours::createFromStructuredData('[
+    {
+        "@type": "OpeningHoursSpecification",
+        "opens": "08:00",
+        "closes": "12:00",
+        "dayOfWeek": [
+            "https://schema.org/Monday",
+            "https://schema.org/Tuesday",
+            "https://schema.org/Wednesday",
+            "https://schema.org/Thursday",
+            "https://schema.org/Friday"
+        ]
+    },
+    {
+        "@type": "OpeningHoursSpecification",
+        "opens": "14:00",
+        "closes": "18:00",
+        "dayOfWeek": [
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday"
+        ]
+    },
+    {
+        "@type": "OpeningHoursSpecification",
+        "opens": "00:00",
+        "closes": "00:00",
+        "validFrom": "2023-12-25",
+        "validThrough": "2023-12-25"
+    }
+]');
+```
+
 #### `OpeningHours::asStructuredData(strinf $format = 'H:i', string|DateTimeZone $timezone) : array`
 
 Returns a [OpeningHoursSpecification](https://schema.org/openingHoursSpecification) as an array.
