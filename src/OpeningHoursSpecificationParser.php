@@ -27,7 +27,7 @@ final class OpeningHoursSpecificationParser
             }
         }
 
-        if (!is_array($openingHoursSpecification) || empty($openingHoursSpecification)) {
+        if (! is_array($openingHoursSpecification) || empty($openingHoursSpecification)) {
             throw new InvalidOpeningHoursSpecification(
                 'Invalid https://schema.org/OpeningHoursSpecification structured data'
             );
@@ -51,8 +51,8 @@ final class OpeningHoursSpecificationParser
                 } elseif (is_string($dayOfWeek)) {
                     $this->addDayOfWeekHours(
                         $dayOfWeek,
-                            $openingHoursSpecificationItem['opens'] ?? null,
-                            $openingHoursSpecificationItem['closes'] ?? null
+                        $openingHoursSpecificationItem['opens'] ?? null,
+                        $openingHoursSpecificationItem['closes'] ?? null
                     );
                 } else {
                     throw new InvalidOpeningHoursSpecification('Invalid https://schema.org/OpeningHoursSpecification structured data');
@@ -118,24 +118,24 @@ final class OpeningHoursSpecificationParser
         ?string $opens,
         ?string $closes
     ): void {
-        if (!is_string($validFrom) || !is_string($validThrough)) {
+        if (! is_string($validFrom) || ! is_string($validThrough)) {
             throw new InvalidOpeningHoursSpecification('Missing validFrom and validThrough dates');
         }
 
-        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $validFrom) || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $validThrough)) {
+        if (! preg_match('/^\d{4}-\d{2}-\d{2}$/', $validFrom) || ! preg_match('/^\d{4}-\d{2}-\d{2}$/', $validThrough)) {
             throw new InvalidOpeningHoursSpecification('Invalid validFrom and validThrough dates');
         }
 
         if ($validFrom === $validThrough) {
             $exceptionKey = $validFrom;
         } else {
-            $exceptionKey = $validFrom . ' to ' . $validThrough;
+            $exceptionKey = $validFrom.' to '.$validThrough;
         }
 
-        if (!isset($this->openingHours['exceptions'])) {
+        if (! isset($this->openingHours['exceptions'])) {
             $this->openingHours['exceptions'] = [];
         }
-        if (!isset($this->openingHours['exceptions'][$exceptionKey])) {
+        if (! isset($this->openingHours['exceptions'][$exceptionKey])) {
             // Default to close all day
             $this->openingHours['exceptions'][$exceptionKey] = [];
         }
@@ -151,11 +151,14 @@ final class OpeningHoursSpecificationParser
         ?string $opens,
         ?string $closes,
     ): ?string {
-        if (!is_string($opens) || !is_string($closes)) {
+        if (! is_string($opens) || ! is_string($closes)) {
             throw new InvalidOpeningHoursSpecification('Missing opens and closes hours');
         }
 
-        if (!preg_match('/^\d{2}:\d{2}(:\d{2})?$/', $opens) || !preg_match('/^\d{2}:\d{2}(:\d{2})?$/', $closes)) {
+        if (
+            ! preg_match('/^\d{2}:\d{2}(:\d{2})?$/', $opens) ||
+            ! preg_match('/^\d{2}:\d{2}(:\d{2})?$/', $closes)
+        ) {
             throw new InvalidOpeningHoursSpecification('Invalid opens and closes hours');
         }
 
@@ -168,6 +171,6 @@ final class OpeningHoursSpecificationParser
             return null;
         }
 
-        return $opens . '-' . $closes;
+        return $opens.'-'.$closes;
     }
 }

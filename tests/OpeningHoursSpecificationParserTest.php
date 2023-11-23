@@ -11,7 +11,7 @@ class OpeningHoursSpecificationParserTest extends TestCase
 {
     public function testCreateFromStructuredData(): void
     {
-        $openingHoursSpecs = <<<JSON
+        $openingHoursSpecs = <<<'JSON'
 [
     {
         "@type": "OpeningHoursSpecification",

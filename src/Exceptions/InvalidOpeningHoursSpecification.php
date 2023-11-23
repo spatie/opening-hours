@@ -6,5 +6,4 @@ namespace Spatie\OpeningHours\Exceptions;
 
 class InvalidOpeningHoursSpecification extends \InvalidArgumentException
 {
-
 }
