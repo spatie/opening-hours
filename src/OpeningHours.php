@@ -20,7 +20,6 @@ use Spatie\OpeningHours\Helpers\Arr;
 use Spatie\OpeningHours\Helpers\DataTrait;
 use Spatie\OpeningHours\Helpers\DateTimeCopier;
 use Spatie\OpeningHours\Helpers\DiffTrait;
-use ValueError;
 
 class OpeningHours
 {
@@ -128,9 +127,15 @@ class OpeningHours
         string|DateTimeZone|null $timezone = null,
         string|DateTimeZone|null $outputTimezone = null,
     ): self {
-        $parser = new OpeningHoursSpecificationParser($structuredData);
-
-        return new static($parser->getOpeningHours(), $timezone, $outputTimezone);
+        return new static(
+            array_merge(
+                // https://schema.org/OpeningHoursSpecification allows overflow by default
+                ['overflow' => true],
+                OpeningHoursSpecificationParser::create($structuredData)->getOpeningHours(),
+            ),
+            $timezone,
+            $outputTimezone,
+        );
     }
 
     /**
@@ -213,7 +218,7 @@ class OpeningHours
             static::create($data);
 
             return true;
-        } catch (Exception|ValueError) {
+        } catch (Exception) {
             return false;
         }
     }
@@ -891,6 +896,11 @@ class OpeningHours
         return $date;
     }
 
+    /**
+     * Returns opening hours for the days that match a given condition as an array.
+     *
+     * @return OpeningHoursForDay[]
+     */
     public function filter(callable $callback): array
     {
         return Arr::filter($this->openingHours, $callback);
@@ -906,6 +916,11 @@ class OpeningHours
         return Arr::flatMap($this->openingHours, $callback);
     }
 
+    /**
+     * Returns opening hours for the exceptions that match a given condition as an array.
+     *
+     * @return OpeningHoursForDay[]
+     */
     public function filterExceptions(callable $callback): array
     {
         return Arr::filter($this->exceptions, $callback);
@@ -919,6 +934,14 @@ class OpeningHours
     public function flatMapExceptions(callable $callback): array
     {
         return Arr::flatMap($this->exceptions, $callback);
+    }
+
+    /** Checks that opening hours for every day of the week matches a given condition */
+    public function every(callable $callback): bool
+    {
+        return $this->filter(
+            static fn (OpeningHoursForDay $day) => ! $callback($day),
+        ) === [];
     }
 
     public function asStructuredData(
@@ -963,6 +986,20 @@ class OpeningHours
         );
 
         return array_merge($regularHours, $exceptions);
+    }
+
+    public function isAlwaysClosed(): bool
+    {
+        return $this->exceptions === [] && $this->filters === [] && $this->every(
+            static fn (OpeningHoursForDay $day) => $day->isEmpty(),
+        );
+    }
+
+    public function isAlwaysOpen(): bool
+    {
+        return $this->exceptions === [] && $this->filters === [] && $this->every(
+            static fn (OpeningHoursForDay $day) => ((string) $day) === '00:00-24:00',
+        );
     }
 
     private static function filterHours(array $data, array $excludedKeys): Generator
