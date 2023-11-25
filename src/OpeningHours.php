@@ -123,6 +123,16 @@ class OpeningHours
         return new static($data, $timezone, $outputTimezone);
     }
 
+    public static function createFromStructuredData(
+        array|string $structuredData,
+        string|DateTimeZone|null $timezone = null,
+        string|DateTimeZone|null $outputTimezone = null,
+    ): self {
+        $parser = new OpeningHoursSpecificationParser($structuredData);
+
+        return new static($parser->getOpeningHours(), $timezone, $outputTimezone);
+    }
+
     /**
      * @param  array  $data  hours definition array or sub-array
      * @param  array  $excludedKeys  keys to ignore from parsing
