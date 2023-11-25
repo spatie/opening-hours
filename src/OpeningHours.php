@@ -128,7 +128,11 @@ class OpeningHours
         string|DateTimeZone|null $outputTimezone = null,
     ): self {
         return new static(
-            OpeningHoursSpecificationParser::create($structuredData)->getOpeningHours(),
+            array_merge(
+                // https://schema.org/OpeningHoursSpecification allows overflow by default
+                ['overflow' => true],
+                OpeningHoursSpecificationParser::create($structuredData)->getOpeningHours(),
+            ),
             $timezone,
             $outputTimezone,
         );
@@ -936,7 +940,7 @@ class OpeningHours
     public function every(callable $callback): bool
     {
         return $this->filter(
-            static fn (OpeningHoursForDay $day) => !$callback($day),
+            static fn (OpeningHoursForDay $day) => ! $callback($day),
         ) === [];
     }
 

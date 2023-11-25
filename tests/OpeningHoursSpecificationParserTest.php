@@ -111,6 +111,23 @@ class OpeningHoursSpecificationParserTest extends TestCase
         $this->assertTrue($openingHours->isAlwaysClosed());
     }
 
+    public function testRangeOverNight(): void
+    {
+        $openingHours = OpeningHours::createFromStructuredData([
+            [
+                'dayOfWeek' => 'Monday',
+                'opens' => '18:00',
+                'closes' => '02:00',
+            ],
+        ]);
+
+        $this->assertTrue($openingHours->isClosedAt(new DateTimeImmutable('2023-11-27 17:50')));
+        $this->assertTrue($openingHours->isOpenAt(new DateTimeImmutable('2023-11-27 23:55')));
+        $this->assertTrue($openingHours->isOpenAt(new DateTimeImmutable('2023-11-27 23:59:59.99')));
+        $this->assertTrue($openingHours->isOpenAt(new DateTimeImmutable('2023-11-28 01:50')));
+        $this->assertTrue($openingHours->isClosedAt(new DateTimeImmutable('2023-11-28 19:00')));
+    }
+
     public function testH24Specs(): void
     {
         $openingHours = OpeningHours::createFromStructuredData([
