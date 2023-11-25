@@ -845,7 +845,7 @@ class OpeningHours
 
     protected function setExceptionsFromStrings(array $exceptions): void
     {
-        if (empty($exceptions)) {
+        if ($exceptions === []) {
             return;
         }
 

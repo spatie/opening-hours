@@ -249,7 +249,7 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
 
     public function isEmpty(): bool
     {
-        return empty($this->openingHours);
+        return $this->openingHours === [];
     }
 
     public function map(callable $callback): array
