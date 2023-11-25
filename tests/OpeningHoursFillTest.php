@@ -11,7 +11,6 @@ use Spatie\OpeningHours\Exceptions\InvalidDayName;
 use Spatie\OpeningHours\OpeningHours;
 use Spatie\OpeningHours\OpeningHoursForDay;
 use Spatie\OpeningHours\TimeRange;
-use ValueError;
 
 class OpeningHoursFillTest extends TestCase
 {

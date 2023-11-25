@@ -421,6 +421,31 @@ Checks if the business is closed right now.
 $openingHours->isClosed();
 ```
 
+#### `OpeningHours::isAlwaysOpen(): bool`
+
+Checks if the business is open 24/7, has no exceptions and no filters.
+
+```php
+if ($openingHours->isAlwaysOpen()) {
+    echo 'This business is open all day long every day.';
+}
+```
+
+#### `OpeningHours::isAlwaysClosed(): bool`
+
+Checks if the business is never open, has no exceptions and no filters.
+
+`OpeningHours` accept empty array or list with every week day empty with no prejudices.
+
+If it's not a valid state in your domain, you should use this method to throw an exception
+or show an error.
+
+```php
+if ($openingHours->isAlwaysClosed()) {
+    throw new RuntimeException('Opening hours missing');
+}
+```
+
 #### `OpeningHours::nextOpen`
 
 ```php
