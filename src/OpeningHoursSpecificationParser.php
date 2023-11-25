@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Spatie\OpeningHours;
 
+use JsonException;
 use Spatie\OpeningHours\Exceptions\InvalidOpeningHoursSpecification;
 
 final class OpeningHoursSpecificationParser
@@ -14,22 +15,22 @@ final class OpeningHoursSpecificationParser
     {
         if (is_string($openingHoursSpecification)) {
             try {
-                $openingHoursSpecification = \json_decode(
+                $openingHoursSpecification = json_decode(
                     $openingHoursSpecification,
                     true,
-                    flags: JSON_THROW_ON_ERROR
+                    flags: JSON_THROW_ON_ERROR,
                 );
-            } catch (\JsonException $e) {
+            } catch (JsonException $e) {
                 throw new InvalidOpeningHoursSpecification(
                     'Invalid https://schema.org/OpeningHoursSpecification JSON',
-                    previous: $e
+                    previous: $e,
                 );
             }
         }
 
-        if (! is_array($openingHoursSpecification) || empty($openingHoursSpecification)) {
+        if (! is_array($openingHoursSpecification) || $openingHoursSpecification === []) {
             throw new InvalidOpeningHoursSpecification(
-                'Invalid https://schema.org/OpeningHoursSpecification structured data'
+                'Invalid https://schema.org/OpeningHoursSpecification structured data',
             );
         }
 
@@ -45,17 +46,19 @@ final class OpeningHoursSpecificationParser
                         $this->addDayOfWeekHours(
                             $dayOfWeekItem,
                             $openingHoursSpecificationItem['opens'] ?? null,
-                            $openingHoursSpecificationItem['closes'] ?? null
+                            $openingHoursSpecificationItem['closes'] ?? null,
                         );
                     }
                 } elseif (is_string($dayOfWeek)) {
                     $this->addDayOfWeekHours(
                         $dayOfWeek,
                         $openingHoursSpecificationItem['opens'] ?? null,
-                        $openingHoursSpecificationItem['closes'] ?? null
+                        $openingHoursSpecificationItem['closes'] ?? null,
                     );
                 } else {
-                    throw new InvalidOpeningHoursSpecification('Invalid https://schema.org/OpeningHoursSpecification structured data');
+                    throw new InvalidOpeningHoursSpecification(
+                        'Invalid https://schema.org/OpeningHoursSpecification structured data',
+                    );
                 }
             } elseif (
                 isset($openingHoursSpecificationItem['validFrom']) &&
@@ -70,10 +73,12 @@ final class OpeningHoursSpecificationParser
                     $validFrom,
                     $validThrough,
                     $openingHoursSpecificationItem['opens'] ?? null,
-                    $openingHoursSpecificationItem['closes'] ?? null
+                    $openingHoursSpecificationItem['closes'] ?? null,
                 );
             } else {
-                throw new InvalidOpeningHoursSpecification('Invalid https://schema.org/OpeningHoursSpecification structured data');
+                throw new InvalidOpeningHoursSpecification(
+                    'Invalid https://schema.org/OpeningHoursSpecification structured data',
+                );
             }
         }
     }
@@ -101,14 +106,16 @@ final class OpeningHoursSpecificationParser
     private function addDayOfWeekHours(
         string $dayOfWeek,
         ?string $opens,
-        ?string $closes
+        ?string $closes,
     ): void {
         $dayOfWeek = self::schemaOrgDayToString($dayOfWeek);
 
         $hours = $this->formatHours($opens, $closes);
-        if (null === $hours) {
+
+        if ($hours === null) {
             return;
         }
+
         $this->openingHours[$dayOfWeek][] = $hours;
     }
 
@@ -122,28 +129,25 @@ final class OpeningHoursSpecificationParser
             throw new InvalidOpeningHoursSpecification('Missing validFrom and validThrough dates');
         }
 
-        if (! preg_match('/^\d{4}-\d{2}-\d{2}$/', $validFrom) || ! preg_match('/^\d{4}-\d{2}-\d{2}$/', $validThrough)) {
+        if (
+            ! preg_match('/^\d{4}-\d{2}-\d{2}$/', $validFrom) ||
+            ! preg_match('/^\d{4}-\d{2}-\d{2}$/', $validThrough)
+        ) {
             throw new InvalidOpeningHoursSpecification('Invalid validFrom and validThrough dates');
         }
 
-        if ($validFrom === $validThrough) {
-            $exceptionKey = $validFrom;
-        } else {
-            $exceptionKey = $validFrom.' to '.$validThrough;
-        }
+        $exceptionKey = $validFrom === $validThrough ? $validFrom : $validFrom.' to '.$validThrough;
 
-        if (! isset($this->openingHours['exceptions'])) {
-            $this->openingHours['exceptions'] = [];
-        }
-        if (! isset($this->openingHours['exceptions'][$exceptionKey])) {
-            // Default to close all day
-            $this->openingHours['exceptions'][$exceptionKey] = [];
-        }
+        $this->openingHours['exceptions'] ??= [];
+        // Default to close all day
+        $this->openingHours['exceptions'][$exceptionKey] ??= [];
 
         $hours = $this->formatHours($opens, $closes);
-        if (null === $hours) {
+
+        if ($hours === null) {
             return;
         }
+
         $this->openingHours['exceptions'][$exceptionKey][] = $hours;
     }
 

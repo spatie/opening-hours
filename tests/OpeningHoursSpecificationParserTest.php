@@ -12,61 +12,61 @@ class OpeningHoursSpecificationParserTest extends TestCase
     public function testCreateFromStructuredData(): void
     {
         $openingHoursSpecs = <<<'JSON'
-[
-    {
-        "@type": "OpeningHoursSpecification",
-        "opens": "08:00",
-        "closes": "12:00",
-        "dayOfWeek": [
-            "https://schema.org/Monday",
-            "https://schema.org/Tuesday",
-            "https://schema.org/Wednesday",
-            "https://schema.org/Thursday",
-            "https://schema.org/Friday"
-        ]
-    },
-    {
-        "@type": "OpeningHoursSpecification",
-        "opens": "14:00",
-        "closes": "18:00",
-        "dayOfWeek": [
-            "https://schema.org/Monday",
-            "https://schema.org/Tuesday",
-            "https://schema.org/Wednesday",
-            "https://schema.org/Thursday",
-            "https://schema.org/Friday"
-        ]
-    },
-    {
-        "@type": "OpeningHoursSpecification",
-        "opens": "08:00:00",
-        "closes": "12:00:00",
-        "dayOfWeek": "https://schema.org/Saturday"
-    },
-    {
-        "@type": "OpeningHoursSpecification",
-        "opens": "00:00",
-        "closes": "00:00",
-        "dayOfWeek": [
-            "Sunday"
-        ]
-    },
-    {
-        "@type": "OpeningHoursSpecification",
-        "opens": "00:00",
-        "closes": "00:00",
-        "validFrom": "2023-12-25",
-        "validThrough": "2023-12-25"
-    },
-    {
-        "@type": "OpeningHoursSpecification",
-        "opens": "09:00",
-        "closes": "18:00",
-        "validFrom": "2023-12-24",
-        "validThrough": "2023-12-24"
-    }
-]
-JSON;
+            [
+                {
+                    "@type": "OpeningHoursSpecification",
+                    "opens": "08:00",
+                    "closes": "12:00",
+                    "dayOfWeek": [
+                        "https://schema.org/Monday",
+                        "https://schema.org/Tuesday",
+                        "https://schema.org/Wednesday",
+                        "https://schema.org/Thursday",
+                        "https://schema.org/Friday"
+                    ]
+                },
+                {
+                    "@type": "OpeningHoursSpecification",
+                    "opens": "14:00",
+                    "closes": "18:00",
+                    "dayOfWeek": [
+                        "https://schema.org/Monday",
+                        "https://schema.org/Tuesday",
+                        "https://schema.org/Wednesday",
+                        "https://schema.org/Thursday",
+                        "https://schema.org/Friday"
+                    ]
+                },
+                {
+                    "@type": "OpeningHoursSpecification",
+                    "opens": "08:00:00",
+                    "closes": "12:00:00",
+                    "dayOfWeek": "https://schema.org/Saturday"
+                },
+                {
+                    "@type": "OpeningHoursSpecification",
+                    "opens": "00:00",
+                    "closes": "00:00",
+                    "dayOfWeek": [
+                        "Sunday"
+                    ]
+                },
+                {
+                    "@type": "OpeningHoursSpecification",
+                    "opens": "00:00",
+                    "closes": "00:00",
+                    "validFrom": "2023-12-25",
+                    "validThrough": "2023-12-25"
+                },
+                {
+                    "@type": "OpeningHoursSpecification",
+                    "opens": "09:00",
+                    "closes": "18:00",
+                    "validFrom": "2023-12-24",
+                    "validThrough": "2023-12-24"
+                }
+            ]
+            JSON;
 
         $openingHours = OpeningHours::createFromStructuredData(json_decode($openingHoursSpecs, true));
         $this->assertInstanceOf(OpeningHours::class, $openingHours);
@@ -92,12 +92,12 @@ JSON;
         // Exception Closed on Christmas day
         $this->assertTrue(
             $openingHours->isClosedAt(new \DateTime('2023-12-25 08:00')),
-            'Closed on 2023 Monday Christmas day'
+            'Closed on 2023 Monday Christmas day',
         );
         // Exception Opened on Christmas Eve
         $this->assertTrue(
             $openingHours->isOpenAt(new \DateTime('2023-12-24 10:00')),
-            'Opened on 2023 Sunday before Christmas day'
+            'Opened on 2023 Sunday before Christmas day',
         );
     }
 }
