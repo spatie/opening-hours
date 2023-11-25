@@ -11,29 +11,8 @@ final class OpeningHoursSpecificationParser
 {
     private array $openingHours = [];
 
-    public function __construct(array|string|null $openingHoursSpecification)
+    private function __construct(array $openingHoursSpecification)
     {
-        if (is_string($openingHoursSpecification)) {
-            try {
-                $openingHoursSpecification = json_decode(
-                    $openingHoursSpecification,
-                    true,
-                    flags: JSON_THROW_ON_ERROR,
-                );
-            } catch (JsonException $e) {
-                throw new InvalidOpeningHoursSpecification(
-                    'Invalid https://schema.org/OpeningHoursSpecification JSON',
-                    previous: $e,
-                );
-            }
-        }
-
-        if (! is_array($openingHoursSpecification) || $openingHoursSpecification === []) {
-            throw new InvalidOpeningHoursSpecification(
-                'Invalid https://schema.org/OpeningHoursSpecification structured data',
-            );
-        }
-
         foreach ($openingHoursSpecification as $openingHoursSpecificationItem) {
             if (isset($openingHoursSpecificationItem['dayOfWeek'])) {
                 /*
@@ -81,6 +60,34 @@ final class OpeningHoursSpecificationParser
                 );
             }
         }
+    }
+
+    public static function createFromArray(array $openingHoursSpecification): self
+    {
+        return new self($openingHoursSpecification);
+    }
+
+    public static function createFromString(string $openingHoursSpecification): self
+    {
+        try {
+            return self::createFromArray(json_decode(
+                $openingHoursSpecification,
+                true,
+                flags: JSON_THROW_ON_ERROR,
+            ));
+        } catch (JsonException $e) {
+            throw new InvalidOpeningHoursSpecification(
+                'Invalid https://schema.org/OpeningHoursSpecification JSON',
+                previous: $e,
+            );
+        }
+    }
+
+    public static function create(array|string $openingHoursSpecification): self
+    {
+        return is_string($openingHoursSpecification)
+            ? self::createFromString($openingHoursSpecification)
+            : self::createFromArray($openingHoursSpecification);
     }
 
     public function getOpeningHours(): array

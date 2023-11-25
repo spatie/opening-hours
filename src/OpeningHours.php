@@ -128,9 +128,11 @@ class OpeningHours
         string|DateTimeZone|null $timezone = null,
         string|DateTimeZone|null $outputTimezone = null,
     ): self {
-        $parser = new OpeningHoursSpecificationParser($structuredData);
-
-        return new static($parser->getOpeningHours(), $timezone, $outputTimezone);
+        return new static(
+            OpeningHoursSpecificationParser::create($structuredData)->getOpeningHours(),
+            $timezone,
+            $outputTimezone,
+        );
     }
 
     /**
