@@ -957,7 +957,7 @@ class OpeningHoursTest extends TestCase
     /** @test */
     public function it_can_use_day_enum()
     {
-        $openingHours = new class () extends OpeningHours
+        $openingHours = new class() extends OpeningHours
         {
             public readonly array $days;
 

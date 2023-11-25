@@ -61,7 +61,7 @@ final class OpeningHoursSpecificationParser
     }
 
     /**
-     * Regular opening hours
+     * Regular opening hours.
      */
     private function addDaysOfWeek(
         array $dayOfWeek,

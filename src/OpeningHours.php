@@ -936,7 +936,7 @@ class OpeningHours
     public function every(callable $callback): bool
     {
         return $this->filter(
-            static fn (OpeningHoursForDay $day) => !$callback($day),
+            static fn (OpeningHoursForDay $day) => ! $callback($day),
         ) === [];
     }
 
