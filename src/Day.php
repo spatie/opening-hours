@@ -3,6 +3,8 @@
 namespace Spatie\OpeningHours;
 
 use DateTimeInterface;
+use Spatie\OpeningHours\Exceptions\InvalidDayName;
+use ValueError;
 
 enum Day: string
 {
@@ -21,7 +23,11 @@ enum Day: string
 
     public static function fromName(string $day): self
     {
-        return self::from(strtolower($day));
+        try {
+            return self::from(strtolower($day));
+        } catch (ValueError $exception) {
+            throw InvalidDayName::invalidDayName($day, $exception);
+        }
     }
 
     public function toISO(): int

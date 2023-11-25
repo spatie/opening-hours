@@ -7,6 +7,7 @@ use DateTimeImmutable;
 use DateTimeZone;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
+use Spatie\OpeningHours\Day;
 use Spatie\OpeningHours\Exceptions\InvalidDateRange;
 use Spatie\OpeningHours\Exceptions\MaximumLimitExceeded;
 use Spatie\OpeningHours\Exceptions\SearchLimitReached;
@@ -951,6 +952,21 @@ class OpeningHoursTest extends TestCase
         ]);
 
         $this->assertTrue($openingHours->isOpen());
+    }
+
+    /** @test */
+    public function it_can_use_day_enum()
+    {
+        $openingHours = new class () extends OpeningHours {
+            public readonly array $days;
+
+            public function __construct()
+            {
+                $this->days = $this->readDatesRange(Day::MONDAY);
+            }
+        };
+
+        $this->assertSame(['monday'], $openingHours->days);
     }
 
     /** @test */

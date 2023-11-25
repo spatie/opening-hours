@@ -4,6 +4,7 @@ namespace Spatie\OpeningHours\Test;
 
 use DateTimeImmutable;
 use DateTimeZone;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Spatie\OpeningHours\PreciseTime;
 
@@ -68,5 +69,15 @@ class PreciseTimeTest extends TestCase
         $date = PreciseTime::fromString('2022-08-07 23:32:58.123456 America/Toronto');
         $this->assertSame(23, $date->hours());
         $this->assertSame(32, $date->minutes());
+    }
+
+    /** @test */
+    public function it_cannot_have_date_reference_point()
+    {
+        $this->expectExceptionObject(new InvalidArgumentException(
+            PreciseTime::class.' does not support date reference point',
+        ));
+
+        PreciseTime::fromString('2022-08-07 23:32:58.123456 America/Toronto', date: new DateTimeImmutable());
     }
 }
