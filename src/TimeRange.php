@@ -5,10 +5,12 @@ namespace Spatie\OpeningHours;
 use Spatie\OpeningHours\Exceptions\InvalidTimeRangeArray;
 use Spatie\OpeningHours\Exceptions\InvalidTimeRangeList;
 use Spatie\OpeningHours\Exceptions\InvalidTimeRangeString;
+use Spatie\OpeningHours\Helpers\DataTrait;
 use Spatie\OpeningHours\Helpers\DateTimeCopier;
 
 readonly class TimeRange implements TimeDataContainer
 {
+    use DataTrait;
     use DateTimeCopier;
 
     protected function __construct(

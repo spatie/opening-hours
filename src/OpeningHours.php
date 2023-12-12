@@ -17,6 +17,7 @@ use Spatie\OpeningHours\Exceptions\InvalidTimezone;
 use Spatie\OpeningHours\Exceptions\MaximumLimitExceeded;
 use Spatie\OpeningHours\Exceptions\SearchLimitReached;
 use Spatie\OpeningHours\Helpers\Arr;
+use Spatie\OpeningHours\Helpers\DataTrait;
 use Spatie\OpeningHours\Helpers\DateTimeCopier;
 use Spatie\OpeningHours\Helpers\DiffTrait;
 
@@ -24,6 +25,7 @@ class OpeningHours
 {
     public const DEFAULT_DAY_LIMIT = 8;
 
+    use DataTrait;
     use DateTimeCopier;
     use DiffTrait;
 

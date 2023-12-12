@@ -10,10 +10,12 @@ use IteratorAggregate;
 use Spatie\OpeningHours\Exceptions\NonMutableOffsets;
 use Spatie\OpeningHours\Exceptions\OverlappingTimeRanges;
 use Spatie\OpeningHours\Helpers\Arr;
+use Spatie\OpeningHours\Helpers\DataTrait;
 use Spatie\OpeningHours\Helpers\RangeFinder;
 
 class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
 {
+    use DataTrait;
     use RangeFinder;
 
     private function __construct(

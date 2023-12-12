@@ -8,10 +8,12 @@ use DateTimeImmutable;
 use DateTimeInterface;
 use DateTimeZone;
 use Spatie\OpeningHours\Exceptions\InvalidTimeString;
+use Spatie\OpeningHours\Helpers\DataTrait;
 use Spatie\OpeningHours\Helpers\DateTimeCopier;
 
 readonly class Time implements TimeDataContainer
 {
+    use DataTrait;
     use DateTimeCopier;
 
     protected function __construct(
