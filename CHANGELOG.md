@@ -2,6 +2,10 @@
 
 All notable changes to `opening-hours` will be documented in this file
 
+## 4.0.0 - upcoming
+
+- Replace `getData()` with readonly property `->data`
+
 ## 3.0.0 - 2023-11-12
 
 - Add `Time::date()` method

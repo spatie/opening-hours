@@ -184,18 +184,18 @@ class OpeningHoursFillTest extends TestCase
             ],
         ]);
 
-        $this->assertSame('Newyearsday opening times', $hours->exceptions()['2011-01-01']->getData());
-        $this->assertSame('Newyearsday opening times', $hours->forDate(new DateTime('2011-01-01'))->getData());
-        $this->assertSame('Newyearsday next day', $hours->exceptions()['2011-01-02']->getData());
-        $this->assertSame('Christmas', $hours->exceptions()['12-25']->getData());
-        $this->assertSame('Christmas', $hours->forDate(new DateTime('2011-12-25'))->getData());
-        $this->assertNull($hours->forDay('monday')->getData());
-        $this->assertSame('foobar', $hours->forDay('tuesday')->getData());
+        $this->assertSame('Newyearsday opening times', $hours->exceptions()['2011-01-01']->data);
+        $this->assertSame('Newyearsday opening times', $hours->forDate(new DateTime('2011-01-01'))->data);
+        $this->assertSame('Newyearsday next day', $hours->exceptions()['2011-01-02']->data);
+        $this->assertSame('Christmas', $hours->exceptions()['12-25']->data);
+        $this->assertSame('Christmas', $hours->forDate(new DateTime('2011-12-25'))->data);
+        $this->assertNull($hours->forDay('monday')->data);
+        $this->assertSame('foobar', $hours->forDay('tuesday')->data);
         $this->assertSame(2, $hours->forDay('tuesday')->count());
-        $this->assertSame(['foobar'], $hours->forDay('wednesday')->getData());
+        $this->assertSame(['foobar'], $hours->forDay('wednesday')->data);
         $this->assertSame(1, $hours->forDay('wednesday')->count());
-        $this->assertSame(['foobar'], $hours->forDay('thursday')[0]->getData());
-        $this->assertNull($hours->forDay('thursday')[1]->getData());
+        $this->assertSame(['foobar'], $hours->forDay('thursday')[0]->data);
+        $this->assertNull($hours->forDay('thursday')[1]->data);
 
         $hours = OpeningHours::create([
             'monday' => [
@@ -204,8 +204,8 @@ class OpeningHoursFillTest extends TestCase
             ],
         ]);
 
-        $this->assertSame('morning', $hours->forDay('monday')[0]->getData());
-        $this->assertSame('afternoon', $hours->forDay('monday')[1]->getData());
+        $this->assertSame('morning', $hours->forDay('monday')[0]->data);
+        $this->assertSame('afternoon', $hours->forDay('monday')[1]->data);
 
         $hours = OpeningHours::create([
             'tuesday' => [
@@ -219,8 +219,8 @@ class OpeningHoursFillTest extends TestCase
         ]);
 
         $this->assertSame('09:00-12:00,13:00-18:00,19:00-21:00', strval($hours->forDay('tuesday')));
-        $this->assertNull($hours->forDay('tuesday')[1]->getData());
-        $this->assertSame('Extra on Tuesday evening', $hours->forDay('tuesday')[2]->getData());
+        $this->assertNull($hours->forDay('tuesday')[1]->data);
+        $this->assertSame('Extra on Tuesday evening', $hours->forDay('tuesday')[2]->data);
     }
 
     /** @test */
@@ -273,7 +273,7 @@ class OpeningHoursFillTest extends TestCase
         $this->assertSame('', $hours->forDate(new DateTimeImmutable('2018-04-02'))->__toString());
         $this->assertSame('04-03 08:00', $hours->nextOpen(new DateTimeImmutable('2018-03-31'))->format('m-d H:i'));
         $this->assertSame('12-03 11:00', $hours->nextClose(new DateTimeImmutable('2018-12-03'))->format('m-d H:i'));
-        $this->assertSame('Month equals day', $hours->forDate(new DateTimeImmutable('2018-12-12'))->getData());
+        $this->assertSame('Month equals day', $hours->forDate(new DateTimeImmutable('2018-12-12'))->data);
     }
 
     /** @test */

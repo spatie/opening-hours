@@ -6,11 +6,12 @@ use DateTimeInterface;
 
 readonly class DateTimeRange extends TimeRange
 {
-    protected DateTimeInterface $date;
-
-    protected function __construct(DateTimeInterface $date, Time $start, Time $end, mixed $data = null)
-    {
-        $this->date = $date;
+    protected function __construct(
+        protected DateTimeInterface $date,
+        Time $start,
+        Time $end,
+        mixed $data = null,
+    ) {
         $startDate = $this->copyAndModify($date, $start.(
             $start > $date->format(self::TIME_FORMAT)
                 ? ' - 1 day'
@@ -22,9 +23,9 @@ readonly class DateTimeRange extends TimeRange
                 : ''
         ));
         parent::__construct(
-            Time::fromString($start, $start->getData(), $startDate),
-            Time::fromString($end, $start->getData(), $endDate),
-            $data
+            Time::fromString($start, $start->data, $startDate),
+            Time::fromString($end, $start->data, $endDate),
+            $data,
         );
     }
 

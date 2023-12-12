@@ -5,23 +5,17 @@ namespace Spatie\OpeningHours;
 use Spatie\OpeningHours\Exceptions\InvalidTimeRangeArray;
 use Spatie\OpeningHours\Exceptions\InvalidTimeRangeList;
 use Spatie\OpeningHours\Exceptions\InvalidTimeRangeString;
-use Spatie\OpeningHours\Helpers\DataTrait;
 use Spatie\OpeningHours\Helpers\DateTimeCopier;
 
 readonly class TimeRange implements TimeDataContainer
 {
     use DateTimeCopier;
-    use DataTrait;
 
-    protected Time $start;
-
-    protected Time $end;
-
-    protected function __construct(Time $start, Time $end, $data = null)
-    {
-        $this->start = $start;
-        $this->end = $end;
-        $this->data = $data;
+    protected function __construct(
+        protected Time $start,
+        protected Time $end,
+        public mixed $data = null,
+    ) {
     }
 
     public static function fromString(string $string, $data = null): self

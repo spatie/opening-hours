@@ -10,20 +10,18 @@ use IteratorAggregate;
 use Spatie\OpeningHours\Exceptions\NonMutableOffsets;
 use Spatie\OpeningHours\Exceptions\OverlappingTimeRanges;
 use Spatie\OpeningHours\Helpers\Arr;
-use Spatie\OpeningHours\Helpers\DataTrait;
 use Spatie\OpeningHours\Helpers\RangeFinder;
 
 class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
 {
-    use DataTrait, RangeFinder;
+    use RangeFinder;
 
     private function __construct(
         /** @var \Spatie\OpeningHours\TimeRange[] */
         protected readonly array $openingHours,
-        mixed $data,
+        public readonly mixed $data,
     ) {
         $this->guardAgainstTimeRangeOverlaps($openingHours);
-        $this->data = $data;
     }
 
     public static function fromStrings(array $strings, mixed $data = null): static

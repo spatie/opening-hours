@@ -10,11 +10,10 @@ use InvalidArgumentException;
 
 readonly class PreciseTime extends Time
 {
-    protected DateTimeInterface $dateTime;
-
-    protected function __construct(DateTimeInterface $dateTime, mixed $data = null)
-    {
-        $this->dateTime = $dateTime;
+    protected function __construct(
+        protected DateTimeInterface $dateTime,
+        mixed $data = null,
+    ) {
         parent::__construct(0, 0, $data);
     }
 

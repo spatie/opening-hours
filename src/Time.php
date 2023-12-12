@@ -8,25 +8,18 @@ use DateTimeImmutable;
 use DateTimeInterface;
 use DateTimeZone;
 use Spatie\OpeningHours\Exceptions\InvalidTimeString;
-use Spatie\OpeningHours\Helpers\DataTrait;
 use Spatie\OpeningHours\Helpers\DateTimeCopier;
 
 readonly class Time implements TimeDataContainer
 {
-    use DataTrait, DateTimeCopier;
+    use DateTimeCopier;
 
-    protected int $hours;
-
-    protected int $minutes;
-
-    protected ?DateTimeInterface $date;
-
-    protected function __construct(int $hours, int $minutes, mixed $data = null, ?DateTimeInterface $date = null)
-    {
-        $this->hours = $hours;
-        $this->minutes = $minutes;
-        $this->data = $data;
-        $this->date = $date;
+    protected function __construct(
+        protected int $hours,
+        protected int $minutes,
+        public mixed $data = null,
+        protected ?DateTimeInterface $date = null,
+    ) {
     }
 
     public static function fromString(string $string, mixed $data = null, ?DateTimeInterface $date = null): self

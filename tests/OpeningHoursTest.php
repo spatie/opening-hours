@@ -1539,8 +1539,8 @@ class OpeningHoursTest extends TestCase
 
         $monday = OpeningHours::create($data)->forDay('Monday');
 
-        $this->assertNull($monday->getData());
-        $this->assertNull($monday[0]->getData());
+        $this->assertNull($monday->data);
+        $this->assertNull($monday[0]->data);
         $this->assertSame('09:00-23:00', (string) $monday);
     }
 
@@ -1557,8 +1557,8 @@ class OpeningHoursTest extends TestCase
 
         $monday = OpeningHours::create($data)->forDay('Monday');
 
-        $this->assertNull($monday->getData());
-        $this->assertNull($monday[0]->getData());
+        $this->assertNull($monday->data);
+        $this->assertNull($monday[0]->data);
         $this->assertSame('09:00-12:00,13:00-18:00', (string) $monday);
     }
 

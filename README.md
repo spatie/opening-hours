@@ -128,9 +128,9 @@ $openingHours = OpeningHours::create([
     ],
 ]);
 
-echo $openingHours->forDay('monday')->getData(); // Typical Monday
-echo $openingHours->forDate(new DateTime('2016-12-25'))->getData(); // Closed for Christmas
-echo $openingHours->forDay('tuesday')[2]->getData(); // Extra on Tuesday evening
+echo $openingHours->forDay('monday')->data; // Typical Monday
+echo $openingHours->forDate(new DateTime('2016-12-25'))->data; // Closed for Christmas
+echo $openingHours->forDay('tuesday')[2]->data; // Extra on Tuesday evening
 ```
 
 In the example above, data are strings but it can be any kind of value. So you can embed multiple properties in an array.

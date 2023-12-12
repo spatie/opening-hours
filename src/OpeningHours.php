@@ -17,7 +17,6 @@ use Spatie\OpeningHours\Exceptions\InvalidTimezone;
 use Spatie\OpeningHours\Exceptions\MaximumLimitExceeded;
 use Spatie\OpeningHours\Exceptions\SearchLimitReached;
 use Spatie\OpeningHours\Helpers\Arr;
-use Spatie\OpeningHours\Helpers\DataTrait;
 use Spatie\OpeningHours\Helpers\DateTimeCopier;
 use Spatie\OpeningHours\Helpers\DiffTrait;
 
@@ -25,7 +24,10 @@ class OpeningHours
 {
     public const DEFAULT_DAY_LIMIT = 8;
 
-    use DataTrait, DateTimeCopier, DiffTrait;
+    use DateTimeCopier;
+    use DiffTrait;
+
+    public readonly mixed $data;
 
     /** @var \Spatie\OpeningHours\OpeningHoursForDay[] */
     protected array $openingHours = [];
@@ -710,20 +712,12 @@ class OpeningHours
         return Arr::map($dates, static fn ($date) => DateTime::createFromFormat('Y-m-d', $date));
     }
 
-    /**
-     * @param  string|DateTimeZone|null  $timezone
-     * @return void
-     */
-    public function setTimezone($timezone)
+    public function setTimezone(string|DateTimeZone|null $timezone): void
     {
         $this->timezone = $this->parseTimezone($timezone);
     }
 
-    /**
-     * @param  string|DateTimeZone|null  $timezone
-     * @return void
-     */
-    public function setOutputTimezone($timezone)
+    public function setOutputTimezone(string|DateTimeZone|null $timezone): void
     {
         $this->outputTimezone = $this->parseTimezone($timezone);
     }
