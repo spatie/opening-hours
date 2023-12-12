@@ -928,7 +928,7 @@ class OpeningHoursTest extends TestCase
         $this->assertTrue($openingHours->isOpenOn('2020-10-19'));
     }
 
-    public function timezones()
+    public static function timezones(): array
     {
         return [
             ['-12:00'],

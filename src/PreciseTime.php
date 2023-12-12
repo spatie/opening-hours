@@ -17,7 +17,7 @@ readonly class PreciseTime extends Time
         parent::__construct(0, 0, $data);
     }
 
-    public static function fromString(string $string, mixed $data = null, ?DateTimeInterface $date = null): parent
+    public static function fromString(string $string, mixed $data = null, ?DateTimeInterface $date = null): self
     {
         if ($date !== null) {
             throw new InvalidArgumentException(static::class.' does not support date reference point');
@@ -36,7 +36,7 @@ readonly class PreciseTime extends Time
         return (int) $this->dateTime->format('i');
     }
 
-    public static function fromDateTime(DateTimeInterface $dateTime, mixed $data = null): parent
+    public static function fromDateTime(DateTimeInterface $dateTime, mixed $data = null): self
     {
         return new self($dateTime, $data);
     }
