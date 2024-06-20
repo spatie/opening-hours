@@ -68,7 +68,7 @@ class OpeningHoursStructuredDataTest extends TestCase
 
         $openingHours = OpeningHours::create([
             'monday' => [
-                'hours' =>  [
+                'hours' => [
                     '09:00-17:00',
                 ],
             ],
