@@ -6,6 +6,8 @@ use DateTime;
 use DateTimeImmutable;
 use DateTimeZone;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Spatie\OpeningHours\Day;
 use Spatie\OpeningHours\Exceptions\InvalidDateRange;
@@ -18,7 +20,7 @@ use Spatie\OpeningHours\TimeRange;
 
 class OpeningHoursTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_can_return_the_opening_hours_for_a_regular_week()
     {
         $openingHours = OpeningHours::create([
@@ -37,7 +39,7 @@ class OpeningHoursTest extends TestCase
         $this->assertCount(0, $openingHoursForWeek['sunday']);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_return_consecutive_opening_hours_for_a_regular_week()
     {
         $openingHours = OpeningHours::create([
@@ -104,7 +106,7 @@ class OpeningHoursTest extends TestCase
         ], $dump);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_return_combined_opening_hours_for_a_regular_week()
     {
         $openingHours = OpeningHours::create([
@@ -143,7 +145,7 @@ class OpeningHoursTest extends TestCase
         ], $dump);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_validate_the_opening_hours()
     {
         $valid = OpeningHours::isValid([
@@ -158,7 +160,7 @@ class OpeningHoursTest extends TestCase
         $this->assertFalse($invalid);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_return_the_exceptions()
     {
         $openingHours = OpeningHours::create([
@@ -174,7 +176,7 @@ class OpeningHoursTest extends TestCase
         $this->assertCount(0, $exceptions['2016-09-26']);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_return_the_opening_hours_for_a_regular_week_day()
     {
         $openingHours = OpeningHours::create([
@@ -190,7 +192,7 @@ class OpeningHoursTest extends TestCase
         $this->assertCount(0, $openingHoursForTuesday);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_determine_that_its_regularly_open_on_a_week_day()
     {
         $openingHours = OpeningHours::create([
@@ -207,7 +209,7 @@ class OpeningHoursTest extends TestCase
         $this->assertFalse($openingHours->isOpenOn((new DateTime('First Tuesday of January'))->format('m-d')));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_determine_that_its_regularly_closed_on_a_week_day()
     {
         $openingHours = OpeningHours::create([
@@ -224,7 +226,7 @@ class OpeningHoursTest extends TestCase
         $this->assertTrue($openingHours->isClosedOn((new DateTime('First Tuesday of January'))->format('m-d')));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_return_the_opening_hours_for_a_specific_date()
     {
         $openingHours = OpeningHours::create([
@@ -253,7 +255,7 @@ class OpeningHoursTest extends TestCase
         $this->assertCount(0, $openingHoursForMonday2609);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_determine_that_its_open_at_a_certain_date_and_time()
     {
         $openingHours = OpeningHours::create([
@@ -289,7 +291,7 @@ class OpeningHoursTest extends TestCase
         $this->assertTrue($openingHours->isClosedAt($shouldBeClosedBecauseOfDay));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_determine_that_its_open_at_a_certain_date_and_time_on_an_exceptional_day()
     {
         $openingHours = OpeningHours::create([
@@ -308,7 +310,7 @@ class OpeningHoursTest extends TestCase
         $this->assertTrue($openingHours->isClosedAt($shouldBeClosed));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_determine_that_its_open_at_a_certain_date_and_time_on_an_recurring_exceptional_day()
     {
         $openingHours = OpeningHours::create([
@@ -345,7 +347,7 @@ class OpeningHoursTest extends TestCase
         $this->assertFalse($openingHours->isClosedAt($openOnChristmasMorning));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_prioritize_exceptions_by_giving_full_dates_priority()
     {
         $openingHours = OpeningHours::create([
@@ -374,7 +376,7 @@ class OpeningHoursTest extends TestCase
         $this->assertTrue($openingHours->isClosedAt($closedOnNewYearDay2019));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_handle_consecutive_open_hours()
     {
         $openingHours = OpeningHours::create([
@@ -442,7 +444,7 @@ class OpeningHoursTest extends TestCase
         $this->assertSame('2022-08-04 00:00:00', $openingHours->previousClose($friday)->format('Y-m-d H:i:s'));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_determine_next_open_hours_from_non_working_date_time()
     {
         $openingHours = OpeningHours::create([
@@ -460,7 +462,7 @@ class OpeningHoursTest extends TestCase
         $this->assertSame('2016-09-26 09:00:00', $previousTimeOpen->format('Y-m-d H:i:s'));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_determine_next_open_hours_from_edges_time()
     {
         $openingHours = OpeningHours::create([
@@ -549,7 +551,7 @@ class OpeningHoursTest extends TestCase
         $this->assertSame('2016-09-26 13:00:00', $previousTimeOpen->format('Y-m-d H:i:s'));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_determine_next_open_hours_from_mixed_structures()
     {
         $openingHours = OpeningHours::create([
@@ -653,7 +655,7 @@ class OpeningHoursTest extends TestCase
         $this->assertSame('2019-02-18 11:00:00', $nextTimeClose->format('Y-m-d H:i:s'));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_determine_next_open_hours_from_non_working_date_time_immutable()
     {
         $openingHours = OpeningHours::create([
@@ -672,7 +674,7 @@ class OpeningHoursTest extends TestCase
         $this->assertSame('2016-09-26 13:00:00', $nextTimeOpen->foo());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_determine_next_close_hours_from_non_working_date_time()
     {
         $ranges = [
@@ -721,7 +723,7 @@ class OpeningHoursTest extends TestCase
         $this->assertSame('09:00-18:00', strval($openingHours->forDate(new DateTime('2016-11-14'))));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_determine_next_close_hours_from_non_working_date_time_immutable()
     {
         $openingHours = OpeningHours::create([
@@ -734,7 +736,7 @@ class OpeningHoursTest extends TestCase
         $this->assertSame('2016-09-26 19:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_determine_next_open_hours_from_working_date_time()
     {
         $openingHours = OpeningHours::create([
@@ -748,7 +750,7 @@ class OpeningHoursTest extends TestCase
         $this->assertSame('2016-09-27 10:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_determine_next_open_hours_from_working_date_time_immutable()
     {
         $openingHours = OpeningHours::create([
@@ -762,7 +764,7 @@ class OpeningHoursTest extends TestCase
         $this->assertSame('2016-09-27 10:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_determine_next_close_hours_from_working_date_time()
     {
         $openingHours = OpeningHours::create([
@@ -776,7 +778,7 @@ class OpeningHoursTest extends TestCase
         $this->assertSame('2016-09-26 19:00:00', $nextTimeClose->format('Y-m-d H:i:s'));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_determine_next_close_hours_from_working_date_time_immutable()
     {
         $openingHours = OpeningHours::create([
@@ -790,7 +792,7 @@ class OpeningHoursTest extends TestCase
         $this->assertSame('2016-09-26 19:00:00', $nextTimeClose->format('Y-m-d H:i:s'));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_determine_next_open_hours_from_early_morning()
     {
         $openingHours = OpeningHours::create([
@@ -807,7 +809,7 @@ class OpeningHoursTest extends TestCase
         $this->assertSame('2016-09-27 10:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_determine_next_open_hours_from_early_morning_immutable()
     {
         $openingHours = OpeningHours::create([
@@ -824,7 +826,7 @@ class OpeningHoursTest extends TestCase
         $this->assertSame('2016-09-27 10:00:00', $nextTimeOpen->format('Y-m-d H:i:s'));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_determine_next_close_hours_from_early_morning()
     {
         $openingHours = OpeningHours::create([
@@ -841,7 +843,7 @@ class OpeningHoursTest extends TestCase
         $this->assertSame('2016-09-27 11:00:00', $nextClosedTime->format('Y-m-d H:i:s'));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_determine_next_close_hours_from_early_morning_immutable()
     {
         $openingHours = OpeningHours::create([
@@ -858,7 +860,7 @@ class OpeningHoursTest extends TestCase
         $this->assertSame('2016-09-27 11:00:00', $nextClosedTime->format('Y-m-d H:i:s'));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_set_the_timezone_on_the_openings_hours_object()
     {
         $openingHours = OpeningHours::create([
@@ -914,11 +916,8 @@ class OpeningHoursTest extends TestCase
         date_default_timezone_set($timezone);
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider timezones
-     */
+    #[Test]
+    #[DataProvider('timezones')]
     public function it_can_handle_timezone_for_date_string($timezone)
     {
         $openingHours = OpeningHours::create([
@@ -938,7 +937,7 @@ class OpeningHoursTest extends TestCase
         ];
     }
 
-    /** @test */
+    #[Test]
     public function it_can_determine_that_its_open_now()
     {
         $openingHours = OpeningHours::create([
@@ -954,7 +953,7 @@ class OpeningHoursTest extends TestCase
         $this->assertTrue($openingHours->isOpen());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_use_day_enum()
     {
         $openingHours = new class extends OpeningHours
@@ -970,7 +969,7 @@ class OpeningHoursTest extends TestCase
         $this->assertSame(['monday'], $openingHours->days);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_determine_that_its_closed_now()
     {
         $openingHours = OpeningHours::create([]);
@@ -978,7 +977,7 @@ class OpeningHoursTest extends TestCase
         $this->assertTrue($openingHours->isClosed());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_retrieve_regular_closing_days_as_strings()
     {
         $openingHours = OpeningHours::create([
@@ -994,7 +993,7 @@ class OpeningHoursTest extends TestCase
         $this->assertSame(['saturday', 'sunday'], $openingHours->regularClosingDays());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_retrieve_regular_closing_days_as_iso_numbers()
     {
         $openingHours = OpeningHours::create([
@@ -1010,7 +1009,7 @@ class OpeningHoursTest extends TestCase
         $this->assertSame([6, 7], $openingHours->regularClosingDaysISO());
     }
 
-    /** @test */
+    #[Test]
     public function it_can_retrieve_a_list_of_exceptional_closing_dates()
     {
         $openingHours = OpeningHours::create([
@@ -1027,7 +1026,7 @@ class OpeningHoursTest extends TestCase
         $this->assertSame('2017-06-02', $exceptionalClosingDates[1]->format('Y-m-d'));
     }
 
-    /** @test */
+    #[Test]
     public function it_works_when_starting_at_midnight()
     {
         $openingHours = OpeningHours::create([
@@ -1038,7 +1037,7 @@ class OpeningHoursTest extends TestCase
         $this->assertInstanceOf(DateTime::class, $nextTimeOpen);
     }
 
-    /** @test */
+    #[Test]
     public function it_works_when_starting_at_midnight_immutable()
     {
         $openingHours = OpeningHours::create([
@@ -1049,7 +1048,7 @@ class OpeningHoursTest extends TestCase
         $this->assertInstanceOf(DateTimeImmutable::class, $nextTimeOpen);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_set_the_timezone_on_construct_with_date_time_zone()
     {
         $openingHours = OpeningHours::create([
@@ -1067,7 +1066,7 @@ class OpeningHoursTest extends TestCase
         $this->assertCount(0, $openingHoursForWeek['sunday']);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_set_the_timezone_on_construct_with_string()
     {
         $openingHours = OpeningHours::create([
@@ -1085,7 +1084,7 @@ class OpeningHoursTest extends TestCase
         $this->assertCount(0, $openingHoursForWeek['sunday']);
     }
 
-    /** @test */
+    #[Test]
     public function it_throws_an_exception_on_invalid_timezone()
     {
         $this->expectException(InvalidArgumentException::class);
@@ -1096,7 +1095,7 @@ class OpeningHoursTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_throws_an_exception_on_limit_exceeded_void_array_next_open()
     {
         $this->expectException(MaximumLimitExceeded::class);
@@ -1105,7 +1104,7 @@ class OpeningHoursTest extends TestCase
         OpeningHours::create([])->nextOpen(new DateTime('2019-06-06 19:02:00'));
     }
 
-    /** @test */
+    #[Test]
     public function it_throws_an_exception_on_limit_exceeded_void_array_previous_open()
     {
         $this->expectException(MaximumLimitExceeded::class);
@@ -1114,7 +1113,7 @@ class OpeningHoursTest extends TestCase
         OpeningHours::create([])->previousOpen(new DateTime('2019-06-06 19:02:00'));
     }
 
-    /** @test */
+    #[Test]
     public function it_throws_an_exception_on_limit_exceeded_full_array_next_open()
     {
         $this->expectException(MaximumLimitExceeded::class);
@@ -1131,7 +1130,7 @@ class OpeningHoursTest extends TestCase
         ])->nextOpen(new DateTime('2019-06-06 19:02:00'));
     }
 
-    /** @test */
+    #[Test]
     public function it_throws_an_exception_on_limit_exceeded_full_array_previous_open()
     {
         $this->expectException(MaximumLimitExceeded::class);
@@ -1148,7 +1147,7 @@ class OpeningHoursTest extends TestCase
         ])->previousOpen(new DateTime('2019-06-06 19:02:00'));
     }
 
-    /** @test */
+    #[Test]
     public function it_throws_an_exception_on_limit_exceeded_full_array_next_open_with_exceptions()
     {
         $this->expectException(MaximumLimitExceeded::class);
@@ -1168,7 +1167,7 @@ class OpeningHoursTest extends TestCase
         ])->nextOpen(new DateTime('2019-06-06 19:02:00'));
     }
 
-    /** @test */
+    #[Test]
     public function it_throws_an_exception_on_search_limit_exceeded_with_next_open()
     {
         $this->expectException(SearchLimitReached::class);
@@ -1180,7 +1179,7 @@ class OpeningHoursTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_throws_an_exception_on_search_limit_exceeded_with_next_close()
     {
         $this->expectException(SearchLimitReached::class);
@@ -1192,7 +1191,7 @@ class OpeningHoursTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_throws_an_exception_on_search_limit_exceeded_with_previous_open()
     {
         $this->expectException(SearchLimitReached::class);
@@ -1204,7 +1203,7 @@ class OpeningHoursTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_throws_an_exception_on_search_limit_exceeded_with_previous_close()
     {
         $this->expectException(SearchLimitReached::class);
@@ -1216,7 +1215,7 @@ class OpeningHoursTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_stops_at_cap_limit_with_next_open()
     {
         $this->assertSame(
@@ -1229,7 +1228,7 @@ class OpeningHoursTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_stops_at_cap_limit_exceeded_with_next_close()
     {
         $this->assertSame(
@@ -1242,7 +1241,7 @@ class OpeningHoursTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_stops_at_cap_limit_with_previous_open()
     {
         $this->assertSame(
@@ -1255,7 +1254,7 @@ class OpeningHoursTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_stops_at_cap_limit_exceeded_with_previous_close()
     {
         $this->assertSame(
@@ -1268,7 +1267,7 @@ class OpeningHoursTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_throws_an_exception_on_limit_exceeded_void_array_next_close()
     {
         $this->expectException(MaximumLimitExceeded::class);
@@ -1277,7 +1276,7 @@ class OpeningHoursTest extends TestCase
         OpeningHours::create([])->nextClose(new DateTime('2019-06-06 19:02:00'));
     }
 
-    /** @test */
+    #[Test]
     public function it_throws_an_exception_on_limit_exceeded_void_array_previous_close()
     {
         $this->expectException(MaximumLimitExceeded::class);
@@ -1286,7 +1285,7 @@ class OpeningHoursTest extends TestCase
         OpeningHours::create([])->previousClose(new DateTime('2019-06-06 19:02:00'));
     }
 
-    /** @test */
+    #[Test]
     public function it_throws_an_exception_on_limit_exceeded_full_array_next_close()
     {
         $this->expectException(MaximumLimitExceeded::class);
@@ -1303,7 +1302,7 @@ class OpeningHoursTest extends TestCase
         ])->nextClose(new DateTime('2019-06-06 19:02:00'));
     }
 
-    /** @test */
+    #[Test]
     public function it_throws_an_exception_on_limit_exceeded_full_array_previous_close()
     {
         $this->expectException(MaximumLimitExceeded::class);
@@ -1320,7 +1319,7 @@ class OpeningHoursTest extends TestCase
         ])->previousClose(new DateTime('2019-06-06 19:02:00'));
     }
 
-    /** @test */
+    #[Test]
     public function it_should_handle_far_exception()
     {
         $this->assertSame('2019-12-25 00:00:00', OpeningHours::create([
@@ -1337,7 +1336,7 @@ class OpeningHoursTest extends TestCase
         ])->nextClose(new DateTime('2019-06-06 19:02:00'))->format('Y-m-d H:i:s'));
     }
 
-    /** @test */
+    #[Test]
     public function it_should_handle_very_far_future_exception_by_changing_limit()
     {
         $openingHours = OpeningHours::create([
@@ -1357,7 +1356,7 @@ class OpeningHoursTest extends TestCase
         $this->assertSame('2022-12-25 00:00:00', $openingHours->nextClose(new DateTime('2019-06-06 19:02:00'))->format('Y-m-d H:i:s'));
     }
 
-    /** @test */
+    #[Test]
     public function it_should_handle_very_far_past_exception_by_changing_limit()
     {
         $openingHours = OpeningHours::create([
@@ -1377,7 +1376,7 @@ class OpeningHoursTest extends TestCase
         $this->assertSame('2013-12-26 00:00:00', $openingHours->previousOpen(new DateTime('2019-06-06 19:02:00'))->format('Y-m-d H:i:s'));
     }
 
-    /** @test */
+    #[Test]
     public function it_should_handle_open_range()
     {
         $openingHours = OpeningHours::create([
@@ -1423,7 +1422,7 @@ class OpeningHoursTest extends TestCase
         $this->assertSame('2020-09-22 02:30', $range->end()->date()->format('Y-m-d H:i'));
     }
 
-    /** @test */
+    #[Test]
     public function it_should_handle_open_start_date_time()
     {
         $openingHours = OpeningHours::create([
@@ -1448,7 +1447,7 @@ class OpeningHoursTest extends TestCase
         $this->assertSame('2019-07-17 07:00:00', $openingHours->currentOpenRangeStart(new DateTime('2019-07-17 07:59:59'))->format('Y-m-d H:i:s'));
     }
 
-    /** @test */
+    #[Test]
     public function it_should_handle_open_end_date_time()
     {
         $openingHours = OpeningHours::create([
@@ -1473,7 +1472,7 @@ class OpeningHoursTest extends TestCase
         $this->assertSame('2019-07-17 10:00:00', $openingHours->currentOpenRangeEnd(new DateTime('2019-07-17 07:59:59'))->format('Y-m-d H:i:s'));
     }
 
-    /** @test */
+    #[Test]
     public function it_should_support_empty_arrays_with_merge()
     {
         $hours = OpeningHours::createAndMergeOverlappingRanges(
@@ -1498,7 +1497,7 @@ class OpeningHoursTest extends TestCase
         $this->assertTrue($hours->isClosedAt(new DateTimeImmutable('2020-01-01')));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_calculate_time_diff()
     {
         $openingHours = OpeningHours::create([

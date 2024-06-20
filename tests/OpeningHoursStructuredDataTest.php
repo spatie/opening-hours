@@ -3,12 +3,13 @@
 namespace Spatie\OpeningHours\Test;
 
 use DateTimeZone;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Spatie\OpeningHours\OpeningHours;
 
 class OpeningHoursStructuredDataTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_can_render_opening_hours_as_an_array_of_structured_data()
     {
         $openingHours = OpeningHours::create([
