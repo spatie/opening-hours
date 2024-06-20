@@ -4,6 +4,7 @@ namespace Spatie\OpeningHours\Test;
 
 use DateTime;
 use DateTimeImmutable;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Spatie\OpeningHours\Day;
 use Spatie\OpeningHours\Exceptions\InvalidDate;
@@ -14,7 +15,7 @@ use Spatie\OpeningHours\TimeRange;
 
 class OpeningHoursFillTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_fills_opening_hours()
     {
         $openingHours = OpeningHours::create([
@@ -49,7 +50,7 @@ class OpeningHoursFillTest extends TestCase
         $this->assertCount(0, $openingHours->forDate(new DateTimeImmutable('2016-09-26 11:00:00')));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_map_week_with_a_callback()
     {
         $openingHours = OpeningHours::create([
@@ -76,7 +77,7 @@ class OpeningHoursFillTest extends TestCase
         }));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_map_exceptions_with_a_callback()
     {
         $openingHours = OpeningHours::create([
@@ -99,7 +100,7 @@ class OpeningHoursFillTest extends TestCase
         }));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_handle_empty_input()
     {
         $openingHours = OpeningHours::create([]);
@@ -109,7 +110,7 @@ class OpeningHoursFillTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function it_handles_day_names_in_a_case_insensitive_manner()
     {
         $openingHours = OpeningHours::create([
@@ -125,7 +126,7 @@ class OpeningHoursFillTest extends TestCase
         $this->assertSame((string) $openingHours->forDay('Monday')[0], '09:00-18:00');
     }
 
-    /** @test */
+    #[Test]
     public function it_will_throw_an_exception_when_using_an_invalid_day_name()
     {
         $this->expectExceptionObject(InvalidDayName::invalidDayName('mmmmonday'));
@@ -133,7 +134,7 @@ class OpeningHoursFillTest extends TestCase
         OpeningHours::create(['mmmmonday' => ['09:00-18:00']]);
     }
 
-    /** @test */
+    #[Test]
     public function it_will_throw_an_exception_when_using_an_invalid_exception_date()
     {
         $this->expectException(InvalidDate::class);
@@ -145,7 +146,7 @@ class OpeningHoursFillTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function it_store_meta_data()
     {
         $hours = OpeningHours::create([
@@ -223,7 +224,7 @@ class OpeningHoursFillTest extends TestCase
         $this->assertSame('Extra on Tuesday evening', $hours->forDay('tuesday')[2]->data);
     }
 
-    /** @test */
+    #[Test]
     public function it_handle_filters()
     {
         $typicalDay = [
@@ -276,7 +277,7 @@ class OpeningHoursFillTest extends TestCase
         $this->assertSame('Month equals day', $hours->forDate(new DateTimeImmutable('2018-12-12'))->data);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_merge_ranges_on_explicitly_create_from_overlapping_ranges()
     {
         $hours = OpeningHours::createAndMergeOverlappingRanges([
@@ -313,7 +314,7 @@ class OpeningHoursFillTest extends TestCase
         ], $dump['tuesday']);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_merge_ranges_including_explicit_24_00()
     {
         $hours = OpeningHours::createAndMergeOverlappingRanges([
@@ -332,7 +333,7 @@ class OpeningHoursFillTest extends TestCase
         ], $dump);
     }
 
-    /** @test */
+    #[Test]
     public function it_should_reorder_ranges()
     {
         $hours = OpeningHours::createAndMergeOverlappingRanges([
