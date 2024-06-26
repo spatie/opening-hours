@@ -5,12 +5,13 @@ namespace Spatie\OpeningHours\Test;
 use DateTimeImmutable;
 use DateTimeZone;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Spatie\OpeningHours\PreciseTime;
 
 class PreciseTimeTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_can_be_formatted()
     {
         $date = new DateTimeImmutable('2022-08-07 23:32:58.123456 America/Toronto');
@@ -24,7 +25,7 @@ class PreciseTimeTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_can_return_original_datetime()
     {
         $date = new DateTimeImmutable('2022-08-07 23:32:58.123456 America/Toronto');
@@ -34,7 +35,7 @@ class PreciseTimeTest extends TestCase
         )->format('Y-m-d H:i:s'.(PHP_VERSION < 7.1 ? '' : '.u').' e'));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_return_diff()
     {
         $date = new DateTimeImmutable('2021-08-07 23:32:58.123456 America/Toronto');
@@ -46,7 +47,7 @@ class PreciseTimeTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function it_can_be_compared()
     {
         $date = new DateTimeImmutable('2022-08-07 23:32:58.123456 America/Toronto');
@@ -63,7 +64,7 @@ class PreciseTimeTest extends TestCase
         )));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_output_hours_and_minutes()
     {
         $date = PreciseTime::fromString('2022-08-07 23:32:58.123456 America/Toronto');
@@ -71,7 +72,7 @@ class PreciseTimeTest extends TestCase
         $this->assertSame(32, $date->minutes());
     }
 
-    /** @test */
+    #[Test]
     public function it_cannot_have_date_reference_point()
     {
         $this->expectExceptionObject(new InvalidArgumentException(

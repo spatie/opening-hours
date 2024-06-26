@@ -4,13 +4,14 @@ namespace Spatie\OpeningHours\Test;
 
 use DateTimeImmutable;
 use DateTimeZone;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Spatie\OpeningHours\Exceptions\InvalidDateTimeClass;
 use Spatie\OpeningHours\OpeningHours;
 
 class OpeningHoursCustomClassTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_can_use_immutable_date_time()
     {
         $openingHours = OpeningHours::create([
@@ -24,7 +25,7 @@ class OpeningHoursCustomClassTest extends TestCase
         $this->assertSame('2021-10-11 09:00:00', $date->format('Y-m-d H:i:s'));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_use_timezones()
     {
         $openingHours = OpeningHours::create([
@@ -103,7 +104,7 @@ class OpeningHoursCustomClassTest extends TestCase
         $this->assertSame('2022-08-01 03:00:00 America/New_York', $date->format('Y-m-d H:i:s e'));
     }
 
-    /** @test */
+    #[Test]
     public function it_can_use_mocked_time()
     {
         $mock1 = new class extends DateTimeImmutable
@@ -136,7 +137,7 @@ class OpeningHoursCustomClassTest extends TestCase
         $this->assertTrue($openingHours->isOpen());
     }
 
-    /** @test */
+    #[Test]
     public function it_should_refuse_invalid_date_time_class()
     {
         $this->expectException(InvalidDateTimeClass::class);

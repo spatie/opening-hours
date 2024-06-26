@@ -4,13 +4,14 @@ namespace Spatie\OpeningHours\Test;
 
 use DateTime;
 use DateTimeImmutable;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Spatie\OpeningHours\OpeningHours;
 use Spatie\OpeningHours\TimeRange;
 
 class OpeningHoursOverflowTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function it_fills_opening_hours_with_overflow()
     {
         $openingHours = OpeningHours::create([
@@ -22,7 +23,7 @@ class OpeningHoursOverflowTest extends TestCase
         $this->assertSame((string) $openingHours->forDay('monday')[0], '09:00-02:00');
     }
 
-    /** @test */
+    #[Test]
     public function check_open_with_overflow()
     {
         $openingHours = OpeningHours::create([
@@ -60,7 +61,7 @@ class OpeningHoursOverflowTest extends TestCase
         $this->assertTrue($openingHours->isOpenAt($shouldBeOpen));
     }
 
-    /** @test */
+    #[Test]
     public function check_open_with_overflow_immutable()
     {
         $openingHours = OpeningHours::create([
@@ -72,7 +73,7 @@ class OpeningHoursOverflowTest extends TestCase
         $this->assertTrue($openingHours->isOpenAt($shouldBeOpen));
     }
 
-    /** @test */
+    #[Test]
     public function next_close_with_overflow()
     {
         $openingHours = OpeningHours::create([
@@ -84,7 +85,7 @@ class OpeningHoursOverflowTest extends TestCase
         $this->assertSame('2019-04-23 02:00:00', $openingHours->nextClose($shouldBeOpen)->format('Y-m-d H:i:s'));
     }
 
-    /** @test */
+    #[Test]
     public function next_close_with_overflow_immutable()
     {
         $openingHours = OpeningHours::create([
@@ -141,7 +142,7 @@ class OpeningHoursOverflowTest extends TestCase
         $this->assertSame('2019-04-22 02:00:00', $previousTimeOpen);
     }
 
-    /** @test */
+    #[Test]
     public function previous_open_and_close_with_overflow_immutable()
     {
         $openingHours = OpeningHours::create([
@@ -155,7 +156,7 @@ class OpeningHoursOverflowTest extends TestCase
         $this->assertSame('2024-06-11 05:00', $openingHours->previousClose($tuesday)->format('Y-m-d H:i'));
     }
 
-    /** @test */
+    #[Test]
     public function overflow_on_simple_ranges()
     {
         //Tuesday 4th of June 2019, 11.35 am
