@@ -2,7 +2,6 @@
 
 namespace Spatie\OpeningHours\Helpers;
 
-use Spatie\OpeningHours\PreciseTime;
 use Spatie\OpeningHours\Time;
 use Spatie\OpeningHours\TimeRange;
 
