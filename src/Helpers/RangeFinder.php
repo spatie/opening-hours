@@ -44,7 +44,7 @@ trait RangeFinder
 
     protected function findPreviousRangeInFreeTime(Time $time, TimeRange $timeRange): ?TimeRange
     {
-        return $time->isAfter($timeRange->end()) ? $timeRange : null;
+        return $time->isAfter($timeRange->end()) && $time->isAfter($timeRange->start()) ? $timeRange : null;
     }
 
     protected function findPreviousOpenInFreeTime(Time $time, TimeRange $timeRange): ?Time

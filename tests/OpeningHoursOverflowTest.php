@@ -143,6 +143,20 @@ class OpeningHoursOverflowTest extends TestCase
     }
 
     #[Test]
+    public function previous_open_and_close_with_overflow_immutable()
+    {
+        $openingHours = OpeningHours::create([
+            'overflow' => true,
+            'monday' => ['18:00-05:00'],
+            'tuesday' => ['18:00-05:00'],
+        ]);
+        $tuesday = new DateTime('2024-06-11 06:00:00');
+
+        $this->assertSame('2024-06-10 18:00', $openingHours->previousOpen($tuesday)->format('Y-m-d H:i'));
+        $this->assertSame('2024-06-11 05:00', $openingHours->previousClose($tuesday)->format('Y-m-d H:i'));
+    }
+
+    #[Test]
     public function overflow_on_simple_ranges()
     {
         //Tuesday 4th of June 2019, 11.35 am
