@@ -122,11 +122,11 @@ final class OpeningHoursSpecificationParser
         mixed $opens,
         mixed $closes,
     ): void {
-        if (! preg_match('/^\d{4}-\d{2}-\d{2}$/', $validFrom)) {
+        if (! preg_match('/^(?:\d{4}-)?\d{2}-\d{2}$/', $validFrom)) {
             throw new InvalidOpeningHoursSpecification('Invalid validFrom date');
         }
 
-        if (! preg_match('/^\d{4}-\d{2}-\d{2}$/', $validThrough)) {
+        if (! preg_match('/^(?:\d{4}-)?\d{2}-\d{2}$/', $validThrough)) {
             throw new InvalidOpeningHoursSpecification('Invalid validThrough date');
         }
 
