@@ -188,6 +188,222 @@ class OpeningHoursSpecificationParserTest extends TestCase
         $this->assertSame('', (string) $openingHours->forDay(Day::MONDAY));
     }
 
+    public function testCreateFromPreviousExport(): void
+    {
+        $timetable = OpeningHours::create([
+            'monday' => ['09:00-12:00', '13:00-18:00'],
+            'tuesday' => ['09:00-12:00', '13:00-18:00'],
+            'wednesday' => ['09:00-12:00'],
+            'thursday' => ['09:00-12:00', '13:00-18:00'],
+            'friday' => ['09:00-12:00', '13:00-20:00'],
+            'saturday' => ['09:00-12:00', '13:00-16:00'],
+            'sunday' => [],
+            'exceptions' => [
+                '2016-11-11' => ['09:00-12:00'],
+                '2016-12-25' => [],
+                '01-01' => [],                // Recurring on each 1st of January
+                '12-25' => ['09:00-12:00'],   // Recurring on each 25th of December
+            ],
+        ]);
+
+        $array = $timetable->asStructuredData();
+        self::assertSame([
+            [
+                '@type' => 'OpeningHoursSpecification',
+                'dayOfWeek' => 'Monday',
+                'opens' => '09:00',
+                'closes' => '12:00',
+            ],
+            [
+                '@type' => 'OpeningHoursSpecification',
+                'dayOfWeek' => 'Monday',
+                'opens' => '13:00',
+                'closes' => '18:00',
+            ],
+            [
+                '@type' => 'OpeningHoursSpecification',
+                'dayOfWeek' => 'Tuesday',
+                'opens' => '09:00',
+                'closes' => '12:00',
+            ],
+            [
+                '@type' => 'OpeningHoursSpecification',
+                'dayOfWeek' => 'Tuesday',
+                'opens' => '13:00',
+                'closes' => '18:00',
+            ],
+            [
+                '@type' => 'OpeningHoursSpecification',
+                'dayOfWeek' => 'Wednesday',
+                'opens' => '09:00',
+                'closes' => '12:00',
+            ],
+            [
+                '@type' => 'OpeningHoursSpecification',
+                'dayOfWeek' => 'Thursday',
+                'opens' => '09:00',
+                'closes' => '12:00',
+            ],
+            [
+                '@type' => 'OpeningHoursSpecification',
+                'dayOfWeek' => 'Thursday',
+                'opens' => '13:00',
+                'closes' => '18:00',
+            ],
+            [
+                '@type' => 'OpeningHoursSpecification',
+                'dayOfWeek' => 'Friday',
+                'opens' => '09:00',
+                'closes' => '12:00',
+            ],
+            [
+                '@type' => 'OpeningHoursSpecification',
+                'dayOfWeek' => 'Friday',
+                'opens' => '13:00',
+                'closes' => '20:00',
+            ],
+            [
+                '@type' => 'OpeningHoursSpecification',
+                'dayOfWeek' => 'Saturday',
+                'opens' => '09:00',
+                'closes' => '12:00',
+            ],
+            [
+                '@type' => 'OpeningHoursSpecification',
+                'dayOfWeek' => 'Saturday',
+                'opens' => '13:00',
+                'closes' => '16:00',
+            ],
+            [
+                '@type' => 'OpeningHoursSpecification',
+                'opens' => '09:00',
+                'closes' => '12:00',
+                'validFrom' => '2016-11-11',
+                'validThrough' => '2016-11-11',
+            ],
+            [
+                '@type' => 'OpeningHoursSpecification',
+                'opens' => '00:00',
+                'closes' => '00:00',
+                'validFrom' => '2016-12-25',
+                'validThrough' => '2016-12-25',
+            ],
+            [
+                '@type' => 'OpeningHoursSpecification',
+                'opens' => '00:00',
+                'closes' => '00:00',
+                'validFrom' => '01-01',
+                'validThrough' => '01-01',
+            ],
+            [
+                '@type' => 'OpeningHoursSpecification',
+                'opens' => '09:00',
+                'closes' => '12:00',
+                'validFrom' => '12-25',
+                'validThrough' => '12-25',
+            ],
+        ], $array);
+
+        $newOpeningHours = OpeningHours::createFromStructuredData($array);
+
+        self::assertSame([
+            [
+                '@type' => 'OpeningHoursSpecification',
+                'dayOfWeek' => 'Monday',
+                'opens' => '09:00',
+                'closes' => '12:00',
+            ],
+            [
+                '@type' => 'OpeningHoursSpecification',
+                'dayOfWeek' => 'Monday',
+                'opens' => '13:00',
+                'closes' => '18:00',
+            ],
+            [
+                '@type' => 'OpeningHoursSpecification',
+                'dayOfWeek' => 'Tuesday',
+                'opens' => '09:00',
+                'closes' => '12:00',
+            ],
+            [
+                '@type' => 'OpeningHoursSpecification',
+                'dayOfWeek' => 'Tuesday',
+                'opens' => '13:00',
+                'closes' => '18:00',
+            ],
+            [
+                '@type' => 'OpeningHoursSpecification',
+                'dayOfWeek' => 'Wednesday',
+                'opens' => '09:00',
+                'closes' => '12:00',
+            ],
+            [
+                '@type' => 'OpeningHoursSpecification',
+                'dayOfWeek' => 'Thursday',
+                'opens' => '09:00',
+                'closes' => '12:00',
+            ],
+            [
+                '@type' => 'OpeningHoursSpecification',
+                'dayOfWeek' => 'Thursday',
+                'opens' => '13:00',
+                'closes' => '18:00',
+            ],
+            [
+                '@type' => 'OpeningHoursSpecification',
+                'dayOfWeek' => 'Friday',
+                'opens' => '09:00',
+                'closes' => '12:00',
+            ],
+            [
+                '@type' => 'OpeningHoursSpecification',
+                'dayOfWeek' => 'Friday',
+                'opens' => '13:00',
+                'closes' => '20:00',
+            ],
+            [
+                '@type' => 'OpeningHoursSpecification',
+                'dayOfWeek' => 'Saturday',
+                'opens' => '09:00',
+                'closes' => '12:00',
+            ],
+            [
+                '@type' => 'OpeningHoursSpecification',
+                'dayOfWeek' => 'Saturday',
+                'opens' => '13:00',
+                'closes' => '16:00',
+            ],
+            [
+                '@type' => 'OpeningHoursSpecification',
+                'opens' => '09:00',
+                'closes' => '12:00',
+                'validFrom' => '2016-11-11',
+                'validThrough' => '2016-11-11',
+            ],
+            [
+                '@type' => 'OpeningHoursSpecification',
+                'opens' => '00:00',
+                'closes' => '00:00',
+                'validFrom' => '2016-12-25',
+                'validThrough' => '2016-12-25',
+            ],
+            [
+                '@type' => 'OpeningHoursSpecification',
+                'opens' => '00:00',
+                'closes' => '00:00',
+                'validFrom' => '01-01',
+                'validThrough' => '01-01',
+            ],
+            [
+                '@type' => 'OpeningHoursSpecification',
+                'opens' => '09:00',
+                'closes' => '12:00',
+                'validFrom' => '12-25',
+                'validThrough' => '12-25',
+            ],
+        ], $newOpeningHours->asStructuredData());
+    }
+
     public function testInvalidJson(): void
     {
         self::expectExceptionObject(new InvalidOpeningHoursSpecification(
