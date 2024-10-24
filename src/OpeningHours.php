@@ -504,7 +504,7 @@ class OpeningHours
             $this->isOpenAt($this->copyAndModify($dateTime, '-1 second'))
         ) {
             return $this->getDateWithTimezone(
-                $this->nextOpen($dateTime->modify('+1 minute')),
+                $this->nextOpen($dateTime->modify('+1 second')),
                 $outputTimezone
             );
         }
