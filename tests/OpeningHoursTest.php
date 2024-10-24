@@ -8,6 +8,7 @@ use DateTimeZone;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Spatie\OpeningHours\Day;
 use Spatie\OpeningHours\Exceptions\InvalidDateRange;
@@ -1646,5 +1647,42 @@ class OpeningHoursTest extends TestCase
                 '11-10 to 11-12' => ['07:00-10:00'],
             ],
         ]);
+    }
+
+    #[TestWith([true])]
+    #[TestWith([false])]
+    public function testFirstDayMinuteOpenEveryDay(bool $overflow)
+    {
+        $config = [
+            'monday' => ['00:01-00:00'],
+            'tuesday' => ['00:01-00:00'],
+            'wednesday' => ['00:01-00:00'],
+            'thursday' => ['00:01-00:00'],
+            'friday' => ['00:01-00:00'],
+            'saturday' => ['00:01-00:00'],
+            'sunday' => ['00:01-00:00'],
+            'overflow' => $overflow,
+        ];
+        $openingHoursObject = OpeningHours::create($config);
+
+        $nextOpen = $openingHoursObject->nextOpen(new DateTimeImmutable('2024-10-22 00:00:00'));
+
+        $this->assertSame('2024-10-22 00:01:00.000000', $nextOpen->format('Y-m-d H:i:s.u'));
+
+        $nextOpen = $openingHoursObject->nextOpen(new DateTimeImmutable('2024-10-22 00:00:30'));
+
+        $this->assertSame('2024-10-22 00:01:00.000000', $nextOpen->format('Y-m-d H:i:s.u'));
+
+        $nextOpen = $openingHoursObject->nextOpen(new DateTimeImmutable('2024-10-22 00:01:00'));
+
+        $this->assertSame('2024-10-23 00:01:00.000000', $nextOpen->format('Y-m-d H:i:s.u'));
+
+        $nextOpen = $openingHoursObject->nextOpen(new DateTimeImmutable('2024-10-22 00:01:00'));
+
+        $this->assertSame('2024-10-23 00:01:00.000000', $nextOpen->format('Y-m-d H:i:s.u'));
+
+        $nextOpen = $openingHoursObject->nextOpen(new DateTimeImmutable('2024-10-22 23:59:59.999999'));
+
+        $this->assertSame('2024-10-23 00:01:00.000000', $nextOpen->format('Y-m-d H:i:s.u'));
     }
 }
