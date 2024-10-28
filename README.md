@@ -467,7 +467,6 @@ Set `$cap` to a date so if no open time can be found before this moment, `$cap` 
 ```php
 $openingHours->nextOpen(new DateTime('2016-12-24 11:00:00'));
 ```
-`
 
 #### `OpeningHours::nextClose`
 
@@ -486,6 +485,11 @@ If a `DateTimeImmutable` object is passed, a `DateTimeImmutable` object is retur
 Set `$searchUntil` to a date to throw an exception if no closed time can be found before this moment.
 
 Set `$cap` to a date so if no closed time can be found before this moment, `$cap` is returned.
+
+If the schedule is always open or always closed, there is no state change to found and therefore
+`nextOpen` (but also `previousOpen`, `nextClose` and `previousClose`) will throw a `MaximumLimitExceeded`
+You can catch it and react accordingly or you can use `isAlwaysOpen` / `isAlwaysClosed` methods
+to anticipate such case.
 
 ```php
 $openingHours->nextClose(new DateTime('2016-12-24 11:00:00'));
