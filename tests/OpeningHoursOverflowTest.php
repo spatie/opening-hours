@@ -177,4 +177,48 @@ class OpeningHoursOverflowTest extends TestCase
         $this->assertFalse($openWithOverflow->isOpenAt($time));
         $this->assertFalse($openWithoutOverflow->isOpenAt($time));
     }
+
+    #[Test]
+    public function overflow_next_close()
+    {
+        $openingHours = OpeningHours::create([
+            'overflow' => true,
+            'monday' => ['18:00-05:00'], // 2024-11-11
+            'tuesday' => ['17:00-06:00'], // 2024-11-12
+        ]);
+
+        $nextClose = $openingHours->nextClose(new DateTime('2024-11-12 04:00:00'));
+
+        $this->assertSame('2024-11-12 05:00', $nextClose->format('Y-m-d H:i'));
+
+        $nextClose = $openingHours->nextClose(new DateTime('2024-11-12 05:30:00'));
+
+        $this->assertSame('2024-11-13 06:00', $nextClose->format('Y-m-d H:i'));
+
+        $nextClose = $openingHours->nextClose(new DateTime('2024-11-12 05:30:00'));
+
+        $openingHours = OpeningHours::create([
+            'overflow' => true,
+            'monday' => ['18:00-05:00'], // 2024-11-11
+            'tuesday' => ['05:40-05:50', '17:00-06:00'], // 2024-11-12
+        ]);
+
+        $nextClose = $openingHours->nextClose(new DateTime('2024-11-12 05:30:00'));
+
+        $this->assertSame('2024-11-12 05:50', $nextClose->format('Y-m-d H:i'));
+
+        $openingHours = OpeningHours::create([
+            'overflow' => true,
+            'monday' => ['18:00-22:00', '23:00-05:00'], // 2024-11-11
+            'tuesday' => ['17:00-06:00'], // 2024-11-12
+        ]);
+
+        $nextClose = $openingHours->nextClose(new DateTime('2024-11-11 23:30:00'));
+
+        $this->assertSame('2024-11-12 05:00', $nextClose->format('Y-m-d H:i'));
+
+        $nextClose = $openingHours->nextClose(new DateTime('2024-11-12 04:00:00'));
+
+        $this->assertSame('2024-11-12 05:00', $nextClose->format('Y-m-d H:i'));
+    }
 }

@@ -45,7 +45,7 @@ readonly class Time implements TimeDataContainer
         return $this->minutes;
     }
 
-    public function date(): DateTimeInterface
+    public function date(): ?DateTimeInterface
     {
         return $this->date;
     }
