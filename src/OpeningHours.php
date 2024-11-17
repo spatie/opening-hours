@@ -525,6 +525,12 @@ class OpeningHours
         $outputTimezone = $this->getOutputTimezone($dateTime);
         $dateTime = $this->applyTimezone($dateTime ?? new $this->dateTimeClass());
         $dateTime = $this->copyDateTime($dateTime);
+        $openRangeEnd = $this->currentOpenRange($dateTime)?->end();
+
+        if ($openRangeEnd && $openRangeEnd->hours() < 24) {
+            return $openRangeEnd->date() ?? $openRangeEnd->toDateTime($dateTime);
+        }
+
         $nextClose = null;
 
         if ($this->overflow) {
@@ -541,7 +547,14 @@ class OpeningHours
         if (! $nextClose) {
             $nextClose = $openingHoursForDay->nextClose(PreciseTime::fromDateTime($dateTime));
 
-            if ($nextClose && $nextClose->hours() < 24 && $nextClose->format('Gi') < $dateTime->format('Gi')) {
+            if (
+                $nextClose
+                && $nextClose->hours() < 24
+                && (
+                    $nextClose->format('Gi') < $dateTime->format('Gi')
+                    || ($this->isClosedAt($dateTime) && $this->nextOpen($dateTime)->format('Gi') > $nextClose->format('Gi'))
+                )
+            ) {
                 $dateTime = $dateTime->modify('+1 day');
             }
         }
