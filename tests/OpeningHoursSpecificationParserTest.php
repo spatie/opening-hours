@@ -104,11 +104,69 @@ class OpeningHoursSpecificationParserTest extends TestCase
         );
     }
 
-    public function testEmptySpecs(): void
+    public function testIsAlwaysClosedWithUndefinedOpeningHoursAndUndefinedExceptions(): void
     {
         $openingHours = OpeningHours::createFromStructuredData([]);
 
         $this->assertTrue($openingHours->isAlwaysClosed());
+    }
+
+    public function testIsAlwaysClosedWithEmptyOpeningHoursAndEmptyExceptions(): void
+    {
+        $openingHours = OpeningHours::create([
+            'Monday' => [],
+            'Tuesday' => [],
+            'Wednesday' => [],
+            'Thursday' => [],
+            'Friday' => [],
+            'Saturday' => [],
+            'Sunday' => [],
+            'exceptions' => [
+                '2023-12-24' => [],
+            ],
+        ]);
+
+        $this->assertTrue($openingHours->isAlwaysClosed());
+    }
+
+    public function testIsAlwaysOpenWithUndefinedOpeningHoursAndUndefinedExceptions(): void
+    {
+        $openingHours = OpeningHours::createFromStructuredData([]);
+
+        $this->assertFalse($openingHours->isAlwaysOpen());
+    }
+
+    public function testIsAlwaysOpenWithFilledOpeningHoursAndFilledExceptions(): void
+    {
+        $openingHours = OpeningHours::create([
+            'Monday' => ['00:00-24:00'],
+            'Tuesday' => ['00:00-24:00'],
+            'Wednesday' => ['00:00-24:00'],
+            'Thursday' => ['00:00-24:00'],
+            'Friday' => ['00:00-24:00'],
+            'Saturday' => ['00:00-24:00'],
+            'Sunday' => ['00:00-24:00'],
+            'exceptions' => [
+                '2023-12-24' => ['00:00-24:00'],
+            ],
+        ]);
+
+        $this->assertTrue($openingHours->isAlwaysOpen());
+    }
+
+    public function testIsAlwaysOpenWithFilledOpeningHoursAndUndefinedExceptions()
+    {
+        $openingHours = OpeningHours::create([
+            'Monday' => ['00:00-24:00'],
+            'Tuesday' => ['00:00-24:00'],
+            'Wednesday' => ['00:00-24:00'],
+            'Thursday' => ['00:00-24:00'],
+            'Friday' => ['00:00-24:00'],
+            'Saturday' => ['00:00-24:00'],
+            'Sunday' => ['00:00-24:00'],
+        ]);
+
+        $this->assertTrue($openingHours->isAlwaysOpen());
     }
 
     public function testRangeOverNight(): void

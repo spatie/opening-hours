@@ -935,6 +935,14 @@ class OpeningHours
         return Arr::filter($this->exceptions, $callback);
     }
 
+    /** Checks that all exceptions match a given condition */
+    public function everyExceptions(callable $callback): bool
+    {
+        return $this->filterExceptions(
+            static fn (OpeningHoursForDay $day) => ! $callback($day),
+        ) === [];
+    }
+
     public function mapExceptions(callable $callback): array
     {
         return Arr::map($this->exceptions, $callback);
@@ -999,16 +1007,22 @@ class OpeningHours
 
     public function isAlwaysClosed(): bool
     {
-        return $this->exceptions === [] && $this->filters === [] && $this->every(
-            static fn (OpeningHoursForDay $day) => $day->isEmpty(),
-        );
+        $isAlwaysClosedCallback = static fn (OpeningHoursForDay $day) => $day->isEmpty();
+        $allExceptionsAlwaysClosed = $this->everyExceptions($isAlwaysClosedCallback);
+        $allOpeningHoursAlwaysClosed = $this->every($isAlwaysClosedCallback);
+        $noFiltersApplied = $this->filters === [];
+
+        return $allExceptionsAlwaysClosed && $noFiltersApplied && $allOpeningHoursAlwaysClosed;
     }
 
     public function isAlwaysOpen(): bool
     {
-        return $this->exceptions === [] && $this->filters === [] && $this->every(
-            static fn (OpeningHoursForDay $day) => ((string) $day) === '00:00-24:00',
-        );
+        $isAlwaysOpenCallback = static fn (OpeningHoursForDay $day) => ((string) $day) === '00:00-24:00';
+        $allExceptionsAlwaysOpen = $this->everyExceptions($isAlwaysOpenCallback);
+        $allOpeningHoursAlwaysOpen = $this->every($isAlwaysOpenCallback);
+        $noFiltersApplied = $this->filters === [];
+
+        return $allExceptionsAlwaysOpen && $noFiltersApplied && $allOpeningHoursAlwaysOpen;
     }
 
     private static function filterHours(array $data, array $excludedKeys): Generator
