@@ -80,7 +80,7 @@ readonly class Time implements TimeDataContainer
         return $this->toDateTime()->diff($time->toDateTime());
     }
 
-    public function toDateTime(DateTimeInterface $date = null): DateTimeInterface
+    public function toDateTime(?DateTimeInterface $date = null): DateTimeInterface
     {
         $date = $date ? $this->copyDateTime($date) : new DateTime('1970-01-01 00:00:00');
 
