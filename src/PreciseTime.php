@@ -66,7 +66,7 @@ readonly class PreciseTime extends Time
         return $this->toDateTime()->diff($time->toDateTime());
     }
 
-    public function toDateTime(DateTimeInterface $date = null): DateTimeInterface
+    public function toDateTime(?DateTimeInterface $date = null): DateTimeInterface
     {
         return $date
             ? $this->copyDateTime($date)->modify($this->format('H:i:s.u'))
