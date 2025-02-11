@@ -315,6 +315,32 @@ class OpeningHoursFillTest extends TestCase
     }
 
     #[Test]
+    public function it_should_merge_ranges_and_keep_date_time_class()
+    {
+        $hours = OpeningHours::createAndMergeOverlappingRanges([
+            'dateTimeClass' => DateTimeImmutable::class,
+            'monday' => [
+                '08:00-12:00',
+                '08:00-12:00',
+                '11:30-13:30',
+                '13:00-18:00',
+            ],
+            'tuesday' => [
+                '08:00-12:00',
+                '11:30-13:30',
+                '15:00-18:00',
+                '16:00-17:00',
+                '19:00-20:00',
+                '20:00-21:00',
+            ],
+        ]);
+        $date = $hours->nextOpen(new DateTimeImmutable('2018-12-03'));
+        $this->assertInstanceOf(DateTimeImmutable::class, $date);
+
+        $this->assertSame('2018-12-03 08:00', $date->format('Y-m-d H:i'));
+    }
+
+    #[Test]
     public function it_should_merge_ranges_including_explicit_24_00()
     {
         $hours = OpeningHours::createAndMergeOverlappingRanges([
