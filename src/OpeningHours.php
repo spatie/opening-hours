@@ -147,7 +147,7 @@ class OpeningHours
      * @param  array  $excludedKeys  keys to ignore from parsing
      * @return array
      */
-    public static function mergeOverlappingRanges(array $data, array $excludedKeys = ['data', 'filters', 'overflow']): array
+    public static function mergeOverlappingRanges(array $data, array $excludedKeys = ['data', 'dateTimeClass', 'filters', 'overflow']): array
     {
         $result = [];
         $ranges = [];
