@@ -143,9 +143,9 @@ class OpeningHours
     }
 
     /**
-     * @param  array $data  hours definition array or sub-array
-     * @param  bool  $ignoreData  should ignore data
-     * @param  array $excludedKeys  keys to ignore from parsing
+     * @param  array  $data  hours definition array or sub-array
+     * @param  bool   $ignoreData  should ignore data
+     * @param  array  $excludedKeys  keys to ignore from parsing
      * @return array
      */
     public static function mergeOverlappingRanges(array $data, bool $ignoreData = true, array $excludedKeys = ['data', 'dateTimeClass', 'filters', 'overflow']): array
