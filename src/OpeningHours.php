@@ -163,7 +163,7 @@ class OpeningHours
             if ($value instanceof TimeRange) {
                 $newRanges = [];
 
-                foreach ($ranges[$dataString] as $range) {
+                foreach (($ranges[$dataString] ?? []) as $range) {
                     if ($value->format() === $range->format()) {
                         continue 2;
                     }
