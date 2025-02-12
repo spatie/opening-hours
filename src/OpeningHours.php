@@ -144,7 +144,7 @@ class OpeningHours
 
     /**
      * @param  array  $data  hours definition array or sub-array
-     * @param  bool   $ignoreData  should ignore data
+     * @param  bool  $ignoreData  should ignore data
      * @param  array  $excludedKeys  keys to ignore from parsing
      * @return array
      */
@@ -210,7 +210,7 @@ class OpeningHours
      *         }                         $data
      * @param  string|DateTimeZone|null  $timezone
      * @param  string|DateTimeZone|null  $outputTimezone
-     * @param  bool                      $ignoreData
+     * @param  bool  $ignoreData
      * @return static
      */
     public static function createAndMergeOverlappingRanges(array $data, $timezone = null, $outputTimezone = null, bool $ignoreData = true): self
