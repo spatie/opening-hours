@@ -360,6 +360,31 @@ class OpeningHoursFillTest extends TestCase
     }
 
     #[Test]
+    public function it_should_merge_ranges_and_keep_data()
+    {
+        $hours = OpeningHours::createAndMergeOverlappingRanges([
+            'monday' => [
+                ['hours' => '08:00-12:00', 'data' => ['testdata' => true]],
+                ['hours' => '12:00-24:00', 'data' => ['testdata' => true]],
+                ['hours' => '05:00-08:00', 'data' => ['testdata' => false]],
+            ],
+        ], null, null, false);
+        $dump = [];
+        $data = null;
+        /** @var TimeRange $range */
+        foreach ($hours->forDay('monday') as $range) {
+            $data = $range->data;
+            $dump[] = $range->format();
+        }
+
+        $this->assertSame([
+            '05:00-08:00',
+            '08:00-24:00',
+        ], $dump);
+        $this->assertSame(['testdata' => true], $data);
+    }
+
+    #[Test]
     public function it_should_reorder_ranges()
     {
         $hours = OpeningHours::createAndMergeOverlappingRanges([

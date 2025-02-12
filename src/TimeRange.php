@@ -63,7 +63,7 @@ readonly class TimeRange implements TimeDataContainer
         return is_array($value) ? static::fromArray($value) : static::fromString($value);
     }
 
-    public static function fromList(array $ranges): self
+    public static function fromList(array $ranges, $data = null): self
     {
         if (count($ranges) === 0) {
             throw InvalidTimeRangeList::create();
@@ -88,7 +88,7 @@ readonly class TimeRange implements TimeDataContainer
             }
         }
 
-        return new self($start, $end);
+        return new self($start, $end, $data);
     }
 
     public static function fromMidnight(Time $end, $data = null): self
