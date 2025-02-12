@@ -161,7 +161,7 @@ class OpeningHours
 
             $value = is_array($value)
                 ? static::mergeOverlappingRanges($value, $ignoreData)
-                : (is_string($value) ? TimeRange::fromString($value) : $value);
+                : (is_string($value) ? TimeRange::fromString($value, $data) : $value);
 
             if ($value instanceof TimeRange) {
                 $newRanges = [];
