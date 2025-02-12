@@ -154,7 +154,7 @@ class OpeningHours
         $ranges = [];
 
         foreach (static::filterHours($data, $excludedKeys) as $key => [$value, $data]) {
-            $dataString = json_encode($ignoreData ? null : $data);
+            $dataString = $ignoreData ? "" : json_encode($data);
 
             $value = is_array($value)
                 ? static::mergeOverlappingRanges($value, $ignoreData)
