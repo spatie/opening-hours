@@ -144,29 +144,32 @@ class OpeningHours
 
     /**
      * @param  array  $data  hours definition array or sub-array
+     * @param  bool  $ignoreData  should ignore data
      * @param  array  $excludedKeys  keys to ignore from parsing
      * @return array
      */
-    public static function mergeOverlappingRanges(array $data, array $excludedKeys = ['data', 'dateTimeClass', 'filters', 'overflow']): array
+    public static function mergeOverlappingRanges(array $data, bool $ignoreData = true, array $excludedKeys = ['data', 'dateTimeClass', 'filters', 'overflow']): array
     {
         $result = [];
         $ranges = [];
 
-        foreach (static::filterHours($data, $excludedKeys) as $key => $value) {
+        foreach (static::filterHours($data, $excludedKeys) as $key => [$value, $data]) {
+            $dataString = $ignoreData ? '' : json_encode($data);
+
             $value = is_array($value)
-                ? static::mergeOverlappingRanges($value, ['data'])
-                : (is_string($value) ? TimeRange::fromString($value) : $value);
+                ? static::mergeOverlappingRanges($value, $ignoreData)
+                : (is_string($value) ? TimeRange::fromString($value, $data) : $value);
 
             if ($value instanceof TimeRange) {
                 $newRanges = [];
 
-                foreach ($ranges as $range) {
+                foreach (($ranges[$dataString] ?? []) as $range) {
                     if ($value->format() === $range->format()) {
                         continue 2;
                     }
 
                     if ($value->overlaps($range) || $range->overlaps($value)) {
-                        $value = TimeRange::fromList([$value, $range]);
+                        $value = TimeRange::fromList([$value, $range], $data);
 
                         continue;
                     }
@@ -175,7 +178,7 @@ class OpeningHours
                 }
 
                 $newRanges[] = $value;
-                $ranges = $newRanges;
+                $ranges[$dataString] = $newRanges;
 
                 continue;
             }
@@ -184,7 +187,9 @@ class OpeningHours
         }
 
         foreach ($ranges as $range) {
-            $result[] = $range;
+            foreach ((array) $range as $rangeItem) {
+                $result[] = $rangeItem;
+            }
         }
 
         return $result;
@@ -205,11 +210,12 @@ class OpeningHours
      *         }                         $data
      * @param  string|DateTimeZone|null  $timezone
      * @param  string|DateTimeZone|null  $outputTimezone
+     * @param  bool  $ignoreData
      * @return static
      */
-    public static function createAndMergeOverlappingRanges(array $data, $timezone = null, $outputTimezone = null): self
+    public static function createAndMergeOverlappingRanges(array $data, $timezone = null, $outputTimezone = null, bool $ignoreData = true): self
     {
-        return static::create(static::mergeOverlappingRanges($data), $timezone, $outputTimezone);
+        return static::create(static::mergeOverlappingRanges($data, $ignoreData), $timezone, $outputTimezone);
     }
 
     /**
@@ -1034,13 +1040,13 @@ class OpeningHours
 
             if (is_int($key) && is_array($value) && isset($value['hours'])) {
                 foreach ((array) $value['hours'] as $subKey => $hour) {
-                    yield "$key.$subKey" => $hour;
+                    yield "$key.$subKey" => [$hour, $value['data'] ?? null];
                 }
 
                 continue;
             }
 
-            yield $key => $value;
+            yield $key => [$value, null];
         }
     }
 
