@@ -38,7 +38,7 @@ class OpeningHoursForDay implements ArrayAccess, Countable, IteratorAggregate
         uasort($strings, static fn ($a, $b) => strcmp(static::getHoursFromRange($a), static::getHoursFromRange($b)));
 
         return new static(
-            Arr::map($strings, static fn ($string) => TimeRange::fromDefinition($string)),
+            Arr::map($strings, static fn ($string) => $string instanceof TimeRange ? $string : TimeRange::fromDefinition($string)),
             $data,
         );
     }
