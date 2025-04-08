@@ -109,14 +109,14 @@ class OpeningHoursCustomClassTest extends TestCase
     {
         $mock1 = new class extends DateTimeImmutable
         {
-            public function __construct($datetime = 'now', DateTimeZone $timezone = null)
+            public function __construct($datetime = 'now', ?DateTimeZone $timezone = null)
             {
                 parent::__construct('2021-10-11 04:30', $timezone);
             }
         };
         $mock2 = new class extends DateTimeImmutable
         {
-            public function __construct($datetime = 'now', DateTimeZone $timezone = null)
+            public function __construct($datetime = 'now', ?DateTimeZone $timezone = null)
             {
                 parent::__construct('2021-10-11 09:30', $timezone);
             }
