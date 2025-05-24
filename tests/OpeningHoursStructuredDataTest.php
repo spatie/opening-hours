@@ -106,7 +106,7 @@ class OpeningHoursStructuredDataTest extends TestCase
         $now = new DateTime('2025-05-23 09:00:00', new DateTimeZone('Australia/Brisbane'));
 
         $this->assertSame(
-            '2025-04-22 23:59:00 Australia/Brisbane',
+            '2025-05-22 23:59:00 Australia/Brisbane',
             $openingHours->previousClose($now)->format('Y-m-d H:i:s e'),
         );
     }
