@@ -89,13 +89,13 @@ class OpeningHoursStructuredDataTest extends TestCase
     public function it_can_find_previous_close_time_with_custom_timezone()
     {
         $schedule = [
-            "monday" => ["10:00-23:59"],
-            "tuesday" => ["10:00-23:59"],
-            "wednesday" => ["10:00-23:59"],
-            "thursday" => ["10:00-23:59"],
-            "friday" => ["10:00-23:59"],
-            "saturday" => ["10:00-23:59"],
-            "sunday" => ["10:00-23:59"],
+            'monday' => ['10:00-23:59'],
+            'tuesday' => ['10:00-23:59'],
+            'wednesday' => ['10:00-23:59'],
+            'thursday' => ['10:00-23:59'],
+            'friday' => ['10:00-23:59'],
+            'saturday' => ['10:00-23:59'],
+            'sunday' => ['10:00-23:59'],
         ];
 
         $openingHours = OpeningHours::createAndMergeOverlappingRanges(
