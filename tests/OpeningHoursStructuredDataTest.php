@@ -2,6 +2,7 @@
 
 namespace Spatie\OpeningHours\Test;
 
+use DateTime;
 use DateTimeZone;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
@@ -82,5 +83,31 @@ class OpeningHoursStructuredDataTest extends TestCase
         $this->assertSame('17:00:00+01:00', $openingHours->asStructuredData('H:i:sP', 'Europe/Paris')[0]['closes']);
 
         $this->assertSame('17:00:00+12:45', $openingHours->asStructuredData('H:i:sP', new DateTimeZone('+12:45'))[0]['closes']);
+    }
+
+    #[Test]
+    public function it_can_find_previous_close_time_with_custom_timezone()
+    {
+        $schedule = [
+            'monday' => ['10:00-23:59'],
+            'tuesday' => ['10:00-23:59'],
+            'wednesday' => ['10:00-23:59'],
+            'thursday' => ['10:00-23:59'],
+            'friday' => ['10:00-23:59'],
+            'saturday' => ['10:00-23:59'],
+            'sunday' => ['10:00-23:59'],
+        ];
+
+        $openingHours = OpeningHours::createAndMergeOverlappingRanges(
+            data: $schedule,
+            timezone: 'Australia/Brisbane',
+        );
+
+        $now = new DateTime('2025-05-23 09:00:00', new DateTimeZone('Australia/Brisbane'));
+
+        $this->assertSame(
+            '2025-05-22 23:59:00 Australia/Brisbane',
+            $openingHours->previousClose($now)->format('Y-m-d H:i:s e'),
+        );
     }
 }

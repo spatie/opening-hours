@@ -624,7 +624,7 @@ class OpeningHours
             }
 
             $midnight = $dateTime->setTime(0, 0, 0);
-            $dateTime = $this->copyAndModify($midnight, '-1 minute');
+            $dateTime = $this->copyAndModify($midnight, '-1 second');
 
             $openingHoursForDay = $this->forDate($dateTime);
 
@@ -683,7 +683,7 @@ class OpeningHours
             }
 
             $midnight = $dateTime->setTime(0, 0, 0);
-            $dateTime = $this->copyAndModify($midnight, '-1 minute');
+            $dateTime = $this->copyAndModify($midnight, '-1 second');
             $openingHoursForDay = $this->forDate($dateTime);
 
             if ($this->isClosedAt($midnight) && $openingHoursForDay->isOpenAtTheEndOfTheDay()) {
