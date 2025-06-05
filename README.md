@@ -2,7 +2,7 @@
     <a href="https://spatie.be/open-source?utm_source=github&utm_medium=banner&utm_campaign=opening-hours">
       <picture>
         <source media="(prefers-color-scheme: dark)" srcset="https://spatie.be/packages/header/opening-hours/html/dark.webp">
-        <img alt="Logo for opening-hours" src="https://spatie.be/packages/header/opening-hours/html/light.webp" height="190">
+        <img alt="Logo for opening-hours" src="https://spatie.be/packages/header/opening-hours/html/light.webp">
       </picture>
     </a>
 
