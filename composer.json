@@ -28,7 +28,7 @@
     },
     "require-dev": {
         "kylekatarnls/multi-tester": "^2.5",
-        "phpunit/phpunit": "^11.2"
+        "phpunit/phpunit": "^11.5.43 || ^12.4.2"
     },
     "autoload": {
         "psr-4": {
