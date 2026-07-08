@@ -57,17 +57,27 @@ readonly class Time implements TimeDataContainer
 
     public function isSame(self $time): bool
     {
-        return $this->hours === $time->hours && $this->minutes === $time->minutes;
+        return $this->compareClockTime($time) === 0;
     }
 
     public function isAfter(self $time): bool
     {
-        return $this > $time;
+        return $this->compareClockTime($time) > 0;
     }
 
     public function isBefore(self $time): bool
     {
-        return $this < $time;
+        return $this->compareClockTime($time) < 0;
+    }
+
+    private function compareClockTime(self $time): int
+    {
+        return $this->clockMinutes() <=> $time->clockMinutes();
+    }
+
+    private function clockMinutes(): int
+    {
+        return $this->hours * 60 + $this->minutes;
     }
 
     public function isSameOrAfter(self $time): bool
