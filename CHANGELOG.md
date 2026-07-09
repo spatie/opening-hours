@@ -2,7 +2,11 @@
 
 All notable changes to `opening-hours` will be documented in this file
 
-## 4.0.0 - upcoming
+## 4.0.1 - 2026-07-09
+
+- Fix `Time::isBefore()` and `Time::isAfter()` comparing metadata and date context instead of clock time only
+
+## 4.0.0 - 2024-06-26
 
 - Replace `getData()` with readonly property `->data`
 

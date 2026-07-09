@@ -72,6 +72,46 @@ class TimeTest extends TestCase
     }
 
     #[Test]
+    public function it_ignores_metadata_when_comparing_times()
+    {
+        $timeWithDataA = Time::fromString('09:00', data: ['label' => 'morning']);
+        $timeWithDataB = Time::fromString('09:00', data: ['label' => 'opening']);
+
+        $this->assertTrue($timeWithDataA->isSame($timeWithDataB));
+        $this->assertFalse($timeWithDataA->isBefore($timeWithDataB));
+        $this->assertFalse($timeWithDataA->isAfter($timeWithDataB));
+        $this->assertTrue($timeWithDataA->isSameOrAfter($timeWithDataB));
+        $this->assertTrue($timeWithDataA->isSameOrBefore($timeWithDataB));
+    }
+
+    #[Test]
+    public function it_ignores_date_context_when_comparing_times()
+    {
+        $timeWithDateA = Time::fromString('09:00', date: new DateTimeImmutable('2020-01-01'));
+        $timeWithDateB = Time::fromString('09:00', date: new DateTimeImmutable('2025-06-15'));
+
+        $this->assertTrue($timeWithDateA->isSame($timeWithDateB));
+        $this->assertFalse($timeWithDateA->isBefore($timeWithDateB));
+        $this->assertFalse($timeWithDateA->isAfter($timeWithDateB));
+        $this->assertTrue($timeWithDateA->isSameOrAfter($timeWithDateB));
+        $this->assertTrue($timeWithDateA->isSameOrBefore($timeWithDateB));
+    }
+
+    #[Test]
+    public function it_compares_end_of_day_midnight_correctly()
+    {
+        $endOfDay = Time::fromString('24:00');
+        $lastMinute = Time::fromString('23:59');
+        $midnight = Time::fromString('00:00');
+
+        $this->assertTrue($endOfDay->isAfter($lastMinute));
+        $this->assertFalse($endOfDay->isSame($midnight));
+        $this->assertFalse($endOfDay->isBefore($midnight));
+        $this->assertTrue($endOfDay->isAfter($midnight));
+        $this->assertFalse($lastMinute->isAfter($endOfDay));
+    }
+
+    #[Test]
     public function it_can_determine_that_its_before_another_time()
     {
         $this->assertTrue(Time::fromString('09:00')->isBefore(Time::fromString('10:00')));
