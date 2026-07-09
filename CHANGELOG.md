@@ -2,9 +2,57 @@
 
 All notable changes to `opening-hours` will be documented in this file
 
-## 4.0.1 - 2026-07-09
+## 4.2.2 - 2026-07-09
 
 - Fix `Time::isBefore()` and `Time::isAfter()` comparing metadata and date context instead of clock time only
+
+## 4.2.1 - 2025-05-24
+
+- Fix previousClose with custom timezone
+
+## 4.2.0 - 2025-02-17
+
+- Merge time ranges takes into account the data field
+
+## 4.1.3 - 2025-02-11
+
+- Allow 'dateTimeClass' in mergeOverlappingRanges and createAndMerge*
+
+## 4.1.2 - 2024-12-18
+
+- Update implicit nullable
+
+## 4.1.1 - 2024-12-11
+
+- Update implicit nullable
+
+## 4.1.0 - 2024-11-27
+
+- Fix `isAlwaysClosed` and `isAlwaysOpen` when opening hours contain exceptions
+
+## 4.0.3 - 2024-11-17
+
+- Fix `nextClose()` result with overflow overnight
+
+## 4.0.2 - 2024-10-24
+
+- Handle opening-time with the first minute of day only
+
+## 4.0.1 - 2024-10-19
+
+- Allow date without year in validFrom/validTo structured data
+
+## 4.0.0 - 2024-06-26
+
+- Replace `getData()` with readonly property `->data`
+- Added `isAlwaysOpen()` and `isAlwaysClosed()` methods
+- Converted `Day` to an `enum`
+- Made `Time` and `TimeRange` readonly
+- Support OpeningHoursSpecification structured data for creating `OpeningHours`
+- Improve `createFromStructuredData()`
+- Update PHPUnit from 10 to 11 and multiple testing tools
+- Check both start and end to consider a range before/after
+- Drop PHP < 8.2
 
 ## 4.0.0 - 2024-06-26
 
