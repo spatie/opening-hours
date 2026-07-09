@@ -81,6 +81,7 @@ class TimeTest extends TestCase
         $this->assertFalse($timeWithDataA->isBefore($timeWithDataB));
         $this->assertFalse($timeWithDataA->isAfter($timeWithDataB));
         $this->assertTrue($timeWithDataA->isSameOrAfter($timeWithDataB));
+        $this->assertTrue($timeWithDataA->isSameOrBefore($timeWithDataB));
     }
 
     #[Test]
@@ -93,6 +94,7 @@ class TimeTest extends TestCase
         $this->assertFalse($timeWithDateA->isBefore($timeWithDateB));
         $this->assertFalse($timeWithDateA->isAfter($timeWithDateB));
         $this->assertTrue($timeWithDateA->isSameOrAfter($timeWithDateB));
+        $this->assertTrue($timeWithDateA->isSameOrBefore($timeWithDateB));
     }
 
     #[Test]
