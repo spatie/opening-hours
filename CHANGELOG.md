@@ -4,6 +4,7 @@ All notable changes to `opening-hours` will be documented in this file
 
 ## 4.2.2 - 2026-07-09
 
+- Add `Time::isSameOrBefore()`
 - Fix `Time::isBefore()` and `Time::isAfter()` comparing metadata and date context instead of clock time only
 
 ## 4.2.1 - 2025-05-24
