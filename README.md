@@ -259,7 +259,7 @@ The package should only be used through the `OpeningHours` class. There are also
 
 ### `Spatie\OpeningHours\OpeningHours`
 
-#### `OpeningHours::create(array $data, $timezone = null, $toutputTimezone = null): Spatie\OpeningHours\OpeningHours`
+#### `OpeningHours::create(array $data, $timezone = null, $outputTimezone = null): OpeningHours`
 
 Static factory method to fill the set of opening hours.
 
@@ -294,7 +294,7 @@ $openingHours = OpeningHours::create([
 ]);
 ```
 
-#### `OpeningHours::mergeOverlappingRanges(array $schedule) : array`
+#### `OpeningHours::mergeOverlappingRanges(array $data, bool $ignoreData, array $excludedKeys): array`
 
 For safety sake, creating `OpeningHours` object with overlapping ranges will throw an exception unless you pass explicitly `'overflow' => true,` in the opening hours array definition. You can also explicitly merge them.
 
@@ -310,17 +310,6 @@ OpeningHours::createAndMergeOverlappingRanges($ranges);
 ```
 
 Not all days are mandatory, if a day is missing, it will be set as closed.
-
-#### `OpeningHours::fill(array $data): Spatie\OpeningHours\OpeningHours`
-
-The same as `create`, but non-static.
-
-```php
-$openingHours = (new OpeningHours)->fill([
-    'monday' => ['09:00-12:00', '13:00-18:00'],
-    // ...
-]);
-```
 
 #### `OpeningHours::forWeek(): Spatie\OpeningHours\OpeningHoursForDay[]`
 
@@ -578,10 +567,10 @@ Return the amount of closed time (number of minutes as a floating number) betwee
 
 Return the amount of closed time (number of seconds as a floating number) between 2 dates/times.
 
-#### `OpeningHours::currentOpenRange(DateTimeInterface $dateTime) : false | TimeRange`
+#### `OpeningHours::currentOpenRange(DateTimeInterface $dateTime) : ?DateTimeRange`
 
-Returns a `Spatie\OpeningHours\TimeRange` instance of the current open range if the
-business is open, false if the business is closed.
+Returns a `Spatie\OpeningHours\DateTimeRange` instance of the current open range if the
+business is open, `null` if the business is closed.
 
 ```php
 $range = $openingHours->currentOpenRange(new DateTime('2016-12-24 11:00:00'));
@@ -609,10 +598,10 @@ if ($period) {
 }
 ```
 
-#### `OpeningHours::currentOpenRangeStart(DateTimeInterface $dateTime) : false | DateTime`
+#### `OpeningHours::currentOpenRangeStart(DateTimeInterface $dateTime) : ?DateTimeInterface`
 
-Returns a `DateTime` instance of the date and time since when the business is open if
-the business is open, false if the business is closed.
+Returns a `DateTimeInterface` instance of the date and time since when the business is open if
+the business is open, `null` if the business is closed.
 
 Note: date can be the previous day if you use night ranges.
 
@@ -626,10 +615,10 @@ if ($date) {
 }
 ```
 
-#### `OpeningHours::currentOpenRangeEnd(DateTimeInterface $dateTime) : false | DateTime`
+#### `OpeningHours::currentOpenRangeEnd(DateTimeInterface $dateTime) : ?DateTimeInterface`
 
-Returns a `DateTime` instance of the date and time until when the business will be open
-if the business is open, false if the business is closed.
+Returns a `DateTimeInterface` instance of the date and time until when the business will be open
+if the business is open, `null` if the business is closed.
 
 Note: date can be the next day if you use night ranges.
 
@@ -685,7 +674,7 @@ $openingHours = OpeningHours::createFromStructuredData('[
 ]');
 ```
 
-#### `OpeningHours::asStructuredData(strinf $format = 'H:i', string|DateTimeZone $timezone) : array`
+#### `OpeningHours::asStructuredData(string $format = 'H:i', string|DateTimeZone|null $timezone = null) : array`
 
 Returns a [OpeningHoursSpecification](https://schema.org/openingHoursSpecification) as an array.
 
