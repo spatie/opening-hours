@@ -1474,6 +1474,21 @@ class OpeningHoursTest extends TestCase
     }
 
     #[Test]
+    public function it_reports_a_24_00_close_on_the_next_midnight()
+    {
+        $openingHours = OpeningHours::create([
+            'monday' => ['09:00-24:00'],
+            'tuesday' => ['10:00-17:00'],
+        ]);
+
+        $monday = new DateTime('2024-01-01 10:00:00');
+
+        $this->assertSame('2024-01-02 00:00:00', $openingHours->currentOpenRangeEnd($monday)->format('Y-m-d H:i:s'));
+        $this->assertSame('2024-01-02 00:00:00', $openingHours->nextClose($monday)->format('Y-m-d H:i:s'));
+        $this->assertSame('2024-01-02 17:00:00', $openingHours->currentOpenRangeEnd(new DateTime('2024-01-02 11:00:00'))->format('Y-m-d H:i:s'));
+    }
+
+    #[Test]
     public function it_should_support_empty_arrays_with_merge()
     {
         $hours = OpeningHours::createAndMergeOverlappingRanges(

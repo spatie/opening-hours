@@ -620,7 +620,7 @@ if ($date) {
 Returns a `DateTimeInterface` instance of the date and time until when the business will be open
 if the business is open, `null` if the business is closed.
 
-Note: date can be the next day if you use night ranges.
+Note: date can be the next day if you use night ranges. A range that ends at 24:00 closes at midnight on the following day.
 
 ```php
 $date = $openingHours->currentOpenRangeEnd(new DateTime('2016-12-24 11:00:00'));

@@ -452,8 +452,16 @@ class OpeningHours
         }
 
         $dateTime = $this->copyDateTime($dateTime);
+        $end = $range->end();
 
-        $nextDateTime = $range->end()->toDateTime();
+        if ($end->hours() >= 24) {
+            return $this->getDateWithTimezone(
+                $dateTime->modify('+1 day')->setTime(0, 0, 0),
+                $outputTimezone
+            );
+        }
+
+        $nextDateTime = $end->toDateTime();
 
         if ($range->overflowsNextDay() && $nextDateTime->format('Hi') < $dateTime->format('Hi')) {
             $dateTime = $dateTime->modify('+1 day');
