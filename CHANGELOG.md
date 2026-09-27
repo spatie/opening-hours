@@ -2,7 +2,7 @@
 
 All notable changes to `opening-hours` will be documented in this file
 
-## Unreleased
+## 4.2.3 - 2026-09-27
 
 - Fix `currentOpenRangeEnd()` when a range ends at 24:00
 
