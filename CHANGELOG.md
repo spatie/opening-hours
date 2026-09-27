@@ -2,6 +2,10 @@
 
 All notable changes to `opening-hours` will be documented in this file
 
+## Unreleased
+
+- Fix `currentOpenRangeEnd()` when a range ends at 24:00
+
 ## 4.2.2 - 2026-07-09
 
 - Add `Time::isSameOrBefore()`
